@@ -3,12 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Æterni Anima · Audiovisual Medicine</title>
+    <title>BioSynCare Lab - Central de Dados e Transparência</title>
     <meta
       name="description"
-      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
+      content="BioSynCare Lab: Central de dados com transparência nos processos e protocolos. Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
     />
-    <meta property="og:title" content="Æterni Anima · Audiovisual Medicine" />
+    <meta
+      property="og:title"
+      content="BioSynCare Lab - Central de Dados e Transparência"
+    />
     <meta
       property="og:description"
       content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador."
@@ -43,16 +46,14 @@
           <div
             class="h-8 w-8 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold"
           >
-            Æ
+            B
           </div>
           <span class="brand text-lg font-semibold tracking-tight"
-            >Æterni Anima</span
+            >BioSynCare Lab</span
           >
         </a>
         <nav class="ml-auto hidden md:flex items-center gap-6 text-sm">
-          <a class="hover:opacity-70" href="#avmedicine"
-            >Audiovisual&nbsp;Medicine</a
-          >
+          <a class="hover:opacity-70" href="#avmedicine">BioSynCare&nbsp;Lab</a>
           <a class="hover:opacity-70" href="#onc">Integração&nbsp;ONC</a>
           <a class="hover:opacity-70" href="#engine">Engine&nbsp;JS</a>
           <a class="hover:opacity-70" href="#projetos">Projetos</a>
@@ -77,9 +78,13 @@
           <h1
             class="brand text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight"
           >
-            Audiovisual Medicine
+            BioSynCare Lab
           </h1>
-          <p class="mt-5 text-lg text-neutral-700">
+          <p class="mt-3 text-xl font-semibold text-neutral-800">
+            Central de dados com
+            <strong>transparência nos processos e protocolos</strong>
+          </p>
+          <p class="mt-4 text-lg text-neutral-700">
             Protocolos de <strong>estimulação neurosensorial</strong> acessíveis
             para serem escutados e vistos <strong>em tempo real</strong>,
             diretamente no navegador.
@@ -107,32 +112,79 @@
             >
           </div>
         </div>
-        <div class="relative">
+        <div class="relative space-y-4">
           <div
             class="aspect-video rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-100 shadow-inner"
           ></div>
-          <p class="mt-3 text-xs text-neutral-500">
+          <p class="text-xs text-neutral-500">
             Demonstração visual/sonora aparece aqui quando o laboratório estiver
             ativo.
           </p>
+
+          <!-- Device Detection Widget -->
+          <div class="rounded-xl border bg-white p-4 shadow-sm">
+            <h3 class="text-sm font-semibold mb-3 text-neutral-700">
+              Detecção do Dispositivo
+            </h3>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div
+                  id="mobile-indicator"
+                  class="w-3 h-3 rounded-full bg-gray-300"
+                ></div>
+                <span class="text-sm"
+                  >Mobile Device:
+                  <span id="mobile-status" class="font-mono text-xs"
+                    >detectando...</span
+                  ></span
+                >
+              </div>
+              <div class="flex items-center gap-3">
+                <div
+                  id="gpu-indicator"
+                  class="w-3 h-3 rounded-full bg-gray-300"
+                ></div>
+                <span class="text-sm"
+                  >GPU Performance:
+                  <span id="gpu-status" class="font-mono text-xs"
+                    >detectando...</span
+                  ></span
+                >
+              </div>
+              <div class="flex items-center gap-3">
+                <div
+                  id="mode-indicator"
+                  class="w-3 h-3 rounded-full bg-gray-300"
+                ></div>
+                <span class="text-sm"
+                  >Modo Recomendado:
+                  <span id="mode-status" class="font-mono text-xs"
+                    >calculando...</span
+                  ></span
+                >
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Audiovisual Medicine: o que é -->
+    <!-- BioSynCare Lab: o que é -->
     <section id="avmedicine" class="border-t bg-white">
       <div
         class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10"
       >
         <div class="md:col-span-2">
-          <h2 class="text-2xl font-bold">O que é</h2>
+          <h2 class="text-2xl font-bold">O que é o BioSynCare Lab</h2>
           <p class="mt-4 leading-relaxed text-neutral-700">
-            Audiovisual Medicine é um conjunto de <em>protocolos</em> com
-            padrões sonoros e visuais (p.ex., senóides puras, batidas
-            binaurais/monourais, isócronos, simetrias, variações cromáticas,
-            ritmos respiratórios) executados em tempo real no navegador para
-            <strong>neuromodulação</strong> não invasiva e de baixo custo. O
-            <strong>modelo</strong> é
+            O <strong>BioSynCare Lab</strong> é o holder do engine onde as
+            técnicas são testadas em tempo real, desenvolvido como
+            <strong>open source</strong> para máxima transparência. É um
+            conjunto de <em>protocolos</em> com padrões sonoros e visuais
+            (p.ex., senóides puras, batidas binaurais/monourais, isócronos,
+            simetrias, variações cromáticas, ritmos respiratórios) executados em
+            tempo real no navegador para <strong>neuromodulação</strong> não
+            invasiva e de baixo custo. O <strong>modelo</strong> é
             <span class="font-medium">JS apenas no cliente</span>, hospedado em
             <span class="font-medium">GitHub Pages</span>.
           </p>
@@ -162,9 +214,12 @@
           Integração com a ONC (Open Neurosensory Commons)
         </h2>
         <p class="mt-4 text-neutral-700">
-          A ONC fornece vocabulários/ontologias (OWL+SKOS) e JSON‑LD para
-          descrever protocolos, técnicas, parâmetros, evidências e organizações.
-          Abaixo, um parecer pragmático para o <em>Audiovisual Medicine</em>:
+          A <strong>ONC</strong> é onde as sessões de estimulação são definidas,
+          assim como os protocolos e dados, permitindo que sejam discutidos
+          entre especialistas, usuários e praticantes experientes. A ONC fornece
+          vocabulários/ontologias (OWL+SKOS) e JSON‑LD para descrever
+          protocolos, técnicas, parâmetros, evidências e organizações. Abaixo,
+          um parecer pragmático para o <em>BioSynCare Lab</em>:
         </p>
 
         <div class="mt-6 grid md:grid-cols-3 gap-6">
@@ -457,8 +512,156 @@ assets/             // favicon, og, logos
       </div>
     </section>
 
+    <!-- Footer -->
+    <footer class="border-t bg-neutral-100">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-6">
+        <div class="flex items-center justify-between text-sm text-neutral-600">
+          <div>
+            <p>© 2025 BioSynCare Lab - Central de dados e transparência</p>
+          </div>
+          <div>
+            <p>
+              Baseado em
+              <a
+                href="https://aeterni.github.io/"
+                class="underline hover:text-neutral-900"
+                target="_blank"
+                rel="noopener"
+                >Æterni Anima</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
     <!-- Minimal client-only lab demo (inline) -->
     <script type="module">
+      // Device Detection Functions
+      function isMobile() {
+        const userAgent = navigator.userAgent.toLowerCase();
+        const mobileKeywords = [
+          'android',
+          'iphone',
+          'ipad',
+          'ipod',
+          'blackberry',
+          'windows phone',
+          'mobile',
+        ];
+        return (
+          mobileKeywords.some((keyword) => userAgent.includes(keyword)) ||
+          'ontouchstart' in window ||
+          navigator.maxTouchPoints > 0
+        );
+      }
+
+      async function hasGoodGPU() {
+        try {
+          // Test WebGL performance
+          const canvas = document.createElement('canvas');
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          if (!gl) return false;
+
+          // Check renderer info
+          const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+          if (debugInfo) {
+            const renderer = gl
+              .getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+              .toLowerCase();
+
+            // Check for integrated/low-end GPUs
+            const lowEndGPUs = [
+              'intel',
+              'mali',
+              'adreno 3',
+              'adreno 4',
+              'powervr',
+              'vivante',
+            ];
+            const isLowEnd = lowEndGPUs.some((gpu) => renderer.includes(gpu));
+
+            if (isLowEnd) return false;
+          }
+
+          // Performance test: render simple scene and measure
+          const vertices = new Float32Array([-1, -1, 1, -1, 0, 1]);
+          const buffer = gl.createBuffer();
+          gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+          gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+          // Simple performance check
+          const startTime = performance.now();
+          for (let i = 0; i < 1000; i++) {
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+          }
+          gl.finish();
+          const renderTime = performance.now() - startTime;
+
+          // Good GPU should handle this in under 16ms
+          return renderTime < 16;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // Update widget indicators
+      function updateIndicator(elementId, isGood, label) {
+        const indicator = document.getElementById(elementId);
+        const status = document.getElementById(
+          elementId.replace('-indicator', '-status')
+        );
+
+        if (indicator && status) {
+          indicator.className = `w-3 h-3 rounded-full ${
+            isGood ? 'bg-green-400' : 'bg-red-400'
+          }`;
+          status.textContent = label;
+        }
+      }
+
+      // Run detection and update widget
+      async function runDeviceDetection() {
+        const mobile = isMobile();
+        const goodGPU = await hasGoodGPU();
+
+        updateIndicator('mobile-indicator', !mobile, mobile ? 'SIM' : 'NÃO');
+        updateIndicator('gpu-indicator', goodGPU, goodGPU ? 'BOA' : 'BÁSICA');
+
+        // Determine recommended mode
+        let recommendedMode;
+        let modeGood;
+
+        if (mobile && !goodGPU) {
+          recommendedMode = 'CANVAS LEVE';
+          modeGood = false;
+        } else if (mobile && goodGPU) {
+          recommendedMode = 'P5.JS OTIMIZADO';
+          modeGood = true;
+        } else if (!mobile && goodGPU) {
+          recommendedMode = 'THREE.JS COMPLETO';
+          modeGood = true;
+        } else {
+          recommendedMode = 'P5.JS PADRÃO';
+          modeGood = true;
+        }
+
+        updateIndicator('mode-indicator', modeGood, recommendedMode);
+
+        // Store results globally for use by other functions
+        window.deviceCapabilities = { mobile, goodGPU, recommendedMode };
+
+        console.log('Device Detection Results:', {
+          mobile,
+          goodGPU,
+          recommendedMode,
+          userAgent: navigator.userAgent,
+        });
+      }
+
+      // Run detection on page load
+      runDeviceDetection();
+
       // Web Audio minimal demo (client-only). Replace with engine/* imports as you refactor.
       let ctx, master, osc, lfo, lfoGain;
       const ensure = () => {

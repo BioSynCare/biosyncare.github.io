@@ -1,0 +1,437 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix sso: <https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sso:AudioStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation using audio signals like isochronic or binaural beats." ;
+    skos:prefLabel "AudioStimulation Concept" ;
+    skos:related sso:AudioStimulation .
+
+sso:AudioTechniquesConcept a skos:Concept ;
+    skos:definition "Audio-based modulation techniques for brain and sensory stimulation." ;
+    skos:prefLabel "AudioTechniques Concept" ;
+    skos:related sso:AudioTechniques .
+
+sso:AudiovisualStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation using both audio and visual cues together." ;
+    skos:prefLabel "AudiovisualStimulation Concept" ;
+    skos:related sso:AudiovisualStimulation .
+
+sso:BinauralBeatsConcept a skos:Concept ;
+    skos:definition "Dual-tone auditory beats used to create a perceived third beat for entrainment." ;
+    skos:prefLabel "BinauralBeats Concept" ;
+    skos:related sso:BinauralBeats .
+
+sso:BrainStimulationConcept a skos:Concept ;
+    skos:definition "Direct stimulation targeted at brain regions for therapeutic effects." ;
+    skos:prefLabel "BrainStimulation Concept" ;
+    skos:related sso:BrainStimulation .
+
+sso:BrainwaveEntrainmentConcept a skos:Concept ;
+    skos:definition "Techniques aligning brainwave frequencies with external rhythms." ;
+    skos:prefLabel "BrainwaveEntrainment Concept" ;
+    skos:related sso:BrainwaveEntrainment .
+
+sso:ChemicalStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation using chemical agents or drugs." ;
+    skos:prefLabel "ChemicalStimulation Concept" ;
+    skos:related sso:ChemicalStimulation .
+
+sso:ChromosoundConcept a skos:Concept ;
+    skos:definition "A specific type of audiovisual stimulation involving coordinated sound and color." ;
+    skos:prefLabel "Chromosound Concept" ;
+    skos:related sso:Chromosound .
+
+sso:CognitiveModulationConcept a skos:Concept ;
+    skos:definition "Modulation techniques that affect cognitive functions and states." ;
+    skos:prefLabel "CognitiveModulation Concept" ;
+    skos:related sso:CognitiveModulation .
+
+sso:CollaboratorConcept a skos:Concept ;
+    skos:definition "Potential collaborators for the SSO project, including experts and organizations." ;
+    skos:prefLabel "Collaborator Concept" ;
+    skos:related sso:Collaborator .
+
+sso:ColorTherapyConcept a skos:Concept ;
+    skos:definition "Therapy using color exposure to influence mental and physical health." ;
+    skos:prefLabel "ColorTherapy Concept" ;
+    skos:related sso:ColorTherapy .
+
+sso:CompanyConcept a skos:Concept ;
+    skos:definition "An organization providing neuromodulation devices or services." ;
+    skos:prefLabel "Company Concept" ;
+    skos:related sso:Company .
+
+sso:ContextConcept a skos:Concept ;
+    skos:definition "Context in which stimulation is administered, impacting efficacy." ;
+    skos:prefLabel "Context Concept" ;
+    skos:related sso:Context .
+
+sso:DeepBrainStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation of deep brain structures using implanted electrodes." ;
+    skos:prefLabel "DeepBrainStimulation Concept" ;
+    skos:related sso:DeepBrainStimulation .
+
+sso:DeviceConcept a skos:Concept ;
+    skos:definition "Device used for various stimulation techniques." ;
+    skos:prefLabel "Device Concept" ;
+    skos:related sso:Device .
+
+sso:ElectricalStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation via low-level electrical currents." ;
+    skos:prefLabel "ElectricalStimulation Concept" ;
+    skos:related sso:ElectricalStimulation .
+
+sso:Emerson_Marques_Pedro a sso:Collaborator ;
+    skos:prefLabel "Emerson_Marques_Pedro" ;
+    sso:PotentialCollaborator true .
+
+sso:ExpertConcept a skos:Concept ;
+    skos:definition "An expert in neuromodulation, could be a person or a company." ;
+    skos:prefLabel "Expert Concept" ;
+    skos:related sso:Expert .
+
+sso:FlickeringConcept a skos:Concept ;
+    skos:definition "Visual technique using flickering lights to stimulate the brain." ;
+    skos:prefLabel "Flickering Concept" ;
+    skos:related sso:Flickering .
+
+sso:GeneralPurposeDeviceConcept a skos:Concept ;
+    skos:definition "Devices like smartphones and laptops that can run software for stimulation." ;
+    skos:prefLabel "GeneralPurposeDevice Concept" ;
+    skos:related sso:GeneralPurposeDevice .
+
+sso:Giorgia_Crimi a sso:Collaborator ;
+    skos:prefLabel "Giorgia_Crimi" ;
+    sso:PotentialCollaborator true .
+
+sso:GroupSessionConcept a skos:Concept ;
+    skos:definition "A session involving multiple users undergoing the same stimulation protocol." ;
+    skos:prefLabel "GroupSession Concept" ;
+    skos:related sso:GroupSession .
+
+sso:GuidingStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation guided by rhythms or cycles, such as breathing cycles." ;
+    skos:prefLabel "GuidingStimulation Concept" ;
+    skos:related sso:GuidingStimulation .
+
+sso:IndividualSessionConcept a skos:Concept ;
+    skos:definition "A single-user session of neuromodulation or stimulation." ;
+    skos:prefLabel "IndividualSession Concept" ;
+    skos:related sso:IndividualSession .
+
+sso:IsochronousSoundsConcept a skos:Concept ;
+    skos:definition "Sounds with equal intervals, often used for entrainment." ;
+    skos:prefLabel "IsochronousSounds Concept" ;
+    skos:related sso:IsochronousSounds .
+
+sso:Ivan_Maero a sso:Collaborator ;
+    skos:prefLabel "Ivan_Maero" ;
+    sso:ActiveCollaborator true .
+
+sso:Jacopo_Donati a sso:Collaborator ;
+    skos:prefLabel "Jacopo_Donati" ;
+    sso:ActiveCollaborator true .
+
+sso:Jorge_Antunes a sso:Collaborator ;
+    skos:prefLabel "Jorge_Antunes" ;
+    sso:PotentialCollaborator true .
+
+sso:LanguageConcept a skos:Concept ;
+    skos:definition "Stimulation involving human language." ;
+    skos:prefLabel "Language Concept" ;
+    skos:related sso:Language .
+
+sso:Marco_Schonhaut a sso:Collaborator ;
+    skos:prefLabel "Marco_Schonhaut" ;
+    sso:PotentialCollaborator true .
+
+sso:MonauralBeatsConcept a skos:Concept ;
+    skos:definition "Single-tone auditory beats used for stimulation." ;
+    skos:prefLabel "MonauralBeats Concept" ;
+    skos:related sso:MonauralBeats .
+
+sso:NeuromodulationConcept a skos:Concept ;
+    skos:definition "Techniques to alter brain activity through various forms of stimulation." ;
+    skos:prefLabel "Neuromodulation Concept" ;
+    skos:related sso:Neuromodulation .
+
+sso:Renato_Fabbri a sso:Collaborator ;
+    skos:prefLabel "Renato_Fabbri" ;
+    sso:ConfirmedCollaborator true .
+
+sso:SensoryStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation via sensory inputs such as audio, visual, and tactile cues." ;
+    skos:prefLabel "SensoryStimulation Concept" ;
+    skos:related sso:SensoryStimulation .
+
+sso:Sergio_Basbaum a sso:Collaborator ;
+    skos:prefLabel "Sergio_Basbaum" ;
+    sso:PotentialCollaborator true .
+
+sso:SessionConcept a skos:Concept ;
+    skos:definition "A session instance involving stimulation, either guided or unguided." ;
+    skos:prefLabel "Session Concept" ;
+    skos:related sso:Session .
+
+sso:SpecialistPersonConcept a skos:Concept ;
+    skos:definition "A human specialist in neuromodulation techniques." ;
+    skos:prefLabel "SpecialistPerson Concept" ;
+    skos:related sso:SpecialistPerson .
+
+sso:SpecializedNeuromodulationDeviceConcept a skos:Concept ;
+    skos:definition "Devices specifically built for neuromodulation, like MindAlive devices." ;
+    skos:prefLabel "SpecializedNeuromodulationDevice Concept" ;
+    skos:related sso:SpecializedNeuromodulationDevice .
+
+sso:TactileStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation through tactile feedback, using vibrations or touch." ;
+    skos:prefLabel "TactileStimulation Concept" ;
+    skos:related sso:TactileStimulation .
+
+sso:TechniqueConcept a skos:Concept ;
+    skos:definition "Techniques used for neuromodulation." ;
+    skos:prefLabel "Technique Concept" ;
+    skos:related sso:Technique .
+
+sso:TranscranialMagneticStimulationConcept a skos:Concept ;
+    skos:definition "Magnetic stimulation applied to the brain non-invasively." ;
+    skos:prefLabel "TranscranialMagneticStimulation Concept" ;
+    skos:related sso:TranscranialMagneticStimulation .
+
+sso:TranscranialStimulationConcept a skos:Concept ;
+    skos:definition "Techniques applied directly to the skull or scalp." ;
+    skos:prefLabel "TranscranialStimulation Concept" ;
+    skos:related sso:TranscranialStimulation .
+
+sso:VisualStimulationConcept a skos:Concept ;
+    skos:definition "Stimulation using visual signals, including flickering lights and color." ;
+    skos:prefLabel "VisualStimulation Concept" ;
+    skos:related sso:VisualStimulation .
+
+sso:VisualTechniquesConcept a skos:Concept ;
+    skos:definition "Visual-based modulation techniques for stimulation." ;
+    skos:prefLabel "VisualTechniques Concept" ;
+    skos:related sso:VisualTechniques .
+
+sso:administeredBy a owl:ObjectProperty ;
+    rdfs:comment "Session is administered by a specialist or organization." ;
+    rdfs:domain sso:Session ;
+    rdfs:range sso:Expert .
+
+sso:appliesTechnique a owl:ObjectProperty ;
+    rdfs:comment "Technique applied by an expert." ;
+    rdfs:domain sso:Expert ;
+    rdfs:range sso:Technique .
+
+sso:employsTechnique a owl:ObjectProperty ;
+    rdfs:comment "Neuromodulation employs specific techniques." ;
+    rdfs:domain sso:Neuromodulation ;
+    rdfs:range sso:Technique .
+
+sso:enhances a owl:ObjectProperty ;
+    rdfs:comment "Technique that enhances cognitive functions." ;
+    rdfs:domain sso:Technique ;
+    rdfs:range sso:CognitiveModulation .
+
+sso:isPotentialCollaborator a owl:ObjectProperty ;
+    rdfs:comment "Potential collaboration between experts and SSO." ;
+    rdfs:domain sso:Expert ;
+    rdfs:range sso:Collaborator .
+
+sso:providedBy a owl:ObjectProperty ;
+    rdfs:comment "Device provided by a company for neuromodulation." ;
+    rdfs:domain sso:SpecializedNeuromodulationDevice ;
+    rdfs:range sso:Company .
+
+sso:recommendsTechnique a owl:ObjectProperty ;
+    rdfs:comment "Technique recommended by a collaborator." ;
+    rdfs:domain sso:Collaborator ;
+    rdfs:range sso:Technique .
+
+sso:supportsDevice a owl:ObjectProperty ;
+    rdfs:comment "Device supported by the company." ;
+    rdfs:domain sso:Company ;
+    rdfs:range sso:SpecializedNeuromodulationDevice .
+
+sso:usesDevice a owl:ObjectProperty ;
+    rdfs:comment "Session uses a specific device for stimulation." ;
+    rdfs:domain sso:Session ;
+    rdfs:range sso:Device .
+
+sso:AudioStimulation a owl:Class ;
+    rdfs:label "AudioStimulation" ;
+    rdfs:comment "Stimulation using audio signals like isochronic or binaural beats." ;
+    rdfs:subClassOf sso:AudiovisualStimulation .
+
+sso:BinauralBeats a owl:Class ;
+    rdfs:label "BinauralBeats" ;
+    rdfs:comment "Dual-tone auditory beats used to create a perceived third beat for entrainment." ;
+    rdfs:subClassOf sso:AudioTechniques .
+
+sso:BrainwaveEntrainment a owl:Class ;
+    rdfs:label "BrainwaveEntrainment" ;
+    rdfs:comment "Techniques aligning brainwave frequencies with external rhythms." ;
+    rdfs:subClassOf sso:Technique .
+
+sso:ChemicalStimulation a owl:Class ;
+    rdfs:label "ChemicalStimulation" ;
+    rdfs:comment "Stimulation using chemical agents or drugs." ;
+    rdfs:subClassOf sso:Neuromodulation .
+
+sso:Chromosound a owl:Class ;
+    rdfs:label "Chromosound" ;
+    rdfs:comment "A specific type of audiovisual stimulation involving coordinated sound and color." ;
+    rdfs:subClassOf sso:AudiovisualStimulation .
+
+sso:ColorTherapy a owl:Class ;
+    rdfs:label "ColorTherapy" ;
+    rdfs:comment "Therapy using color exposure to influence mental and physical health." ;
+    rdfs:subClassOf sso:VisualTechniques .
+
+sso:Context a owl:Class ;
+    rdfs:label "Context" ;
+    rdfs:comment "Context in which stimulation is administered, impacting efficacy." ;
+    rdfs:subClassOf sso:CognitiveModulation .
+
+sso:DeepBrainStimulation a owl:Class ;
+    rdfs:label "DeepBrainStimulation" ;
+    rdfs:comment "Stimulation of deep brain structures using implanted electrodes." ;
+    rdfs:subClassOf sso:ElectricalStimulation .
+
+sso:Flickering a owl:Class ;
+    rdfs:label "Flickering" ;
+    rdfs:comment "Visual technique using flickering lights to stimulate the brain." ;
+    rdfs:subClassOf sso:VisualTechniques .
+
+sso:GeneralPurposeDevice a owl:Class ;
+    rdfs:label "GeneralPurposeDevice" ;
+    rdfs:comment "Devices like smartphones and laptops that can run software for stimulation." ;
+    rdfs:subClassOf sso:Device .
+
+sso:GroupSession a owl:Class ;
+    rdfs:label "GroupSession" ;
+    rdfs:comment "A session involving multiple users undergoing the same stimulation protocol." ;
+    rdfs:subClassOf sso:Session .
+
+sso:GuidingStimulation a owl:Class ;
+    rdfs:label "GuidingStimulation" ;
+    rdfs:comment "Stimulation guided by rhythms or cycles, such as breathing cycles." ;
+    rdfs:subClassOf sso:SensoryStimulation .
+
+sso:IndividualSession a owl:Class ;
+    rdfs:label "IndividualSession" ;
+    rdfs:comment "A single-user session of neuromodulation or stimulation." ;
+    rdfs:subClassOf sso:Session .
+
+sso:IsochronousSounds a owl:Class ;
+    rdfs:label "IsochronousSounds" ;
+    rdfs:comment "Sounds with equal intervals, often used for entrainment." ;
+    rdfs:subClassOf sso:AudioTechniques .
+
+sso:Language a owl:Class ;
+    rdfs:label "Language" ;
+    rdfs:comment "Stimulation involving human language." ;
+    rdfs:subClassOf sso:CognitiveModulation .
+
+sso:MonauralBeats a owl:Class ;
+    rdfs:label "MonauralBeats" ;
+    rdfs:comment "Single-tone auditory beats used for stimulation." ;
+    rdfs:subClassOf sso:AudioTechniques .
+
+sso:SpecialistPerson a owl:Class ;
+    rdfs:label "SpecialistPerson" ;
+    rdfs:comment "A human specialist in neuromodulation techniques." ;
+    rdfs:subClassOf sso:Expert .
+
+sso:TactileStimulation a owl:Class ;
+    rdfs:label "TactileStimulation" ;
+    rdfs:comment "Stimulation through tactile feedback, using vibrations or touch." ;
+    rdfs:subClassOf sso:SensoryStimulation .
+
+sso:TranscranialMagneticStimulation a owl:Class ;
+    rdfs:label "TranscranialMagneticStimulation" ;
+    rdfs:comment "Magnetic stimulation applied to the brain non-invasively." ;
+    rdfs:subClassOf sso:TranscranialStimulation .
+
+sso:VisualStimulation a owl:Class ;
+    rdfs:label "VisualStimulation" ;
+    rdfs:comment "Stimulation using visual signals, including flickering lights and color." ;
+    rdfs:subClassOf sso:AudiovisualStimulation .
+
+sso:BrainStimulation a owl:Class ;
+    rdfs:label "BrainStimulation" ;
+    rdfs:comment "Direct stimulation targeted at brain regions for therapeutic effects." ;
+    rdfs:subClassOf sso:Neuromodulation .
+
+sso:ElectricalStimulation a owl:Class ;
+    rdfs:label "ElectricalStimulation" ;
+    rdfs:comment "Stimulation via low-level electrical currents." ;
+    rdfs:subClassOf sso:BrainStimulation .
+
+sso:TranscranialStimulation a owl:Class ;
+    rdfs:label "TranscranialStimulation" ;
+    rdfs:comment "Techniques applied directly to the skull or scalp." ;
+    rdfs:subClassOf sso:Neuromodulation .
+
+sso:Company a owl:Class ;
+    rdfs:label "Company" ;
+    rdfs:comment "An organization providing neuromodulation devices or services." ;
+    rdfs:subClassOf sso:Expert .
+
+sso:SpecializedNeuromodulationDevice a owl:Class ;
+    rdfs:label "SpecializedNeuromodulationDevice" ;
+    rdfs:comment "Devices specifically built for neuromodulation, like MindAlive devices." ;
+    rdfs:subClassOf sso:Device .
+
+sso:VisualTechniques a owl:Class ;
+    rdfs:label "VisualTechniques" ;
+    rdfs:comment "Visual-based modulation techniques for stimulation." ;
+    rdfs:subClassOf sso:Technique .
+
+sso:AudioTechniques a owl:Class ;
+    rdfs:label "AudioTechniques" ;
+    rdfs:comment "Audio-based modulation techniques for brain and sensory stimulation." ;
+    rdfs:subClassOf sso:Technique .
+
+sso:AudiovisualStimulation a owl:Class ;
+    rdfs:label "AudiovisualStimulation" ;
+    rdfs:comment "Stimulation using both audio and visual cues together." ;
+    rdfs:subClassOf sso:SensoryStimulation .
+
+sso:CognitiveModulation a owl:Class ;
+    rdfs:label "CognitiveModulation" ;
+    rdfs:comment "Modulation techniques that affect cognitive functions and states." ;
+    rdfs:subClassOf sso:Neuromodulation .
+
+sso:Device a owl:Class ;
+    rdfs:label "Device" ;
+    rdfs:comment "Device used for various stimulation techniques." .
+
+sso:SensoryStimulation a owl:Class ;
+    rdfs:label "SensoryStimulation" ;
+    rdfs:comment "Stimulation via sensory inputs such as audio, visual, and tactile cues." ;
+    rdfs:subClassOf sso:Neuromodulation .
+
+sso:Session a owl:Class ;
+    rdfs:label "Session" ;
+    rdfs:comment "A session instance involving stimulation, either guided or unguided." .
+
+sso:Expert a owl:Class ;
+    rdfs:label "Expert" ;
+    rdfs:comment "An expert in neuromodulation, could be a person or a company." .
+
+sso:Neuromodulation a owl:Class ;
+    rdfs:label "Neuromodulation" ;
+    rdfs:comment "Techniques to alter brain activity through various forms of stimulation." .
+
+sso:Technique a owl:Class ;
+    rdfs:label "Technique" ;
+    rdfs:comment "Techniques used for neuromodulation." .
+
+sso:Collaborator a owl:Class ;
+    rdfs:label "Collaborator" ;
+    rdfs:comment "Potential collaborators for the SSO project, including experts and organizations." .
+
