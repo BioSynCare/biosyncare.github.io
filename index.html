@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Æterni Anima · Audiovisual Medicine</title>
+    <meta
+      name="description"
+      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
+    />
+    <meta property="og:title" content="Æterni Anima · Audiovisual Medicine" />
+    <meta
+      property="og:description"
+      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/assets/og-image.png" />
+    <link rel="icon" href="/assets/favicon.ico" />
+    <!-- Tailwind via CDN (ok for GitHub Pages prototype); swap to local build if needed -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Elegant fallback for serif/ligatured title */
+      .brand {
+        font-feature-settings: 'liga' on, 'calt' on;
+      }
+      .kbd {
+        @apply inline-flex items-center justify-center rounded-md border px-1.5 py-0.5 text-xs font-mono;
+      }
+      /* Minimal focus styles for a11y */
+      :focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body class="bg-neutral-50 text-neutral-900 antialiased">
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b"
+    >
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center gap-4">
+        <a href="#" class="flex items-center gap-3">
+          <div
+            class="h-8 w-8 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold"
+          >
+            Æ
+          </div>
+          <span class="brand text-lg font-semibold tracking-tight"
+            >Æterni Anima</span
+          >
+        </a>
+        <nav class="ml-auto hidden md:flex items-center gap-6 text-sm">
+          <a class="hover:opacity-70" href="#avmedicine"
+            >Audiovisual&nbsp;Medicine</a
+          >
+          <a class="hover:opacity-70" href="#onc">Integração&nbsp;ONC</a>
+          <a class="hover:opacity-70" href="#engine">Engine&nbsp;JS</a>
+          <a class="hover:opacity-70" href="#projetos">Projetos</a>
+          <a class="hover:opacity-70" href="#faq">FAQ</a>
+          <a class="hover:opacity-70" href="#contato">Contato</a>
+        </nav>
+        <a
+          href="#lab"
+          class="ml-auto md:ml-3 inline-flex items-center gap-2 rounded-xl bg-neutral-900 text-white px-3 py-2 text-sm font-medium shadow hover:shadow-md"
+        >
+          Abrir Laboratório WebAudio
+        </a>
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="relative overflow-hidden">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center"
+      >
+        <div>
+          <h1
+            class="brand text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight"
+          >
+            Audiovisual Medicine
+          </h1>
+          <p class="mt-5 text-lg text-neutral-700">
+            Protocolos de <strong>estimulação neurosensorial</strong> acessíveis
+            para serem escutados e vistos <strong>em tempo real</strong>,
+            diretamente no navegador.
+            <span class="whitespace-nowrap">100% client‑side.</span>
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              href="#avmedicine"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              >Saiba mais</a
+            >
+            <a
+              href="https://aeterni.github.io/"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              target="_blank"
+              rel="noopener"
+              >Site atual</a
+            >
+            <a
+              href="https://github.com/aeterni/aeterni.github.io"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              target="_blank"
+              rel="noopener"
+              >Código (GitHub)</a
+            >
+          </div>
+        </div>
+        <div class="relative">
+          <div
+            class="aspect-video rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-100 shadow-inner"
+          ></div>
+          <p class="mt-3 text-xs text-neutral-500">
+            Demonstração visual/sonora aparece aqui quando o laboratório estiver
+            ativo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Audiovisual Medicine: o que é -->
+    <section id="avmedicine" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10"
+      >
+        <div class="md:col-span-2">
+          <h2 class="text-2xl font-bold">O que é</h2>
+          <p class="mt-4 leading-relaxed text-neutral-700">
+            Audiovisual Medicine é um conjunto de <em>protocolos</em> com
+            padrões sonoros e visuais (p.ex., senóides puras, batidas
+            binaurais/monourais, isócronos, simetrias, variações cromáticas,
+            ritmos respiratórios) executados em tempo real no navegador para
+            <strong>neuromodulação</strong> não invasiva e de baixo custo. O
+            <strong>modelo</strong> é
+            <span class="font-medium">JS apenas no cliente</span>, hospedado em
+            <span class="font-medium">GitHub Pages</span>.
+          </p>
+          <p class="mt-4 leading-relaxed text-neutral-700">
+            Os <strong>princípios</strong> seguem o artigo de referência da casa
+            e a tradição consolidada de AVBE; as
+            <strong>técnicas base</strong> já estão implementadas e reutilizadas
+            dos repositórios <code>aeterni</code>, <code>harmonicare</code> e
+            <code>audiovisualmedicine</code>.
+          </p>
+        </div>
+        <aside class="md:col-span-1 rounded-2xl bg-neutral-50 border p-5">
+          <h3 class="font-semibold">Cliente‑side, por quê?</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+            <li>Baixa latência e máxima fidelidade (DSP local).</li>
+            <li>Privacidade por padrão (sem áudio subir ao servidor).</li>
+            <li>Facilidade de distribuição (Pages / PWA).</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Integração ONC -->
+    <section id="onc" class="border-t bg-neutral-50">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+        <h2 class="text-2xl font-bold">
+          Integração com a ONC (Open Neurosensory Commons)
+        </h2>
+        <p class="mt-4 text-neutral-700">
+          A ONC fornece vocabulários/ontologias (OWL+SKOS) e JSON‑LD para
+          descrever protocolos, técnicas, parâmetros, evidências e organizações.
+          Abaixo, um parecer pragmático para o <em>Audiovisual Medicine</em>:
+        </p>
+
+        <div class="mt-6 grid md:grid-cols-3 gap-6">
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">
+              Quando <span class="text-emerald-700">usar</span>
+            </h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                Para <strong>documentar</strong> cada protocolo (parâmetros,
+                indicações, segurança) em JSON‑LD/OWL.
+              </li>
+              <li>
+                Para <strong>reuso científico</strong> (links para fontes,
+                versões, evidências).
+              </li>
+              <li>
+                Para <strong>governança</strong> e interoperabilidade (SPARQL,
+                Wikidata/OpenAlex).
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">
+              Quando <span class="text-rose-700">não usar</span>
+            </h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                Em protótipos ultra‑rápidos onde o <em>schema</em> atrasa a
+                entrega.
+              </li>
+              <li>
+                Para features puramente <em>runtime</em> (DSP) que não exigem
+                metadados semânticos.
+              </li>
+              <li>Se o overhead de serialização impactar a UX.</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">Benefícios no espectro ONC</h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                <strong>Escrita</strong>: reduz ambiguidade, define nomes e
+                faixas válidas.
+              </li>
+              <li>
+                <strong>Desenvolvimento</strong>: valida presets, automatiza
+                testes de parâmetros.
+              </li>
+              <li>
+                <strong>Manutenção</strong>: versionamento semântico de
+                protocolos e evidências.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <details class="mt-6 rounded-2xl border bg-white p-5 group" open>
+          <summary class="cursor-pointer font-medium">
+            Decisão recomendada (MVP → ONC‑ready)
+          </summary>
+          <div class="mt-3 text-sm leading-7 text-neutral-700">
+            <ol class="list-decimal pl-5 space-y-2">
+              <li>
+                <strong>MVP lean</strong> com presets locais (JSON) e tipos
+                TS/JS bem definidos.
+              </li>
+              <li>
+                <strong>Adapter ONC</strong>: função pura que mapeia presets ⇄
+                JSON‑LD/OWL.
+              </li>
+              <li>
+                <strong>Export</strong> opcional: botão “Exportar para ONC” para
+                cada protocolo.
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Engine / Reuso de código -->
+    <section id="engine" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid lg:grid-cols-2 gap-10 items-start"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">Engine de Áudio & Reuso</h2>
+          <p class="mt-4 text-neutral-700">
+            Reutilize os módulos já disponíveis nos repositórios
+            <a
+              class="underline"
+              href="https://github.com/aeterni/aeterni.github.io"
+              target="_blank"
+              rel="noopener"
+              >aeterni</a
+            >,
+            <a
+              class="underline"
+              href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+              target="_blank"
+              rel="noopener"
+              >audiovisualmedicine</a
+            >
+            e
+            <a
+              class="underline"
+              href="https://harmonicare.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              >harmonicare</a
+            >
+            (histórico). O núcleo inclui: geradores senoidais, batidas
+            binaurais/monourais, isócronos, envelopes de amplitude, LFOs e
+            sincronização respiratória.
+          </p>
+          <ul class="mt-4 list-disc pl-5 text-neutral-700 text-sm leading-6">
+            <li>
+              <strong>API proposta</strong>:
+              <code
+                >engine.play({ type: 'binaural', base: 300, beat: 8, duration:
+                30 })</code
+              >
+            </li>
+            <li>
+              <strong>Sincronização</strong>:
+              <code>engine.breathe({ pattern: '4-7-8' })</code>
+            </li>
+            <li>
+              <strong>Visual</strong>:
+              <code>viz.flicker({ freq: 8, waveform: 'square' })</code>
+            </li>
+          </ul>
+          <p class="mt-3 text-xs text-neutral-500">
+            Obs.: Nesta página, os módulos são carregados <em>on‑demand</em> via
+            <code>type="module"</code>. Nada de servidor.
+          </p>
+          <div class="mt-5 flex gap-3">
+            <button
+              id="btn-tone"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Testar 300 Hz
+            </button>
+            <button
+              id="btn-binaural"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Binaural 300±4 Hz
+            </button>
+            <button
+              id="btn-stop"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Parar
+            </button>
+          </div>
+          <p class="mt-2 text-xs text-neutral-500">
+            Use fones de ouvido. Controle o volume do sistema.
+          </p>
+        </div>
+        <div class="rounded-2xl border p-5 bg-neutral-50">
+          <h3 class="font-semibold">Como organizar o código (client‑only)</h3>
+          <pre class="mt-3 text-xs overflow-x-auto"><code>src/
+  engine/
+    audio.js        // Web Audio primitives (osc, gain, envelope)
+    binaural.js     // helpers para batidas binaurais/monourais
+    breathe.js      // sincronização respiratória
+  viz/
+    flicker.js      // padrões visuais (canvas/webgl)
+  presets/
+    relax.json      // parâmetros nomeados
+    foco.json
+  onc/
+    adapter.js      // mapeia presets ⇄ JSON‑LD (opcional)
+index.html          // esta página
+assets/             // favicon, og, logos
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projetos/links existentes -->
+    <section id="projetos" class="border-t bg-neutral-50">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+        <h2 class="text-2xl font-bold">Outros projetos e referências</h2>
+        <div class="mt-6 grid md:grid-cols-3 gap-6">
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://aeterni.github.io/"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">Æterni · site atual</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Conteúdos e experimentos existentes.
+            </p>
+          </a>
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://harmonicare.netlify.app/"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">HarmoniCare (histórico)</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Gênese do app e protocolos base.
+            </p>
+          </a>
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">AudiovisualMedicine · GitHub</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Implementações abertas (client‑side).
+            </p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ curta -->
+    <section id="faq" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-2 gap-8"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">FAQ</h2>
+          <details class="mt-4 rounded-xl border p-4" open>
+            <summary class="font-medium">Precisa de servidor?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Não. Tudo roda no cliente (Web Audio + Canvas/WebGL). Integrações
+              ONC e exportações são arquivos locais/baixados.
+            </p>
+          </details>
+          <details class="mt-3 rounded-xl border p-4">
+            <summary class="font-medium">Compatível com mobile?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Sim, Safari/Chrome mobile modernos. Recomendado usar fones de
+              ouvido.
+            </p>
+          </details>
+          <details class="mt-3 rounded-xl border p-4">
+            <summary class="font-medium">Como versionar protocolos?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Via JSON local (SemVer) e, quando habilitado, exportar JSON‑LD ONC
+              com <em>version IRI</em>.
+            </p>
+          </details>
+        </div>
+        <div class="rounded-2xl border bg-neutral-50 p-5">
+          <h3 class="font-semibold">Boas práticas</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+            <li>Ganho seguro (limitar a −6 dBFS) e <em>fade</em> suave.</li>
+            <li>
+              Evitar flicker visual acima do limiar desconfortável do usuário.
+            </li>
+            <li>Documentar contra‑indicações e uso responsável.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contato -->
+    <section id="contato" class="border-t bg-neutral-900 text-neutral-100">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid md:grid-cols-2 gap-8 items-center"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">Contato</h2>
+          <p class="mt-2 text-neutral-300">
+            Questões técnicas, colaborações e pesquisa.
+          </p>
+          <p class="mt-4 text-sm text-neutral-400">
+            Envie PRs no GitHub ou abra uma <em>issue</em>.
+          </p>
+        </div>
+        <div class="md:justify-self-end">
+          <a
+            href="https://github.com/aeterni/aeterni.github.io"
+            class="inline-flex items-center gap-2 rounded-xl bg-white text-neutral-900 px-4 py-2 text-sm font-medium shadow hover:shadow-md"
+            target="_blank"
+            rel="noopener"
+            >GitHub · aeterni.github.io</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Minimal client-only lab demo (inline) -->
+    <script type="module">
+      // Web Audio minimal demo (client-only). Replace with engine/* imports as you refactor.
+      let ctx, master, osc, lfo, lfoGain;
+      const ensure = () => {
+        if (!ctx) {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+          master = ctx.createGain();
+          master.gain.value = 0.2; // -14 dB aprox
+          master.connect(ctx.destination);
+        }
+      };
+
+      const stopAll = () => {
+        if (osc) {
+          try {
+            osc.stop();
+          } catch {}
+          osc.disconnect();
+          osc = null;
+        }
+        if (lfo) {
+          try {
+            lfo.stop();
+          } catch {}
+          lfo.disconnect();
+          lfo = null;
+        }
+        if (lfoGain) {
+          lfoGain.disconnect();
+          lfoGain = null;
+        }
+      };
+
+      const playTone = (freq = 300) => {
+        ensure();
+        stopAll();
+        osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.connect(master);
+        osc.start();
+      };
+
+      const playBinaural = (base = 300, beat = 4) => {
+        ensure();
+        stopAll();
+        const left = ctx.createOscillator();
+        const right = ctx.createOscillator();
+        left.type = right.type = 'sine';
+        left.frequency.value = base - beat / 2; // 298 Hz
+        right.frequency.value = base + beat / 2; // 302 Hz
+        const gL = ctx.createGain();
+        const gR = ctx.createGain();
+        const splitter = ctx.createChannelMerger(2);
+        left.connect(gL).connect(splitter, 0, 0);
+        right.connect(gR).connect(splitter, 0, 1);
+        const masterStereo = ctx.createGain();
+        masterStereo.gain.value = 0.18;
+        splitter.connect(masterStereo).connect(master);
+        left.start();
+        right.start();
+        // keep references for stop
+        osc = {
+          stop: () => {
+            left.stop();
+            right.stop();
+          },
+          disconnect: () => {
+            left.disconnect();
+            right.disconnect();
+            splitter.disconnect();
+            masterStereo.disconnect();
+          },
+        };
+      };
+
+      document
+        .querySelector('#btn-tone')
+        ?.addEventListener('click', () => playTone(300));
+      document
+        .querySelector('#btn-binaural')
+        ?.addEventListener('click', () => playBinaural(300, 8));
+      document.querySelector('#btn-stop')?.addEventListener('click', stopAll);
+
+      // Optional: tiny ONC adapter sketch
+      // export function toJSONLD(preset) { /* map fields to JSON-LD */ }
+    </script>
+  </body>
+</html>
