@@ -19,6 +19,9 @@
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/assets/og-image.png" />
     <link rel="icon" href="/assets/favicon.ico" />
+    <!-- Enable browser translation -->
+    <meta name="google" content="notranslate" value="false" />
+    <meta http-equiv="content-language" content="pt-br" />
     <!-- Tailwind via CDN (ok for GitHub Pages prototype); swap to local build if needed -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -68,6 +71,34 @@
         </a>
       </div>
     </header>
+
+    <!-- Language Notice -->
+    <div id="language-banner" class="bg-blue-50 border-b border-blue-100">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-2.5">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <p class="text-xs text-blue-800">
+            🌐 <span class="font-medium">Português</span>
+            <span class="opacity-70 ml-1">· Portuguese content</span>
+          </p>
+          <div class="flex items-center gap-2">
+            <button
+              id="translate-btn"
+              class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+            >
+              <span>🌍</span>
+              <span>Translate / Traduzir</span>
+            </button>
+            <button
+              id="close-banner"
+              class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1"
+              title="Close banner"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- Hero -->
     <section class="relative overflow-hidden">
@@ -1037,6 +1068,102 @@ assets/             // favicon, og, logos
 
       // Run detection on page load
       runDeviceDetection();
+
+      // Translation functionality
+      function triggerTranslation() {
+        // Method 1: Try to use Google Translate if available
+        if (typeof google !== 'undefined' && google.translate) {
+          // Google Translate widget method (if loaded)
+          return;
+        }
+
+        // Method 2: Show instructions modal for manual translation
+        const userLang = navigator.language || navigator.userLanguage;
+        const browserName = navigator.userAgent.includes('Chrome')
+          ? 'Chrome'
+          : navigator.userAgent.includes('Safari')
+          ? 'Safari'
+          : navigator.userAgent.includes('Firefox')
+          ? 'Firefox'
+          : navigator.userAgent.includes('Edge')
+          ? 'Edge'
+          : 'seu navegador';
+
+        let instructions = '';
+
+        if (
+          navigator.userAgent.includes('Chrome') ||
+          navigator.userAgent.includes('Edge')
+        ) {
+          instructions = `Para traduzir esta página:
+
+1. Clique com botão direito na página
+2. Selecione "Traduzir para [seu idioma]"
+
+Ou clique no ícone de tradução na barra de endereços.
+
+---
+
+To translate this page:
+
+1. Right-click on the page
+2. Select "Translate to [your language]"
+
+Or click the translation icon in the address bar.`;
+        } else if (navigator.userAgent.includes('Safari')) {
+          instructions = `Para traduzir esta página:
+
+1. Clique no botão "Traduzir" na barra de endereços
+2. Ou vá em Configurações → Tradução
+
+---
+
+To translate this page:
+
+1. Click the "Translate" button in the address bar
+2. Or go to Settings → Translation`;
+        } else if (navigator.userAgent.includes('Firefox')) {
+          instructions = `Para traduzir esta página no Firefox:
+
+1. Instale o complemento "Firefox Translations"
+2. Ou use o menu de tradução (se disponível)
+
+---
+
+To translate this page in Firefox:
+
+1. Install the "Firefox Translations" add-on
+2. Or use the translation menu (if available)`;
+        } else {
+          instructions = `Use o recurso de tradução do seu navegador para visualizar esta página em outro idioma.
+
+---
+
+Use your browser's translation feature to view this page in another language.`;
+        }
+
+        alert(instructions);
+      }
+
+      // Language banner event listeners
+      document
+        .getElementById('translate-btn')
+        ?.addEventListener('click', triggerTranslation);
+
+      document.getElementById('close-banner')?.addEventListener('click', () => {
+        const banner = document.getElementById('language-banner');
+        if (banner) {
+          banner.style.display = 'none';
+          // Save preference to not show banner again
+          localStorage.setItem('hideLanguageBanner', 'true');
+        }
+      });
+
+      // Check if user previously closed the banner
+      if (localStorage.getItem('hideLanguageBanner') === 'true') {
+        const banner = document.getElementById('language-banner');
+        if (banner) banner.style.display = 'none';
+      }
 
       // Web Audio minimal demo (client-only). Replace with engine/* imports as you refactor.
       let ctx, master, osc, lfo, lfoGain;
