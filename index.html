@@ -1,729 +1,1455 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>BioSynCare Lab - Central de Dados e Transparência</title>
-    <meta
-      name="description"
-      content="BioSynCare Lab: Central de dados com transparência nos processos e protocolos. Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
-    />
-    <meta
-      property="og:title"
-      content="BioSynCare Lab - Central de Dados e Transparência"
-    />
-    <meta
-      property="og:description"
-      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="/assets/og-image.png" />
-    <link rel="icon" href="/assets/favicon.ico" />
-    <!-- Enable browser translation -->
-    <meta name="google" content="notranslate" value="false" />
-    <meta http-equiv="content-language" content="pt-br" />
-    <!-- Tailwind via CDN (ok for GitHub Pages prototype); swap to local build if needed -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Elegant fallback for serif/ligatured title */
-      .brand {
-        font-feature-settings: 'liga' on, 'calt' on;
-      }
-      .kbd {
-        @apply inline-flex items-center justify-center rounded-md border px-1.5 py-0.5 text-xs font-mono;
-      }
-      /* Minimal focus styles for a11y */
-      :focus-visible {
-        outline: 2px solid currentColor;
-        outline-offset: 2px;
-      }
-    </style>
-  </head>
-  <body class="bg-neutral-50 text-neutral-900 antialiased">
-    <!-- Header -->
-    <header
-      class="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b"
-    >
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center gap-4">
-        <a href="#" class="flex items-center gap-3">
-          <div
-            class="h-8 w-8 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold"
-          >
-            B
-          </div>
-          <span class="brand text-lg font-semibold tracking-tight"
-            >BioSynCare Lab</span
-          >
-        </a>
-        <nav class="ml-auto hidden md:flex items-center gap-6 text-sm">
-          <a class="hover:opacity-70" href="#avmedicine">BioSynCare&nbsp;Lab</a>
-          <a class="hover:opacity-70" href="#onc">Integração&nbsp;ONC</a>
-          <a class="hover:opacity-70" href="#engine">Engine&nbsp;JS</a>
-          <a class="hover:opacity-70" href="#projetos">Projetos</a>
-          <a class="hover:opacity-70" href="#faq">FAQ</a>
-          <a class="hover:opacity-70" href="#contato">Contato</a>
-        </nav>
-        <a
-          href="#lab"
-          class="ml-auto md:ml-3 inline-flex items-center gap-2 rounded-xl bg-neutral-900 text-white px-3 py-2 text-sm font-medium shadow hover:shadow-md"
-        >
-          Abrir Laboratório WebAudio
-        </a>
-      </div>
-    </header>
+<!DOCTYPE html><!DOCTYPE html>
 
-    <!-- Language Notice -->
-    <div id="language-banner" class="bg-blue-50 border-b border-blue-100">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-2.5">
-        <div class="flex items-center justify-between gap-4 flex-wrap">
-          <p class="text-xs text-blue-800">
-            🌐 <span class="font-medium">Português</span>
-            <span class="opacity-70 ml-1">· Portuguese content</span>
-          </p>
-          <div class="flex items-center gap-2">
-            <button
-              id="translate-btn"
-              class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
-            >
-              <span>🌍</span>
-              <span>Translate / Traduzir</span>
-            </button>
-            <button
-              id="close-banner"
-              class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1"
-              title="Close banner"
-            >
-              ✕
-            </button>
+<html lang="en"><html lang="pt-br">
+
+<head>  <head>
+
+  <meta charset="UTF-8">    <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <title>BioSynCare Lab - Neurosensory Stimulation Dashboard</title>    <title>BioSynCare Lab - Central de Dados e Transparência</title>
+
+  <meta name="description" content="Neurosensory stimulation dashboard with binaural beats, isochronic tones, noise generators, and ONC ontology browser.">    <meta
+
+  <script src="https://cdn.tailwindcss.com"></script>      name="description"
+
+  <style>      content="BioSynCare Lab: Central de dados com transparência nos processos e protocolos. Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
+
+    .panel { @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6; }    />
+
+    .btn-primary { @apply px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium; }    <meta
+
+    .btn-secondary { @apply px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium; }      property="og:title"
+
+    .btn-danger { @apply px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium; }      content="BioSynCare Lab - Central de Dados e Transparência"
+
+    .tab { @apply px-4 py-2 text-sm font-medium rounded-lg transition-colors; }    />
+
+    .tab-active { @apply bg-blue-600 text-white; }    <meta
+
+    .tab-inactive { @apply text-gray-600 hover:bg-gray-100; }      property="og:description"
+
+    .slider { @apply w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer; }      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador."
+
+    .slider::-webkit-slider-thumb { @apply appearance-none w-4 h-4 bg-blue-600 rounded-full cursor-pointer; }    />
+
+    .waveform-display { @apply h-32 bg-gray-50 rounded-lg border border-gray-200; }    <meta property="og:type" content="website" />
+
+  </style>    <meta property="og:image" content="/assets/og-image.png" />
+
+</head>    <link rel="icon" href="/assets/favicon.ico" />
+
+<body class="bg-gray-50 min-h-screen">    <!-- Enable browser translation -->
+
+      <meta name="google" content="notranslate" value="false" />
+
+  <!-- Header -->    <meta http-equiv="content-language" content="pt-br" />
+
+  <header class="bg-white border-b border-gray-200 sticky top-0 z-50">    <!-- Tailwind via CDN (ok for GitHub Pages prototype); swap to local build if needed -->
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">    <script src="https://cdn.tailwindcss.com"></script>
+
+      <div class="flex items-center justify-between">    <style>
+
+        <div class="flex items-center gap-3">      /* Elegant fallback for serif/ligatured title */
+
+          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">      .brand {
+
+            B        font-feature-settings: 'liga' on, 'calt' on;
+
+          </div>      }
+
+          <div>      .kbd {
+
+            <h1 class="text-xl font-bold text-gray-900">BioSynCare Lab</h1>        @apply inline-flex items-center justify-center rounded-md border px-1.5 py-0.5 text-xs font-mono;
+
+            <p class="text-xs text-gray-500">Neurosensory Stimulation Dashboard</p>      }
+
+          </div>      /* Minimal focus styles for a11y */
+
+        </div>      :focus-visible {
+
+                outline: 2px solid currentColor;
+
+        <nav class="hidden md:flex items-center gap-6">        outline-offset: 2px;
+
+          <button class="text-sm text-gray-600 hover:text-gray-900" onclick="showTab('audio')">🎵 Audio</button>      }
+
+          <button class="text-sm text-gray-600 hover:text-gray-900" onclick="showTab('onc')">📚 ONC Browser</button>    </style>
+
+          <button class="text-sm text-gray-600 hover:text-gray-900" onclick="showTab('analytics')">📊 Analytics</button>  </head>
+
+          <button class="text-sm text-gray-600 hover:text-gray-900" onclick="showTab('system')">🔧 System</button>  <body class="bg-neutral-50 text-neutral-900 antialiased">
+
+          <a href="/docs_landing.html" class="text-sm text-gray-600 hover:text-gray-900">📖 Docs</a>    <!-- Header -->
+
+        </nav>    <header
+
+      class="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b"
+
+        <div class="flex items-center gap-3">    >
+
+          <button id="btn-init-audio" class="btn-primary text-sm">      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center gap-4">
+
+            🎧 Initialize Audio        <a href="#" class="flex items-center gap-3">
+
+          </button>          <div
+
+          <button id="btn-stop-all" class="btn-danger text-sm hidden">            class="h-8 w-8 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold"
+
+            ⏹ Stop All          >
+
+          </button>            B
+
+        </div>          </div>
+
+      </div>          <span class="brand text-lg font-semibold tracking-tight"
+
+    </div>            >BioSynCare Lab</span
+
+  </header>          >
+
+        </a>
+
+  <!-- Main Content -->        <nav class="ml-auto hidden md:flex items-center gap-6 text-sm">
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">          <a class="hover:opacity-70" href="#avmedicine">BioSynCare&nbsp;Lab</a>
+
+              <a class="hover:opacity-70" href="#onc">Integração&nbsp;ONC</a>
+
+    <!-- Audio Synthesis Tab -->          <a class="hover:opacity-70" href="#engine">Engine&nbsp;JS</a>
+
+    <div id="tab-audio" class="space-y-6">          <a class="hover:opacity-70" href="#projetos">Projetos</a>
+
+                <a class="hover:opacity-70" href="#faq">FAQ</a>
+
+      <!-- Status Bar -->          <a class="hover:opacity-70" href="#contato">Contato</a>
+
+      <div class="panel">        </nav>
+
+        <div class="flex items-center justify-between">        <a
+
+          <div>          href="#lab"
+
+            <h2 class="text-lg font-semibold text-gray-900">Audio Engine Status</h2>          class="ml-auto md:ml-3 inline-flex items-center gap-2 rounded-xl bg-neutral-900 text-white px-3 py-2 text-sm font-medium shadow hover:shadow-md"
+
+            <p id="audio-status" class="text-sm text-gray-500">Not initialized</p>        >
+
+          </div>          Abrir Laboratório WebAudio
+
+          <div class="text-right">        </a>
+
+            <div class="text-2xl font-bold text-gray-900" id="active-tracks">0</div>      </div>
+
+            <div class="text-xs text-gray-500">Active Tracks</div>    </header>
+
           </div>
-        </div>
-      </div>
+
+        </div>    <!-- Language Notice -->
+
+      </div>    <div id="language-banner" class="bg-blue-50 border-b border-blue-100">
+
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-2.5">
+
+      <!-- Waveform Generators -->        <div class="flex items-center justify-between gap-4 flex-wrap">
+
+      <div class="panel">          <p class="text-xs text-blue-800">
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">🌊 Pure Waveforms</h3>            🌐 <span class="font-medium">Português</span>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">            <span class="opacity-70 ml-1">· Portuguese content</span>
+
+                    </p>
+
+          <!-- Waveform Type -->          <div class="flex items-center gap-2">
+
+          <div>            <button
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">Waveform Type</label>              id="translate-btn"
+
+            <div class="grid grid-cols-2 gap-2">              class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+
+              <button class="tab tab-active" data-waveform="sine">Sine</button>            >
+
+              <button class="tab tab-inactive" data-waveform="triangle">Triangle</button>              <span>🌍</span>
+
+              <button class="tab tab-inactive" data-waveform="square">Square</button>              <span>Translate / Traduzir</span>
+
+              <button class="tab tab-inactive" data-waveform="sawtooth">Sawtooth</button>            </button>
+
+            </div>            <button
+
+          </div>              id="close-banner"
+
+              class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1"
+
+          <!-- Frequency -->              title="Close banner"
+
+          <div>            >
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">              ✕
+
+              Frequency: <span id="waveform-freq-value">440</span> Hz            </button>
+
+            </label>          </div>
+
+            <input type="range" id="waveform-freq" class="slider" min="20" max="2000" value="440" step="1">        </div>
+
+          </div>      </div>
+
     </div>
 
-    <!-- Hero -->
-    <section class="relative overflow-hidden">
-      <div
-        class="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center"
-      >
-        <div>
+          <!-- Gain -->
+
+          <div>    <!-- Hero -->
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">    <section class="relative overflow-hidden">
+
+              Gain: <span id="waveform-gain-value">0.2</span>      <div
+
+            </label>        class="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center"
+
+            <input type="range" id="waveform-gain" class="slider" min="0" max="1" value="0.2" step="0.01">      >
+
+          </div>        <div>
+
           <h1
-            class="brand text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight"
-          >
-            BioSynCare Lab
-          </h1>
-          <p class="mt-3 text-xl font-semibold text-neutral-800">
-            Central de dados com
-            <strong>transparência nos processos e protocolos</strong>
+
+          <!-- Pan -->            class="brand text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight"
+
+          <div>          >
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">            BioSynCare Lab
+
+              Pan: <span id="waveform-pan-value">0</span>          </h1>
+
+            </label>          <p class="mt-3 text-xl font-semibold text-neutral-800">
+
+            <input type="range" id="waveform-pan" class="slider" min="-1" max="1" value="0" step="0.1">            Central de dados com
+
+          </div>            <strong>transparência nos processos e protocolos</strong>
+
           </p>
-          <p class="mt-4 text-lg text-neutral-700">
-            Protocolos de <strong>estimulação neurosensorial</strong> acessíveis
-            para serem escutados e vistos <strong>em tempo real</strong>,
-            diretamente no navegador.
-            <span class="whitespace-nowrap">100% client‑side.</span>
-          </p>
-          <div class="mt-6 flex flex-wrap gap-3">
+
+          <!-- Duration -->          <p class="mt-4 text-lg text-neutral-700">
+
+          <div>            Protocolos de <strong>estimulação neurosensorial</strong> acessíveis
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">            para serem escutados e vistos <strong>em tempo real</strong>,
+
+              Duration: <span id="waveform-duration-value">5</span>s            diretamente no navegador.
+
+            </label>            <span class="whitespace-nowrap">100% client‑side.</span>
+
+            <input type="range" id="waveform-duration" class="slider" min="1" max="300" value="5" step="1">          </p>
+
+          </div>          <div class="mt-6 flex flex-wrap gap-3">
+
             <a
-              href="#avmedicine"
+
+          <!-- Play Button -->              href="#avmedicine"
+
+          <div class="flex items-end">              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+
+            <button id="btn-play-waveform" class="btn-primary w-full">▶ Play Waveform</button>              >Saiba mais</a
+
+          </div>            >
+
+        </div>            <a
+
+      </div>              href="https://aeterni.github.io/"
+
               class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-              >Saiba mais</a
-            >
-            <a
-              href="https://aeterni.github.io/"
-              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-              target="_blank"
-              rel="noopener"
-              >Site atual</a
-            >
-            <a
-              href="https://github.com/aeterni/aeterni.github.io"
-              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-              target="_blank"
-              rel="noopener"
-              >Código (GitHub)</a
-            >
+
+      <!-- Binaural Beats -->              target="_blank"
+
+      <div class="panel">              rel="noopener"
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">🎧 Binaural Beats</h3>              >Site atual</a
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">            >
+
+                      <a
+
+          <div>              href="https://github.com/aeterni/aeterni.github.io"
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+
+              Base Frequency: <span id="binaural-base-value">300</span> Hz              target="_blank"
+
+            </label>              rel="noopener"
+
+            <input type="range" id="binaural-base" class="slider" min="50" max="500" value="300" step="1">              >Código (GitHub)</a
+
+          </div>            >
+
           </div>
-        </div>
-        <div class="relative space-y-4">
-          <div
-            class="aspect-video rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-100 shadow-inner"
-          ></div>
-          <p class="text-xs text-neutral-500">
-            Demonstração visual/sonora aparece aqui quando o laboratório estiver
-            ativo.
-          </p>
 
-          <!-- System Diagnostics Widget -->
-          <details class="rounded-xl border bg-white shadow-sm group" open>
-            <summary
-              class="cursor-pointer p-4 flex items-center justify-between hover:bg-neutral-50 rounded-t-xl"
-            >
-              <div class="flex items-center gap-2">
+          <div>        </div>
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">        <div class="relative space-y-4">
+
+              Beat Frequency: <span id="binaural-beat-value">8</span> Hz          <div
+
+            </label>            class="aspect-video rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-100 shadow-inner"
+
+            <input type="range" id="binaural-beat" class="slider" min="0.5" max="40" value="8" step="0.5">          ></div>
+
+            <div class="mt-1 text-xs text-gray-500">          <p class="text-xs text-neutral-500">
+
+              Delta (0.5-4) | Theta (4-8) | Alpha (8-14) | Beta (14-30) | Gamma (30+)            Demonstração visual/sonora aparece aqui quando o laboratório estiver
+
+            </div>            ativo.
+
+          </div>          </p>
+
+
+
+          <div>          <!-- System Diagnostics Widget -->
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">          <details class="rounded-xl border bg-white shadow-sm group" open>
+
+              Duration: <span id="binaural-duration-value">60</span>s            <summary
+
+            </label>              class="cursor-pointer p-4 flex items-center justify-between hover:bg-neutral-50 rounded-t-xl"
+
+            <input type="range" id="binaural-duration" class="slider" min="10" max="3600" value="60" step="10">            >
+
+          </div>              <div class="flex items-center gap-2">
+
                 <span class="text-sm font-semibold text-neutral-700"
-                  >🔧 Diagnóstico do Sistema</span
-                >
-                <span
-                  id="diagnostic-summary"
-                  class="text-xs text-neutral-500"
+
+          <div class="flex items-end">                  >🔧 Diagnóstico do Sistema</span
+
+            <button id="btn-play-binaural" class="btn-primary w-full">▶ Play Binaural</button>                >
+
+          </div>                <span
+
+        </div>                  id="diagnostic-summary"
+
+      </div>                  class="text-xs text-neutral-500"
+
                 ></span>
-              </div>
-              <span
-                class="text-neutral-400 group-open:rotate-180 transition-transform"
-                >▼</span
-              >
-            </summary>
 
-            <div class="p-4 pt-0 space-y-4">
-              <!-- Quick Status -->
-              <div class="grid grid-cols-3 gap-2">
-                <div class="flex items-center gap-2 text-xs">
+      <!-- Isochronic Tones -->              </div>
+
+      <div class="panel">              <span
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">⏱ Isochronic Tones</h3>                class="text-neutral-400 group-open:rotate-180 transition-transform"
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">                >▼</span
+
+                        >
+
+          <div>            </summary>
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+
+              Carrier Frequency: <span id="iso-freq-value">200</span> Hz            <div class="p-4 pt-0 space-y-4">
+
+            </label>              <!-- Quick Status -->
+
+            <input type="range" id="iso-freq" class="slider" min="50" max="500" value="200" step="1">              <div class="grid grid-cols-3 gap-2">
+
+          </div>                <div class="flex items-center gap-2 text-xs">
+
                   <div
-                    id="mobile-indicator"
-                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
-                  ></div>
-                  <span
-                    ><span id="mobile-status" class="font-mono">...</span></span
-                  >
+
+          <div>                    id="mobile-indicator"
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+
+              Pulse Frequency: <span id="iso-pulse-value">10</span> Hz                  ></div>
+
+            </label>                  <span
+
+            <input type="range" id="iso-pulse" class="slider" min="0.5" max="40" value="10" step="0.5">                    ><span id="mobile-status" class="font-mono">...</span></span
+
+          </div>                  >
+
                 </div>
-                <div class="flex items-center gap-2 text-xs">
-                  <div
-                    id="gpu-indicator"
-                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
-                  ></div>
-                  <span id="gpu-status" class="font-mono">GPU...</span>
+
+          <div>                <div class="flex items-center gap-2 text-xs">
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">                  <div
+
+              Duration: <span id="iso-duration-value">60</span>s                    id="gpu-indicator"
+
+            </label>                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+
+            <input type="range" id="iso-duration" class="slider" min="10" max="3600" value="60" step="10">                  ></div>
+
+          </div>                  <span id="gpu-status" class="font-mono">GPU...</span>
+
                 </div>
-                <div class="flex items-center gap-2 text-xs">
-                  <div
-                    id="mode-indicator"
-                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
-                  ></div>
+
+          <div class="flex items-end">                <div class="flex items-center gap-2 text-xs">
+
+            <button id="btn-play-isochronic" class="btn-primary w-full">▶ Play Isochronic</button>                  <div
+
+          </div>                    id="mode-indicator"
+
+        </div>                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+
+      </div>                  ></div>
+
                   <span id="mode-status" class="font-mono text-xs">...</span>
-                </div>
-              </div>
 
-              <!-- Tabs -->
-              <div class="border-b border-neutral-200">
-                <div class="flex gap-1 text-xs" role="tablist">
-                  <button
-                    class="tab-btn px-3 py-2 font-medium border-b-2 border-blue-500 text-blue-600"
-                    data-tab="performance"
-                  >
-                    Performance
-                  </button>
-                  <button
-                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
-                    data-tab="browser"
-                  >
+      <!-- Noise Generators -->                </div>
+
+      <div class="panel">              </div>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">🔊 Noise Generators</h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">              <!-- Tabs -->
+
+                        <div class="border-b border-neutral-200">
+
+          <div>                <div class="flex gap-1 text-xs" role="tablist">
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">Noise Type</label>                  <button
+
+            <div class="grid grid-cols-3 gap-2">                    class="tab-btn px-3 py-2 font-medium border-b-2 border-blue-500 text-blue-600"
+
+              <button class="tab tab-active" data-noise="white">White</button>                    data-tab="performance"
+
+              <button class="tab tab-inactive" data-noise="pink">Pink</button>                  >
+
+              <button class="tab tab-inactive" data-noise="brown">Brown</button>                    Performance
+
+              <button class="tab tab-inactive" data-noise="blue">Blue</button>                  </button>
+
+              <button class="tab tab-inactive" data-noise="violet">Violet</button>                  <button
+
+              <button class="tab tab-inactive" data-noise="black">Black</button>                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+
+            </div>                    data-tab="browser"
+
+          </div>                  >
+
                     Navegador
-                  </button>
-                  <button
-                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
-                    data-tab="audio"
-                  >
-                    Áudio
-                  </button>
-                  <button
-                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
-                    data-tab="system"
-                  >
-                    Sistema
-                  </button>
-                </div>
-              </div>
 
-              <!-- Tab: Performance -->
-              <div id="tab-performance" class="tab-content">
-                <!-- GPU Performance Meter -->
+          <div>                  </button>
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">                  <button
+
+              Gain: <span id="noise-gain-value">0.15</span>                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+
+            </label>                    data-tab="audio"
+
+            <input type="range" id="noise-gain" class="slider" min="0" max="0.5" value="0.15" step="0.01">                  >
+
+          </div>                    Áudio
+
+                  </button>
+
+          <div>                  <button
+
+            <label class="block text-sm font-medium text-gray-700 mb-2">                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+
+              Duration: <span id="noise-duration-value">30</span>s                    data-tab="system"
+
+            </label>                  >
+
+            <input type="range" id="noise-duration" class="slider" min="5" max="600" value="30" step="5">                    Sistema
+
+          </div>                  </button>
+
+                </div>
+
+          <div class="flex items-end">              </div>
+
+            <button id="btn-play-noise" class="btn-primary w-full">▶ Play Noise</button>
+
+          </div>              <!-- Tab: Performance -->
+
+        </div>              <div id="tab-performance" class="tab-content">
+
+      </div>                <!-- GPU Performance Meter -->
+
                 <div class="mb-3">
-                  <div class="flex items-center justify-between text-xs mb-1">
-                    <span>GPU Score</span>
-                    <div class="flex items-center gap-2">
-                      <span
-                        id="gpu-grade"
-                        class="font-semibold text-neutral-500"
-                        >--</span
-                      >
-                      <span id="gpu-score" class="font-mono">--</span>
-                    </div>
-                  </div>
-                  <div class="w-full bg-neutral-200 rounded-full h-2">
-                    <div
-                      id="gpu-meter"
-                      class="h-2 rounded-full bg-blue-500 transition-all duration-500"
-                      style="width: 0%"
+
+      <!-- Advanced: Martigli Waves & Sonic Symmetries -->                  <div class="flex items-center justify-between text-xs mb-1">
+
+      <div class="panel">                    <span>GPU Score</span>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">🌌 Advanced Synthesis</h3>                    <div class="flex items-center gap-2">
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">                      <span
+
+                                  id="gpu-grade"
+
+          <!-- Martigli Waves -->                        class="font-semibold text-neutral-500"
+
+          <div class="space-y-4">                        >--</span
+
+            <h4 class="font-medium text-gray-800">Martigli Waves</h4>                      >
+
+            <div>                      <span id="gpu-score" class="font-mono">--</span>
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">                    </div>
+
+                Fundamental: <span id="martigli-fund-value">200</span> Hz                  </div>
+
+              </label>                  <div class="w-full bg-neutral-200 rounded-full h-2">
+
+              <input type="range" id="martigli-fund" class="slider" min="50" max="500" value="200" step="1">                    <div
+
+            </div>                      id="gpu-meter"
+
+            <button id="btn-play-martigli" class="btn-secondary w-full">▶ Play Martigli</button>                      class="h-2 rounded-full bg-blue-500 transition-all duration-500"
+
+          </div>                      style="width: 0%"
+
                     ></div>
-                  </div>
-                </div>
 
-                <!-- RAM Availability Meter -->
-                <div class="mb-3">
-                  <div class="flex items-center justify-between text-xs mb-1">
-                    <span>RAM Disponível</span>
-                    <div class="flex items-center gap-2">
-                      <span
-                        id="ram-grade"
-                        class="font-semibold text-neutral-500"
-                        >--</span
-                      >
-                      <span id="ram-amount" class="font-mono">--</span>
-                    </div>
-                  </div>
+          <!-- Sonic Symmetries -->                  </div>
+
+          <div class="space-y-4">                </div>
+
+            <h4 class="font-medium text-gray-800">Sonic Symmetries</h4>
+
+            <div>                <!-- RAM Availability Meter -->
+
+              <label class="block text-sm font-medium text-gray-700 mb-2">Pattern</label>                <div class="mb-3">
+
+              <select id="symmetry-pattern" class="w-full px-3 py-2 border border-gray-300 rounded-lg">                  <div class="flex items-center justify-between text-xs mb-1">
+
+                <option value="fibonacci">Fibonacci</option>                    <span>RAM Disponível</span>
+
+                <option value="golden">Golden Ratio</option>                    <div class="flex items-center gap-2">
+
+                <option value="prime">Prime Numbers</option>                      <span
+
+                <option value="harmonic">Harmonic Series</option>                        id="ram-grade"
+
+              </select>                        class="font-semibold text-neutral-500"
+
+            </div>                        >--</span
+
+            <button id="btn-play-symmetry" class="btn-secondary w-full">▶ Play Symmetry</button>                      >
+
+          </div>                      <span id="ram-amount" class="font-mono">--</span>
+
+        </div>                    </div>
+
+      </div>                  </div>
+
                   <div class="w-full bg-neutral-200 rounded-full h-2">
-                    <div
+
+    </div>                    <div
+
                       id="ram-meter"
-                      class="h-2 rounded-full bg-green-500 transition-all duration-500"
-                      style="width: 0%"
-                    ></div>
-                  </div>
-                </div>
 
-                <!-- Refresh Rate Meter -->
-                <div class="mb-3">
-                  <div class="flex items-center justify-between text-xs mb-1">
-                    <span>Refresh Rate</span>
-                    <div class="flex items-center gap-2">
-                      <span
-                        id="refresh-grade"
-                        class="font-semibold text-neutral-500"
-                        >--</span
-                      >
-                      <span id="refresh-rate" class="font-mono">-- Hz</span>
-                    </div>
-                  </div>
-                  <div class="w-full bg-neutral-200 rounded-full h-2">
-                    <div
-                      id="refresh-meter"
-                      class="h-2 rounded-full bg-purple-500 transition-all duration-500"
-                      style="width: 0%"
-                    ></div>
-                  </div>
-                </div>
+    <!-- ONC Browser Tab -->                      class="h-2 rounded-full bg-green-500 transition-all duration-500"
 
-                <!-- GPU Details -->
-                <div
-                  class="mt-3 pt-3 border-t text-xs space-y-1 text-neutral-600"
-                >
-                  <div class="flex justify-between">
-                    <span>GPU Renderer:</span
-                    ><span id="gpu-renderer" class="font-mono">--</span>
+    <div id="tab-onc" class="space-y-6 hidden">                      style="width: 0%"
+
+      <div class="panel">                    ></div>
+
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">📚 ONC Ontology Browser</h2>                  </div>
+
+                        </div>
+
+        <!-- Search -->
+
+        <div class="mb-6">                <!-- Refresh Rate Meter -->
+
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search Ontology</label>                <div class="mb-3">
+
+          <div class="flex gap-2">                  <div class="flex items-center justify-between text-xs mb-1">
+
+            <input                     <span>Refresh Rate</span>
+
+              type="text"                     <div class="flex items-center gap-2">
+
+              id="onc-search-input"                       <span
+
+              placeholder="Search terms, concepts, properties..."                        id="refresh-grade"
+
+              class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"                        class="font-semibold text-neutral-500"
+
+            >                        >--</span
+
+            <button id="btn-onc-search" class="btn-primary">Search</button>                      >
+
+          </div>                      <span id="refresh-rate" class="font-mono">-- Hz</span>
+
+        </div>                    </div>
+
                   </div>
-                  <div class="flex justify-between">
-                    <span>WebGL Version:</span
-                    ><span id="webgl-version" class="font-mono">--</span>
+
+        <!-- Results -->                  <div class="w-full bg-neutral-200 rounded-full h-2">
+
+        <div id="onc-results" class="space-y-2">                    <div
+
+          <div class="text-sm text-gray-500 text-center py-8">                      id="refresh-meter"
+
+            Enter a search term to browse the ONC ontology                      class="h-2 rounded-full bg-purple-500 transition-all duration-500"
+
+          </div>                      style="width: 0%"
+
+        </div>                    ></div>
+
                   </div>
-                </div>
-              </div>
+
+        <!-- Stats -->                </div>
+
+        <div id="onc-stats" class="mt-6 grid grid-cols-3 gap-4 text-center">
+
+          <div>                <!-- GPU Details -->
+
+            <div class="text-2xl font-bold text-gray-900" id="onc-entities-count">-</div>                <div
+
+            <div class="text-xs text-gray-500">Entities</div>                  class="mt-3 pt-3 border-t text-xs space-y-1 text-neutral-600"
+
+          </div>                >
+
+          <div>                  <div class="flex justify-between">
+
+            <div class="text-2xl font-bold text-gray-900" id="onc-triples-count">-</div>                    <span>GPU Renderer:</span
+
+            <div class="text-xs text-gray-500">Triples</div>                    ><span id="gpu-renderer" class="font-mono">--</span>
+
+          </div>                  </div>
+
+          <div>                  <div class="flex justify-between">
+
+            <div class="text-2xl font-bold text-gray-900" id="onc-filesize">-</div>                    <span>WebGL Version:</span
+
+            <div class="text-xs text-gray-500">File Size</div>                    ><span id="webgl-version" class="font-mono">--</span>
+
+          </div>                  </div>
+
+        </div>                </div>
+
+      </div>              </div>
+
+    </div>
 
               <!-- Tab: Browser -->
-              <div id="tab-browser" class="tab-content hidden">
-                <div class="text-xs space-y-2 text-neutral-600">
-                  <div class="flex justify-between">
-                    <span>Navegador:</span
-                    ><span id="browser-name" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Versão:</span
-                    ><span id="browser-version" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Engine:</span
-                    ><span id="browser-engine" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>User Agent:</span>
-                  </div>
-                  <div
-                    class="text-[10px] font-mono bg-neutral-50 p-2 rounded break-all"
-                    id="user-agent"
-                  >
-                    --
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Cookies:</span
-                    ><span id="cookies-enabled" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Local Storage:</span
-                    ><span id="storage-enabled" class="font-mono">--</span>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Tab: Audio -->
-              <div id="tab-audio" class="tab-content hidden">
-                <div class="text-xs space-y-2 text-neutral-600">
+    <!-- Analytics Tab -->              <div id="tab-browser" class="tab-content hidden">
+
+    <div id="tab-analytics" class="space-y-6 hidden">                <div class="text-xs space-y-2 text-neutral-600">
+
+      <div class="panel">                  <div class="flex justify-between">
+
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">📊 Usage Analytics</h2>                    <span>Navegador:</span
+
+                            ><span id="browser-name" class="font-mono">--</span>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">                  </div>
+
+          <div class="text-center">                  <div class="flex justify-between">
+
+            <div class="text-3xl font-bold text-blue-600" id="stats-total-sessions">0</div>                    <span>Versão:</span
+
+            <div class="text-xs text-gray-500">Total Sessions</div>                    ><span id="browser-version" class="font-mono">--</span>
+
+          </div>                  </div>
+
+          <div class="text-center">                  <div class="flex justify-between">
+
+            <div class="text-3xl font-bold text-green-600" id="stats-completed">0</div>                    <span>Engine:</span
+
+            <div class="text-xs text-gray-500">Completed</div>                    ><span id="browser-engine" class="font-mono">--</span>
+
+          </div>                  </div>
+
+          <div class="text-center">                  <div class="flex justify-between">
+
+            <div class="text-3xl font-bold text-purple-600" id="stats-total-time">0h</div>                    <span>User Agent:</span>
+
+            <div class="text-xs text-gray-500">Total Time</div>                  </div>
+
+          </div>                  <div
+
+          <div class="text-center">                    class="text-[10px] font-mono bg-neutral-50 p-2 rounded break-all"
+
+            <div class="text-3xl font-bold text-orange-600" id="stats-avg-time">0m</div>                    id="user-agent"
+
+            <div class="text-xs text-gray-500">Avg Duration</div>                  >
+
+          </div>                    --
+
+        </div>                  </div>
+
                   <div class="flex justify-between">
-                    <span>Web Audio API:</span
+
+        <div class="flex gap-2">                    <span>Cookies:</span
+
+          <button id="btn-refresh-stats" class="btn-secondary">🔄 Refresh</button>                    ><span id="cookies-enabled" class="font-mono">--</span>
+
+          <button id="btn-export-data" class="btn-secondary">📥 Export Data</button>                  </div>
+
+          <button id="btn-clear-data" class="btn-danger ml-auto">🗑 Clear All Data</button>                  <div class="flex justify-between">
+
+        </div>                    <span>Local Storage:</span
+
+      </div>                    ><span id="storage-enabled" class="font-mono">--</span>
+
+                  </div>
+
+      <!-- Protocol Breakdown -->                </div>
+
+      <div class="panel">              </div>
+
+        <h3 class="text-lg font-semibold text-gray-900 mb-4">Protocol Usage</h3>
+
+        <div id="protocol-breakdown" class="space-y-2">              <!-- Tab: Audio -->
+
+          <div class="text-sm text-gray-500 text-center py-4">No sessions recorded yet</div>              <div id="tab-audio" class="tab-content hidden">
+
+        </div>                <div class="text-xs space-y-2 text-neutral-600">
+
+      </div>                  <div class="flex justify-between">
+
+    </div>                    <span>Web Audio API:</span
+
                     ><span id="audio-api" class="font-mono">--</span>
-                  </div>
+
+    <!-- System Diagnostics Tab -->                  </div>
+
+    <div id="tab-system" class="space-y-6 hidden">                  <div class="flex justify-between">
+
+      <div class="panel">                    <span>Sample Rate:</span
+
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">🔧 System Diagnostics</h2>                    ><span id="sample-rate" class="font-mono">-- Hz</span>
+
+        <div id="system-info" class="space-y-2 text-sm">                  </div>
+
+          <div class="text-gray-500">Loading system information...</div>                  <div class="flex justify-between">
+
+        </div>                    <span>Max Channels:</span
+
+      </div>                    ><span id="max-channels" class="font-mono">--</span>
+
+    </div>                  </div>
+
                   <div class="flex justify-between">
-                    <span>Sample Rate:</span
-                    ><span id="sample-rate" class="font-mono">-- Hz</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Max Channels:</span
-                    ><span id="max-channels" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Audio Context State:</span
+
+  </main>                    <span>Audio Context State:</span
+
                     ><span id="audio-state" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Output Latency:</span
-                    ><span id="output-latency" class="font-mono">-- ms</span>
-                  </div>
-                  <div class="flex justify-between">
+
+  <!-- Load Scripts -->                  </div>
+
+  <script type="module">                  <div class="flex justify-between">
+
+    import { AudioEngine } from './src/core/audio-engine.js';                    <span>Output Latency:</span
+
+    import { oncParser } from './src/utils/onc-parser.js';                    ><span id="output-latency" class="font-mono">-- ms</span>
+
+    import { usageTracker } from './src/utils/usage-tracker.js';                  </div>
+
+    import { gatherDiagnostics } from './src/ui/diagnostics.js';                  <div class="flex justify-between">
+
                     <span>Headphones Detected:</span
-                    ><span id="headphones-detected" class="font-mono">--</span>
-                  </div>
-                  <div
-                    class="mt-2 p-2 bg-amber-50 rounded text-[10px] text-amber-800"
-                  >
+
+    // Global state                    ><span id="headphones-detected" class="font-mono">--</span>
+
+    let audioEngine = null;                  </div>
+
+    let currentWaveform = 'sine';                  <div
+
+    let currentNoise = 'white';                    class="mt-2 p-2 bg-amber-50 rounded text-[10px] text-amber-800"
+
+    let activeTracks = new Set();                  >
+
                     ⚠️ Use fones de ouvido para batidas binaurais e estimulação
-                    estéreo adequada.
-                  </div>
-                </div>
-              </div>
 
-              <!-- Tab: System -->
-              <div id="tab-system" class="tab-content hidden">
+    // Tab management                    estéreo adequada.
+
+    window.showTab = (tabName) => {                  </div>
+
+      const tabs = ['audio', 'onc', 'analytics', 'system'];                </div>
+
+      tabs.forEach(t => {              </div>
+
+        document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== tabName);
+
+      });              <!-- Tab: System -->
+
+    };              <div id="tab-system" class="tab-content hidden">
+
                 <div class="text-xs space-y-2 text-neutral-600">
-                  <div class="flex justify-between">
-                    <span>Platform:</span
-                    ><span id="platform" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>OS:</span
-                    ><span id="os-name" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Device Type:</span
-                    ><span id="device-type" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>CPU Cores:</span
-                    ><span id="cpu-cores" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
+
+    // Initialize audio engine                  <div class="flex justify-between">
+
+    document.getElementById('btn-init-audio').addEventListener('click', async () => {                    <span>Platform:</span
+
+      if (audioEngine) return;                    ><span id="platform" class="font-mono">--</span>
+
+                        </div>
+
+      try {                  <div class="flex justify-between">
+
+        audioEngine = new AudioEngine();                    <span>OS:</span
+
+        await audioEngine.init();                    ><span id="os-name" class="font-mono">--</span>
+
+                          </div>
+
+        document.getElementById('audio-status').textContent = '✓ Initialized | Sample Rate: ' + audioEngine.ctx.sampleRate + ' Hz';                  <div class="flex justify-between">
+
+        document.getElementById('btn-init-audio').classList.add('hidden');                    <span>Device Type:</span
+
+        document.getElementById('btn-stop-all').classList.remove('hidden');                    ><span id="device-type" class="font-mono">--</span>
+
+                          </div>
+
+        console.log('Audio engine initialized:', audioEngine.getStats());                  <div class="flex justify-between">
+
+      } catch (error) {                    <span>CPU Cores:</span
+
+        alert('Failed to initialize audio: ' + error.message);                    ><span id="cpu-cores" class="font-mono">--</span>
+
+      }                  </div>
+
+    });                  <div class="flex justify-between">
+
                     <span>Screen Resolution:</span
-                    ><span id="screen-resolution" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Pixel Ratio:</span
-                    ><span id="pixel-ratio" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
+
+    // Stop all audio                    ><span id="screen-resolution" class="font-mono">--</span>
+
+    document.getElementById('btn-stop-all').addEventListener('click', () => {                  </div>
+
+      if (!audioEngine) return;                  <div class="flex justify-between">
+
+      audioEngine.stopAll();                    <span>Pixel Ratio:</span
+
+      activeTracks.clear();                    ><span id="pixel-ratio" class="font-mono">--</span>
+
+      updateActiveTracksDisplay();                  </div>
+
+    });                  <div class="flex justify-between">
+
                     <span>Touch Support:</span
-                    ><span id="touch-support" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Online:</span
-                    ><span id="online-status" class="font-mono">--</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Connection:</span
-                    ><span id="connection-type" class="font-mono">--</span>
-                  </div>
-                </div>
-              </div>
 
-              <!-- Copy Diagnostics Button -->
-              <button
-                id="copy-diagnostics"
-                class="w-full mt-3 px-3 py-2 text-xs bg-neutral-100 hover:bg-neutral-200 rounded-lg font-medium transition-colors"
-              >
-                📋 Copiar Diagnóstico Completo
-              </button>
-            </div>
-          </details>
-        </div>
-      </div>
-    </section>
+    // Waveform selection                    ><span id="touch-support" class="font-mono">--</span>
 
-    <!-- BioSynCare Lab: o que é -->
-    <section id="avmedicine" class="border-t bg-white">
-      <div
-        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10"
-      >
-        <div class="md:col-span-2">
-          <h2 class="text-2xl font-bold">O que é o BioSynCare Lab</h2>
-          <p class="mt-4 leading-relaxed text-neutral-700">
-            O <strong>BioSynCare Lab</strong> é o holder do engine onde as
-            técnicas são testadas em tempo real, desenvolvido como
-            <strong>open source</strong> para máxima transparência. É um
-            conjunto de <em>protocolos</em> com padrões sonoros e visuais
-            (p.ex., senóides puras, batidas binaurais/monourais, isócronos,
-            simetrias, variações cromáticas, ritmos respiratórios) executados em
-            tempo real no navegador para <strong>neuromodulação</strong> não
-            invasiva e de baixo custo. O <strong>modelo</strong> é
+    document.querySelectorAll('[data-waveform]').forEach(btn => {                  </div>
+
+      btn.addEventListener('click', (e) => {                  <div class="flex justify-between">
+
+        currentWaveform = e.target.dataset.waveform;                    <span>Online:</span
+
+        document.querySelectorAll('[data-waveform]').forEach(b => {                    ><span id="online-status" class="font-mono">--</span>
+
+          b.classList.remove('tab-active');                  </div>
+
+          b.classList.add('tab-inactive');                  <div class="flex justify-between">
+
+        });                    <span>Connection:</span
+
+        e.target.classList.add('tab-active');                    ><span id="connection-type" class="font-mono">--</span>
+
+        e.target.classList.remove('tab-inactive');                  </div>
+
+      });                </div>
+
+    });              </div>
+
+
+
+    // Noise selection              <!-- Copy Diagnostics Button -->
+
+    document.querySelectorAll('[data-noise]').forEach(btn => {              <button
+
+      btn.addEventListener('click', (e) => {                id="copy-diagnostics"
+
+        currentNoise = e.target.dataset.noise;                class="w-full mt-3 px-3 py-2 text-xs bg-neutral-100 hover:bg-neutral-200 rounded-lg font-medium transition-colors"
+
+        document.querySelectorAll('[data-noise]').forEach(b => {              >
+
+          b.classList.remove('tab-active');                📋 Copiar Diagnóstico Completo
+
+          b.classList.add('tab-inactive');              </button>
+
+        });            </div>
+
+        e.target.classList.add('tab-active');          </details>
+
+        e.target.classList.remove('tab-inactive');        </div>
+
+      });      </div>
+
+    });    </section>
+
+
+
+    // Slider updates    <!-- BioSynCare Lab: o que é -->
+
+    const sliders = [    <section id="avmedicine" class="border-t bg-white">
+
+      { id: 'waveform-freq', display: 'waveform-freq-value' },      <div
+
+      { id: 'waveform-gain', display: 'waveform-gain-value' },        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10"
+
+      { id: 'waveform-pan', display: 'waveform-pan-value' },      >
+
+      { id: 'waveform-duration', display: 'waveform-duration-value' },        <div class="md:col-span-2">
+
+      { id: 'binaural-base', display: 'binaural-base-value' },          <h2 class="text-2xl font-bold">O que é o BioSynCare Lab</h2>
+
+      { id: 'binaural-beat', display: 'binaural-beat-value' },          <p class="mt-4 leading-relaxed text-neutral-700">
+
+      { id: 'binaural-duration', display: 'binaural-duration-value' },            O <strong>BioSynCare Lab</strong> é o holder do engine onde as
+
+      { id: 'iso-freq', display: 'iso-freq-value' },            técnicas são testadas em tempo real, desenvolvido como
+
+      { id: 'iso-pulse', display: 'iso-pulse-value' },            <strong>open source</strong> para máxima transparência. É um
+
+      { id: 'iso-duration', display: 'iso-duration-value' },            conjunto de <em>protocolos</em> com padrões sonoros e visuais
+
+      { id: 'noise-gain', display: 'noise-gain-value' },            (p.ex., senóides puras, batidas binaurais/monourais, isócronos,
+
+      { id: 'noise-duration', display: 'noise-duration-value' },            simetrias, variações cromáticas, ritmos respiratórios) executados em
+
+      { id: 'martigli-fund', display: 'martigli-fund-value' },            tempo real no navegador para <strong>neuromodulação</strong> não
+
+    ];            invasiva e de baixo custo. O <strong>modelo</strong> é
+
             <span class="font-medium">JS apenas no cliente</span>, hospedado em
-            <span class="font-medium">GitHub Pages</span>.
-          </p>
-          <p class="mt-4 leading-relaxed text-neutral-700">
-            Os <strong>princípios</strong> seguem o artigo de referência da casa
-            e a tradição consolidada de AVBE; as
-            <strong>técnicas base</strong> já estão implementadas e reutilizadas
-            dos repositórios <code>aeterni</code>, <code>harmonicare</code> e
+
+    sliders.forEach(({ id, display }) => {            <span class="font-medium">GitHub Pages</span>.
+
+      const slider = document.getElementById(id);          </p>
+
+      const displayEl = document.getElementById(display);          <p class="mt-4 leading-relaxed text-neutral-700">
+
+      slider.addEventListener('input', (e) => {            Os <strong>princípios</strong> seguem o artigo de referência da casa
+
+        displayEl.textContent = e.target.value;            e a tradição consolidada de AVBE; as
+
+      });            <strong>técnicas base</strong> já estão implementadas e reutilizadas
+
+    });            dos repositórios <code>aeterni</code>, <code>harmonicare</code> e
+
             <code>audiovisualmedicine</code>.
-          </p>
-        </div>
-        <aside class="md:col-span-1 rounded-2xl bg-neutral-50 border p-5">
-          <h3 class="font-semibold">Cliente‑side, por quê?</h3>
-          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
-            <li>Baixa latência e máxima fidelidade (DSP local).</li>
+
+    // Play waveform          </p>
+
+    document.getElementById('btn-play-waveform').addEventListener('click', () => {        </div>
+
+      if (!audioEngine) {        <aside class="md:col-span-1 rounded-2xl bg-neutral-50 border p-5">
+
+        alert('Please initialize audio first');          <h3 class="font-semibold">Cliente‑side, por quê?</h3>
+
+        return;          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+
+      }            <li>Baixa latência e máxima fidelidade (DSP local).</li>
+
             <li>Privacidade por padrão (sem áudio subir ao servidor).</li>
-            <li>Facilidade de distribuição (Pages / PWA).</li>
-          </ul>
-        </aside>
-      </div>
+
+      const freq = parseFloat(document.getElementById('waveform-freq').value);            <li>Facilidade de distribuição (Pages / PWA).</li>
+
+      const gain = parseFloat(document.getElementById('waveform-gain').value);          </ul>
+
+      const pan = parseFloat(document.getElementById('waveform-pan').value);        </aside>
+
+      const duration = parseFloat(document.getElementById('waveform-duration').value);      </div>
+
     </section>
 
-    <!-- Integração ONC -->
-    <section id="onc" class="border-t bg-neutral-50">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
-        <h2 class="text-2xl font-bold">
-          Integração com a ONC (Open Neurosensory Commons)
-        </h2>
-        <p class="mt-4 text-neutral-700">
-          A <strong>ONC</strong> é onde as sessões de estimulação são definidas,
-          assim como os protocolos e dados, permitindo que sejam discutidos
-          entre especialistas, usuários e praticantes experientes. A ONC fornece
-          vocabulários/ontologias (OWL+SKOS) e JSON‑LD para descrever
-          protocolos, técnicas, parâmetros, evidências e organizações. Abaixo,
-          um parecer pragmático para o <em>BioSynCare Lab</em>:
-        </p>
+      const nodeId = audioEngine.playWaveform({
 
-        <div class="mt-6 grid md:grid-cols-3 gap-6">
-          <div class="rounded-2xl border bg-white p-5">
+        type: currentWaveform,    <!-- Integração ONC -->
+
+        freq,    <section id="onc" class="border-t bg-neutral-50">
+
+        gain,      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+
+        pan,        <h2 class="text-2xl font-bold">
+
+        duration          Integração com a ONC (Open Neurosensory Commons)
+
+      });        </h2>
+
+        <p class="mt-4 text-neutral-700">
+
+      activeTracks.add(nodeId);          A <strong>ONC</strong> é onde as sessões de estimulação são definidas,
+
+      updateActiveTracksDisplay();          assim como os protocolos e dados, permitindo que sejam discutidos
+
+                entre especialistas, usuários e praticantes experientes. A ONC fornece
+
+      usageTracker.logEvent('waveform_played', { type: currentWaveform, freq, gain, duration });          vocabulários/ontologias (OWL+SKOS) e JSON‑LD para descrever
+
+          protocolos, técnicas, parâmetros, evidências e organizações. Abaixo,
+
+      setTimeout(() => {          um parecer pragmático para o <em>BioSynCare Lab</em>:
+
+        activeTracks.delete(nodeId);        </p>
+
+        updateActiveTracksDisplay();
+
+      }, duration * 1000);        <div class="mt-6 grid md:grid-cols-3 gap-6">
+
+    });          <div class="rounded-2xl border bg-white p-5">
+
             <h3 class="font-semibold">
-              Quando <span class="text-emerald-700">usar</span>
-            </h3>
-            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
-              <li>
-                Para <strong>documentar</strong> cada protocolo (parâmetros,
-                indicações, segurança) em JSON‑LD/OWL.
+
+    // Play binaural              Quando <span class="text-emerald-700">usar</span>
+
+    document.getElementById('btn-play-binaural').addEventListener('click', () => {            </h3>
+
+      if (!audioEngine) {            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+
+        alert('Please initialize audio first');              <li>
+
+        return;                Para <strong>documentar</strong> cada protocolo (parâmetros,
+
+      }                indicações, segurança) em JSON‑LD/OWL.
+
               </li>
-              <li>
-                Para <strong>reuso científico</strong> (links para fontes,
-                versões, evidências).
+
+      const base = parseFloat(document.getElementById('binaural-base').value);              <li>
+
+      const beat = parseFloat(document.getElementById('binaural-beat').value);                Para <strong>reuso científico</strong> (links para fontes,
+
+      const duration = parseFloat(document.getElementById('binaural-duration').value);                versões, evidências).
+
               </li>
-              <li>
-                Para <strong>governança</strong> e interoperabilidade (SPARQL,
-                Wikidata/OpenAlex).
-              </li>
-            </ul>
+
+      const nodeId = audioEngine.playBinaural({ base, beat, duration });              <li>
+
+      activeTracks.add(nodeId);                Para <strong>governança</strong> e interoperabilidade (SPARQL,
+
+      updateActiveTracksDisplay();                Wikidata/OpenAlex).
+
+                    </li>
+
+      usageTracker.logEvent('binaural_played', { base, beat, duration });            </ul>
+
           </div>
+
+      setTimeout(() => {          <div class="rounded-2xl border bg-white p-5">
+
+        activeTracks.delete(nodeId);            <h3 class="font-semibold">
+
+        updateActiveTracksDisplay();              Quando <span class="text-rose-700">não usar</span>
+
+      }, duration * 1000);            </h3>
+
+    });            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+
+              <li>
+
+    // Play isochronic                Em protótipos ultra‑rápidos onde o <em>schema</em> atrasa a
+
+    document.getElementById('btn-play-isochronic').addEventListener('click', () => {                entrega.
+
+      if (!audioEngine) {              </li>
+
+        alert('Please initialize audio first');              <li>
+
+        return;                Para features puramente <em>runtime</em> (DSP) que não exigem
+
+      }                metadados semânticos.
+
+              </li>
+
+      const freq = parseFloat(document.getElementById('iso-freq').value);              <li>Se o overhead de serialização impactar a UX.</li>
+
+      const pulseFreq = parseFloat(document.getElementById('iso-pulse').value);            </ul>
+
+      const duration = parseFloat(document.getElementById('iso-duration').value);          </div>
+
           <div class="rounded-2xl border bg-white p-5">
-            <h3 class="font-semibold">
-              Quando <span class="text-rose-700">não usar</span>
-            </h3>
-            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
-              <li>
-                Em protótipos ultra‑rápidos onde o <em>schema</em> atrasa a
-                entrega.
+
+      const nodeId = audioEngine.playIsochronic({ freq, pulseFreq, duration });            <h3 class="font-semibold">Benefícios no espectro ONC</h3>
+
+      activeTracks.add(nodeId);            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+
+      updateActiveTracksDisplay();              <li>
+
+                      <strong>Escrita</strong>: reduz ambiguidade, define nomes e
+
+      usageTracker.logEvent('isochronic_played', { freq, pulseFreq, duration });                faixas válidas.
+
               </li>
-              <li>
-                Para features puramente <em>runtime</em> (DSP) que não exigem
-                metadados semânticos.
-              </li>
-              <li>Se o overhead de serialização impactar a UX.</li>
-            </ul>
-          </div>
-          <div class="rounded-2xl border bg-white p-5">
-            <h3 class="font-semibold">Benefícios no espectro ONC</h3>
-            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
-              <li>
-                <strong>Escrita</strong>: reduz ambiguidade, define nomes e
-                faixas válidas.
-              </li>
-              <li>
-                <strong>Desenvolvimento</strong>: valida presets, automatiza
-                testes de parâmetros.
-              </li>
-              <li>
+
+      setTimeout(() => {              <li>
+
+        activeTracks.delete(nodeId);                <strong>Desenvolvimento</strong>: valida presets, automatiza
+
+        updateActiveTracksDisplay();                testes de parâmetros.
+
+      }, duration * 1000);              </li>
+
+    });              <li>
+
                 <strong>Manutenção</strong>: versionamento semântico de
-                protocolos e evidências.
-              </li>
-            </ul>
-          </div>
-        </div>
+
+    // Play noise                protocolos e evidências.
+
+    document.getElementById('btn-play-noise').addEventListener('click', () => {              </li>
+
+      if (!audioEngine) {            </ul>
+
+        alert('Please initialize audio first');          </div>
+
+        return;        </div>
+
+      }
 
         <details class="mt-6 rounded-2xl border bg-white p-5 group" open>
-          <summary class="cursor-pointer font-medium">
-            Decisão recomendada (MVP → ONC‑ready)
+
+      const gain = parseFloat(document.getElementById('noise-gain').value);          <summary class="cursor-pointer font-medium">
+
+      const duration = parseFloat(document.getElementById('noise-duration').value);            Decisão recomendada (MVP → ONC‑ready)
+
           </summary>
-          <div class="mt-3 text-sm leading-7 text-neutral-700">
-            <ol class="list-decimal pl-5 space-y-2">
-              <li>
-                <strong>MVP lean</strong> com presets locais (JSON) e tipos
-                TS/JS bem definidos.
+
+      const nodeId = audioEngine.playNoise({ type: currentNoise, gain, duration });          <div class="mt-3 text-sm leading-7 text-neutral-700">
+
+      activeTracks.add(nodeId);            <ol class="list-decimal pl-5 space-y-2">
+
+      updateActiveTracksDisplay();              <li>
+
+                      <strong>MVP lean</strong> com presets locais (JSON) e tipos
+
+      usageTracker.logEvent('noise_played', { type: currentNoise, gain, duration });                TS/JS bem definidos.
+
               </li>
-              <li>
-                <strong>Adapter ONC</strong>: função pura que mapeia presets ⇄
-                JSON‑LD/OWL.
-              </li>
-              <li>
+
+      setTimeout(() => {              <li>
+
+        activeTracks.delete(nodeId);                <strong>Adapter ONC</strong>: função pura que mapeia presets ⇄
+
+        updateActiveTracksDisplay();                JSON‑LD/OWL.
+
+      }, duration * 1000);              </li>
+
+    });              <li>
+
                 <strong>Export</strong> opcional: botão “Exportar para ONC” para
-                cada protocolo.
-              </li>
-            </ol>
-          </div>
-        </details>
-      </div>
+
+    // Play Martigli waves                cada protocolo.
+
+    document.getElementById('btn-play-martigli').addEventListener('click', () => {              </li>
+
+      if (!audioEngine) {            </ol>
+
+        alert('Please initialize audio first');          </div>
+
+        return;        </details>
+
+      }      </div>
+
     </section>
 
-    <!-- Engine / Reuso de código -->
-    <section id="engine" class="border-t bg-white">
-      <div
-        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid lg:grid-cols-2 gap-10 items-start"
-      >
+      const fundamental = parseFloat(document.getElementById('martigli-fund').value);
+
+      const nodeId = audioEngine.playMartigliWave({ fundamental, duration: 60 });    <!-- Engine / Reuso de código -->
+
+      activeTracks.add(nodeId);    <section id="engine" class="border-t bg-white">
+
+      updateActiveTracksDisplay();      <div
+
+              class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid lg:grid-cols-2 gap-10 items-start"
+
+      usageTracker.logEvent('martigli_played', { fundamental });      >
+
         <div>
-          <h2 class="text-2xl font-bold">Engine de Áudio & Reuso</h2>
-          <p class="mt-4 text-neutral-700">
-            Reutilize os módulos já disponíveis nos repositórios
-            <a
-              class="underline"
-              href="https://github.com/aeterni/aeterni.github.io"
-              target="_blank"
-              rel="noopener"
-              >aeterni</a
-            >,
-            <a
-              class="underline"
-              href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
-              target="_blank"
-              rel="noopener"
-              >audiovisualmedicine</a
-            >
-            e
-            <a
-              class="underline"
-              href="https://harmonicare.netlify.app/"
-              target="_blank"
-              rel="noopener"
-              >harmonicare</a
-            >
-            (histórico). O núcleo inclui: geradores senoidais, batidas
-            binaurais/monourais, isócronos, envelopes de amplitude, LFOs e
-            sincronização respiratória.
-          </p>
-          <ul class="mt-4 list-disc pl-5 text-neutral-700 text-sm leading-6">
-            <li>
-              <strong>API proposta</strong>:
-              <code
-                >engine.play({ type: 'binaural', base: 300, beat: 8, duration:
-                30 })</code
-              >
-            </li>
-            <li>
-              <strong>Sincronização</strong>:
-              <code>engine.breathe({ pattern: '4-7-8' })</code>
-            </li>
-            <li>
-              <strong>Visual</strong>:
-              <code>viz.flicker({ freq: 8, waveform: 'square' })</code>
-            </li>
-          </ul>
-          <p class="mt-3 text-xs text-neutral-500">
-            Obs.: Nesta página, os módulos são carregados <em>on‑demand</em> via
-            <code>type="module"</code>. Nada de servidor.
-          </p>
-          <div class="mt-5 flex gap-3">
-            <button
-              id="btn-tone"
-              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-            >
-              Testar 300 Hz
-            </button>
-            <button
-              id="btn-binaural"
-              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-            >
-              Binaural 300±4 Hz
-            </button>
-            <button
-              id="btn-stop"
-              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
-            >
-              Parar
-            </button>
-          </div>
-          <p class="mt-2 text-xs text-neutral-500">
-            Use fones de ouvido. Controle o volume do sistema.
-          </p>
-        </div>
-        <div class="rounded-2xl border p-5 bg-neutral-50">
-          <h3 class="font-semibold">Como organizar o código (client‑only)</h3>
-          <pre class="mt-3 text-xs overflow-x-auto"><code>src/
-  engine/
-    audio.js        // Web Audio primitives (osc, gain, envelope)
-    binaural.js     // helpers para batidas binaurais/monourais
-    breathe.js      // sincronização respiratória
-  viz/
-    flicker.js      // padrões visuais (canvas/webgl)
-  presets/
-    relax.json      // parâmetros nomeados
-    foco.json
-  onc/
-    adapter.js      // mapeia presets ⇄ JSON‑LD (opcional)
-index.html          // esta página
-assets/             // favicon, og, logos
-</code></pre>
-        </div>
-      </div>
-    </section>
 
-    <!-- Projetos/links existentes -->
-    <section id="projetos" class="border-t bg-neutral-50">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
-        <h2 class="text-2xl font-bold">Outros projetos e referências</h2>
-        <div class="mt-6 grid md:grid-cols-3 gap-6">
-          <a
-            class="block rounded-2xl border bg-white p-5 hover:shadow"
-            href="https://aeterni.github.io/"
-            target="_blank"
-            rel="noopener"
-          >
-            <h3 class="font-semibold">Æterni · site atual</h3>
-            <p class="mt-1 text-sm text-neutral-600">
-              Conteúdos e experimentos existentes.
-            </p>
-          </a>
-          <a
-            class="block rounded-2xl border bg-white p-5 hover:shadow"
-            href="https://harmonicare.netlify.app/"
-            target="_blank"
-            rel="noopener"
-          >
-            <h3 class="font-semibold">HarmoniCare (histórico)</h3>
-            <p class="mt-1 text-sm text-neutral-600">
-              Gênese do app e protocolos base.
-            </p>
-          </a>
-          <a
-            class="block rounded-2xl border bg-white p-5 hover:shadow"
-            href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
-            target="_blank"
-            rel="noopener"
-          >
-            <h3 class="font-semibold">AudiovisualMedicine · GitHub</h3>
-            <p class="mt-1 text-sm text-neutral-600">
-              Implementações abertas (client‑side).
-            </p>
-          </a>
+      setTimeout(() => {          <h2 class="text-2xl font-bold">Engine de Áudio & Reuso</h2>
+
+        activeTracks.delete(nodeId);          <p class="mt-4 text-neutral-700">
+
+        updateActiveTracksDisplay();            Reutilize os módulos já disponíveis nos repositórios
+
+      }, 60 * 1000);            <a
+
+    });              class="underline"
+
+              href="https://github.com/aeterni/aeterni.github.io"
+
+    // Play sonic symmetry              target="_blank"
+
+    document.getElementById('btn-play-symmetry').addEventListener('click', () => {              rel="noopener"
+
+      if (!audioEngine) {              >aeterni</a
+
+        alert('Please initialize audio first');            >,
+
+        return;            <a
+
+      }              class="underline"
+
+              href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+
+      const pattern = document.getElementById('symmetry-pattern').value;              target="_blank"
+
+      const nodeId = audioEngine.playSonicSymmetry({ pattern, baseFreq: 200, duration: 60 });              rel="noopener"
+
+      activeTracks.add(nodeId);              >audiovisualmedicine</a
+
+      updateActiveTracksDisplay();            >
+
+                  e
+
+      usageTracker.logEvent('symmetry_played', { pattern });            <a
+
+              class="underline"
+
+      setTimeout(() => {              href="https://harmonicare.netlify.app/"
+
+        activeTracks.delete(nodeId);              target="_blank"
+
+        updateActiveTracksDisplay();              rel="noopener"
+
+      }, 60 * 1000);              >harmonicare</a
+
+    });            >
+
+            (histórico). O núcleo inclui: geradores senoidais, batidas
+
+    function updateActiveTracksDisplay() {            binaurais/monourais, isócronos, envelopes de amplitude, LFOs e
+
+      document.getElementById('active-tracks').textContent = activeTracks.size;            sincronização respiratória.
+
+    }          </p>
+
+          <ul class="mt-4 list-disc pl-5 text-neutral-700 text-sm leading-6">
+
+    // ONC Browser            <li>
+
+    let oncLoaded = false;              <strong>API proposta</strong>:
+
+    document.getElementById('btn-onc-search').addEventListener('click', async () => {              <code
+
+      if (!oncLoaded) {                >engine.play({ type: 'binaural', base: 300, beat: 8, duration:
+
+        const success = await oncParser.load('/rdf/Attachment 2_ONC_Ontology.ttl');                30 })</code
+
+        if (success) {              >
+
+          oncLoaded = true;            </li>
+
+          const stats = oncParser.getStats();            <li>
+
+          document.getElementById('onc-entities-count').textContent = stats.totalEntities;              <strong>Sincronização</strong>:
+
+          document.getElementById('onc-triples-count').textContent = stats.totalTriples;              <code>engine.breathe({ pattern: '4-7-8' })</code>
+
+          document.getElementById('onc-filesize').textContent = (stats.fileSize / 1024).toFixed(1) + ' KB';            </li>
+
+        } else {            <li>
+
+          alert('Failed to load ONC ontology');              <strong>Visual</strong>:
+
+          return;              <code>viz.flicker({ freq: 8, waveform: 'square' })</code>
+
+        }            </li>
+
+      }          </ul>
+
+          <p class="mt-3 text-xs text-neutral-500">
+
+      const query = document.getElementById('onc-search-input').value.trim();            Obs.: Nesta página, os módulos são carregados <em>on‑demand</em> via
+
+      if (!query) return;            <code>type="module"</code>. Nada de servidor.
+
+          </p>
+
+      const results = oncParser.search(query);          <div class="mt-5 flex gap-3">
+
+      const resultsDiv = document.getElementById('onc-results');            <button
+
+                    id="btn-tone"
+
+      if (results.length === 0) {              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+
+        resultsDiv.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">No results found</div>';            >
+
+      } else {              Testar 300 Hz
+
+        resultsDiv.innerHTML = results.slice(0, 20).map(entity => `            </button>
+
+          <div class="p-3 bg-gray-50 rounded-lg border border-gray-200">            <button
+
+            <div class="text-sm font-medium text-gray-900 truncate">${entity.uri}</div>              id="btn-binaural"
+
+            <div class="text-xs text-gray-500 mt-1">${entity.properties.size} properties</div>              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+
+          </div>            >
+
+        `).join('');              Binaural 300±4 Hz
+
+      }            </button>
+
+    });            <button
+
+              id="btn-stop"
+
+    // Analytics              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+
+    function refreshAnalytics() {            >
+
+      const stats = usageTracker.getStats();              Parar
+
+                  </button>
+
+      document.getElementById('stats-total-sessions').textContent = stats.totalSessions;          </div>
+
+      document.getElementById('stats-completed').textContent = stats.completedSessions;          <p class="mt-2 text-xs text-neutral-500">
+
+      document.getElementById('stats-total-time').textContent = (stats.totalDuration / 3600).toFixed(1) + 'h';            Use fones de ouvido. Controle o volume do sistema.
+
+      document.getElementById('stats-avg-time').textContent = Math.round(stats.averageDuration / 60) + 'm';          </p>
+
         </div>
-      </div>
-    </section>
+
+      const breakdownDiv = document.getElementById('protocol-breakdown');        <div class="rounded-2xl border p-5 bg-neutral-50">
+
+      const breakdown = stats.protocolBreakdown;          <h3 class="font-semibold">Como organizar o código (client‑only)</h3>
+
+                <pre class="mt-3 text-xs overflow-x-auto"><code>src/
+
+      if (Object.keys(breakdown).length === 0) {  engine/
+
+        breakdownDiv.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">No sessions recorded yet</div>';    audio.js        // Web Audio primitives (osc, gain, envelope)
+
+      } else {    binaural.js     // helpers para batidas binaurais/monourais
+
+        breakdownDiv.innerHTML = Object.entries(breakdown).map(([protocol, data]) => `    breathe.js      // sincronização respiratória
+
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">  viz/
+
+            <div class="text-sm font-medium text-gray-900">${protocol}</div>    flicker.js      // padrões visuais (canvas/webgl)
+
+            <div class="text-sm text-gray-600">${data.count} sessions · ${Math.round(data.totalDuration / 60)}m total</div>  presets/
+
+          </div>    relax.json      // parâmetros nomeados
+
+        `).join('');    foco.json
+
+      }  onc/
+
+    }    adapter.js      // mapeia presets ⇄ JSON‑LD (opcional)
+
+index.html          // esta página
+
+    document.getElementById('btn-refresh-stats').addEventListener('click', refreshAnalytics);assets/             // favicon, og, logos
+
+    </code></pre>
+
+    document.getElementById('btn-export-data').addEventListener('click', () => {        </div>
+
+      const data = usageTracker.exportData();      </div>
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });    </section>
+
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');    <!-- Projetos/links existentes -->
+
+      a.href = url;    <section id="projetos" class="border-t bg-neutral-50">
+
+      a.download = `biosyncare-usage-${new Date().toISOString().split('T')[0]}.json`;      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+
+      a.click();        <h2 class="text-2xl font-bold">Outros projetos e referências</h2>
+
+      URL.revokeObjectURL(url);        <div class="mt-6 grid md:grid-cols-3 gap-6">
+
+    });          <a
+
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+
+    document.getElementById('btn-clear-data').addEventListener('click', () => {            href="https://aeterni.github.io/"
+
+      if (confirm('Are you sure you want to clear all usage data? This cannot be undone.')) {            target="_blank"
+
+        usageTracker.clearAll();            rel="noopener"
+
+        refreshAnalytics();          >
+
+      }            <h3 class="font-semibold">Æterni · site atual</h3>
+
+    });            <p class="mt-1 text-sm text-neutral-600">
+
+              Conteúdos e experimentos existentes.
+
+    // System diagnostics            </p>
+
+    async function loadSystemInfo() {          </a>
+
+      const diag = await gatherDiagnostics();          <a
+
+      const systemDiv = document.getElementById('system-info');            class="block rounded-2xl border bg-white p-5 hover:shadow"
+
+                  href="https://harmonicare.netlify.app/"
+
+      systemDiv.innerHTML = `            target="_blank"
+
+        <div class="space-y-4">            rel="noopener"
+
+          <div>          >
+
+            <h3 class="font-medium text-gray-900 mb-2">Browser</h3>            <h3 class="font-semibold">HarmoniCare (histórico)</h3>
+
+            <div class="text-sm text-gray-600">            <p class="mt-1 text-sm text-neutral-600">
+
+              ${diag.browser.name} ${diag.browser.version} (${diag.browser.engine})              Gênese do app e protocolos base.
+
+            </div>            </p>
+
+          </div>          </a>
+
+          <div>          <a
+
+            <h3 class="font-medium text-gray-900 mb-2">System</h3>            class="block rounded-2xl border bg-white p-5 hover:shadow"
+
+            <div class="text-sm text-gray-600">            href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+
+              ${diag.os.name} · ${diag.system.cores} cores · ${diag.system.screenResolution}            target="_blank"
+
+            </div>            rel="noopener"
+
+          </div>          >
+
+          <div>            <h3 class="font-semibold">AudiovisualMedicine · GitHub</h3>
+
+            <h3 class="font-medium text-gray-900 mb-2">Audio</h3>            <p class="mt-1 text-sm text-neutral-600">
+
+            <div class="text-sm text-gray-600">              Implementações abertas (client‑side).
+
+              Sample Rate: ${diag.audio.sampleRate} Hz · Channels: ${diag.audio.maxChannels} · Latency: ${diag.audio.outputLatency}ms            </p>
+
+            </div>          </a>
+
+          </div>        </div>
+
+        </div>      </div>
+
+      `;    </section>
+
+    }
 
     <!-- FAQ curta -->
-    <section id="faq" class="border-t bg-white">
-      <div
-        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-2 gap-8"
-      >
+
+    // Initialize    <section id="faq" class="border-t bg-white">
+
+    showTab('audio');      <div
+
+    refreshAnalytics();        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-2 gap-8"
+
+    loadSystemInfo();      >
+
         <div>
-          <h2 class="text-2xl font-bold">FAQ</h2>
+
+  </script>          <h2 class="text-2xl font-bold">FAQ</h2>
+
           <details class="mt-4 rounded-xl border p-4" open>
-            <summary class="font-medium">Precisa de servidor?</summary>
-            <p class="mt-2 text-sm text-neutral-700">
+
+</body>            <summary class="font-medium">Precisa de servidor?</summary>
+
+</html>            <p class="mt-2 text-sm text-neutral-700">
+
               Não. Tudo roda no cliente (Web Audio + Canvas/WebGL). Integrações
               ONC e exportações são arquivos locais/baixados.
             </p>

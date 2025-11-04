@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+   xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+>
+  <rdf:Description rdf:about="http://example.org/sso/CognitiveStimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/hasTherapeuticPurpose">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <rdfs:range rdf:resource="http://example.org/sso/TherapeuticUse"/>
+    <rdfs:label>hasTherapeuticPurpose</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/SensoryStimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <skos:prefLabel>Sensory Stimulation</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/isUsedForRelaxation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/Neuromodulation"/>
+    <rdfs:range rdf:resource="http://example.org/sso/Relaxation"/>
+    <rdfs:label>isUsedForRelaxation</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/isUsedInLanguageDevelopment">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/Language"/>
+    <rdfs:range rdf:resource="http://example.org/sso/CognitiveStimulation"/>
+    <rdfs:label>isUsedInLanguageDevelopment</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/AuditoryStimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <skos:prefLabel>Auditory Stimulation</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/Relaxation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/AudiovisualStimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/enhancesCognitiveFunction">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/Neuromodulation"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/CognitiveStimulation"/>
+    <rdfs:range rdf:resource="http://example.org/sso/CognitiveEnhancement"/>
+    <rdfs:label>enhancesCognitiveFunction</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/modulatesBrainActivity">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#ObjectProperty"/>
+    <rdfs:domain rdf:resource="http://example.org/sso/Neuromodulation"/>
+    <rdfs:range rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <rdfs:label>modulatesBrainActivity</rdfs:label>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/Neuromodulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <skos:prefLabel>Neuromodulation</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/TherapeuticUse">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <skos:prefLabel>Therapeutic Use</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/SensoryStimulationOntology">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/Language">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/VisualStimulation">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+    <rdfs:subClassOf rdf:resource="http://example.org/sso/SensoryStimulation"/>
+    <skos:prefLabel>Visual Stimulation</skos:prefLabel>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://example.org/sso/CognitiveEnhancement">
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Class"/>
+  </rdf:Description>
+</rdf:RDF>

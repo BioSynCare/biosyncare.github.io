@@ -1,0 +1,2035 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>BioSynCare Lab - Central de Dados e Transparência</title>
+    <meta
+      name="description"
+      content="BioSynCare Lab: Central de dados com transparência nos processos e protocolos. Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador. Cliente‑side only. Integração opcional com a ONC."
+    />
+    <meta
+      property="og:title"
+      content="BioSynCare Lab - Central de Dados e Transparência"
+    />
+    <meta
+      property="og:description"
+      content="Protocolos de estimulação neurosensorial acessíveis, em tempo real, no navegador."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/assets/og-image.png" />
+    <link rel="icon" href="/assets/favicon.ico" />
+    <!-- Enable browser translation -->
+    <meta name="google" content="notranslate" value="false" />
+    <meta http-equiv="content-language" content="pt-br" />
+    <!-- Tailwind via CDN (ok for GitHub Pages prototype); swap to local build if needed -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Elegant fallback for serif/ligatured title */
+      .brand {
+        font-feature-settings: 'liga' on, 'calt' on;
+      }
+      .kbd {
+        @apply inline-flex items-center justify-center rounded-md border px-1.5 py-0.5 text-xs font-mono;
+      }
+      /* Minimal focus styles for a11y */
+      :focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body class="bg-neutral-50 text-neutral-900 antialiased">
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-30 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/90 border-b"
+    >
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-3 flex items-center gap-4">
+        <a href="#" class="flex items-center gap-3">
+          <div
+            class="h-8 w-8 rounded-xl bg-neutral-900 text-white grid place-items-center font-bold"
+          >
+            B
+          </div>
+          <span class="brand text-lg font-semibold tracking-tight"
+            >BioSynCare Lab</span
+          >
+        </a>
+        <nav class="ml-auto hidden md:flex items-center gap-6 text-sm">
+          <a class="hover:opacity-70" href="#avmedicine">BioSynCare&nbsp;Lab</a>
+          <a class="hover:opacity-70" href="#onc">Integração&nbsp;ONC</a>
+          <a class="hover:opacity-70" href="#engine">Engine&nbsp;JS</a>
+          <a class="hover:opacity-70" href="#projetos">Projetos</a>
+          <a class="hover:opacity-70" href="#faq">FAQ</a>
+          <a class="hover:opacity-70" href="#contato">Contato</a>
+        </nav>
+        <a
+          href="#lab"
+          class="ml-auto md:ml-3 inline-flex items-center gap-2 rounded-xl bg-neutral-900 text-white px-3 py-2 text-sm font-medium shadow hover:shadow-md"
+        >
+          Abrir Laboratório WebAudio
+        </a>
+      </div>
+    </header>
+
+    <!-- Language Notice -->
+    <div id="language-banner" class="bg-blue-50 border-b border-blue-100">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-2.5">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+          <p class="text-xs text-blue-800">
+            🌐 <span class="font-medium">Português</span>
+            <span class="opacity-70 ml-1">· Portuguese content</span>
+          </p>
+          <div class="flex items-center gap-2">
+            <button
+              id="translate-btn"
+              class="inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-md bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
+            >
+              <span>🌍</span>
+              <span>Translate / Traduzir</span>
+            </button>
+            <button
+              id="close-banner"
+              class="text-blue-600 hover:text-blue-800 text-xs px-2 py-1"
+              title="Close banner"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hero -->
+    <section class="relative overflow-hidden">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-16 sm:py-24 grid md:grid-cols-2 gap-10 items-center"
+      >
+        <div>
+          <h1
+            class="brand text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight"
+          >
+            BioSynCare Lab
+          </h1>
+          <p class="mt-3 text-xl font-semibold text-neutral-800">
+            Central de dados com
+            <strong>transparência nos processos e protocolos</strong>
+          </p>
+          <p class="mt-4 text-lg text-neutral-700">
+            Protocolos de <strong>estimulação neurosensorial</strong> acessíveis
+            para serem escutados e vistos <strong>em tempo real</strong>,
+            diretamente no navegador.
+            <span class="whitespace-nowrap">100% client‑side.</span>
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a
+              href="#avmedicine"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              >Saiba mais</a
+            >
+            <a
+              href="https://aeterni.github.io/"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              target="_blank"
+              rel="noopener"
+              >Site atual</a
+            >
+            <a
+              href="https://github.com/aeterni/aeterni.github.io"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+              target="_blank"
+              rel="noopener"
+              >Código (GitHub)</a
+            >
+          </div>
+        </div>
+        <div class="relative space-y-4">
+          <div
+            class="aspect-video rounded-2xl bg-gradient-to-br from-neutral-200 to-neutral-100 shadow-inner"
+          ></div>
+          <p class="text-xs text-neutral-500">
+            Demonstração visual/sonora aparece aqui quando o laboratório estiver
+            ativo.
+          </p>
+
+          <!-- System Diagnostics Widget -->
+          <details class="rounded-xl border bg-white shadow-sm group" open>
+            <summary
+              class="cursor-pointer p-4 flex items-center justify-between hover:bg-neutral-50 rounded-t-xl"
+            >
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-semibold text-neutral-700"
+                  >🔧 Diagnóstico do Sistema</span
+                >
+                <span
+                  id="diagnostic-summary"
+                  class="text-xs text-neutral-500"
+                ></span>
+              </div>
+              <span
+                class="text-neutral-400 group-open:rotate-180 transition-transform"
+                >▼</span
+              >
+            </summary>
+
+            <div class="p-4 pt-0 space-y-4">
+              <!-- Quick Status -->
+              <div class="grid grid-cols-3 gap-2">
+                <div class="flex items-center gap-2 text-xs">
+                  <div
+                    id="mobile-indicator"
+                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+                  ></div>
+                  <span
+                    ><span id="mobile-status" class="font-mono">...</span></span
+                  >
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                  <div
+                    id="gpu-indicator"
+                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+                  ></div>
+                  <span id="gpu-status" class="font-mono">GPU...</span>
+                </div>
+                <div class="flex items-center gap-2 text-xs">
+                  <div
+                    id="mode-indicator"
+                    class="w-2.5 h-2.5 rounded-full bg-gray-300"
+                  ></div>
+                  <span id="mode-status" class="font-mono text-xs">...</span>
+                </div>
+              </div>
+
+              <!-- Tabs -->
+              <div class="border-b border-neutral-200">
+                <div class="flex gap-1 text-xs" role="tablist">
+                  <button
+                    class="tab-btn px-3 py-2 font-medium border-b-2 border-blue-500 text-blue-600"
+                    data-tab="performance"
+                  >
+                    Performance
+                  </button>
+                  <button
+                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+                    data-tab="browser"
+                  >
+                    Navegador
+                  </button>
+                  <button
+                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+                    data-tab="audio"
+                  >
+                    Áudio
+                  </button>
+                  <button
+                    class="tab-btn px-3 py-2 font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-700"
+                    data-tab="system"
+                  >
+                    Sistema
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tab: Performance -->
+              <div id="tab-performance" class="tab-content">
+                <!-- GPU Performance Meter -->
+                <div class="mb-3">
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span>GPU Score</span>
+                    <div class="flex items-center gap-2">
+                      <span
+                        id="gpu-grade"
+                        class="font-semibold text-neutral-500"
+                        >--</span
+                      >
+                      <span id="gpu-score" class="font-mono">--</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-neutral-200 rounded-full h-2">
+                    <div
+                      id="gpu-meter"
+                      class="h-2 rounded-full bg-blue-500 transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- RAM Availability Meter -->
+                <div class="mb-3">
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span>RAM Disponível</span>
+                    <div class="flex items-center gap-2">
+                      <span
+                        id="ram-grade"
+                        class="font-semibold text-neutral-500"
+                        >--</span
+                      >
+                      <span id="ram-amount" class="font-mono">--</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-neutral-200 rounded-full h-2">
+                    <div
+                      id="ram-meter"
+                      class="h-2 rounded-full bg-green-500 transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- Refresh Rate Meter -->
+                <div class="mb-3">
+                  <div class="flex items-center justify-between text-xs mb-1">
+                    <span>Refresh Rate</span>
+                    <div class="flex items-center gap-2">
+                      <span
+                        id="refresh-grade"
+                        class="font-semibold text-neutral-500"
+                        >--</span
+                      >
+                      <span id="refresh-rate" class="font-mono">-- Hz</span>
+                    </div>
+                  </div>
+                  <div class="w-full bg-neutral-200 rounded-full h-2">
+                    <div
+                      id="refresh-meter"
+                      class="h-2 rounded-full bg-purple-500 transition-all duration-500"
+                      style="width: 0%"
+                    ></div>
+                  </div>
+                </div>
+
+                <!-- GPU Details -->
+                <div
+                  class="mt-3 pt-3 border-t text-xs space-y-1 text-neutral-600"
+                >
+                  <div class="flex justify-between">
+                    <span>GPU Renderer:</span
+                    ><span id="gpu-renderer" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>WebGL Version:</span
+                    ><span id="webgl-version" class="font-mono">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Browser -->
+              <div id="tab-browser" class="tab-content hidden">
+                <div class="text-xs space-y-2 text-neutral-600">
+                  <div class="flex justify-between">
+                    <span>Navegador:</span
+                    ><span id="browser-name" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Versão:</span
+                    ><span id="browser-version" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Engine:</span
+                    ><span id="browser-engine" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>User Agent:</span>
+                  </div>
+                  <div
+                    class="text-[10px] font-mono bg-neutral-50 p-2 rounded break-all"
+                    id="user-agent"
+                  >
+                    --
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Cookies:</span
+                    ><span id="cookies-enabled" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Local Storage:</span
+                    ><span id="storage-enabled" class="font-mono">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: Audio -->
+              <div id="tab-audio" class="tab-content hidden">
+                <div class="text-xs space-y-2 text-neutral-600">
+                  <div class="flex justify-between">
+                    <span>Web Audio API:</span
+                    ><span id="audio-api" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Sample Rate:</span
+                    ><span id="sample-rate" class="font-mono">-- Hz</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Max Channels:</span
+                    ><span id="max-channels" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Audio Context State:</span
+                    ><span id="audio-state" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Output Latency:</span
+                    ><span id="output-latency" class="font-mono">-- ms</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Headphones Detected:</span
+                    ><span id="headphones-detected" class="font-mono">--</span>
+                  </div>
+                  <div
+                    class="mt-2 p-2 bg-amber-50 rounded text-[10px] text-amber-800"
+                  >
+                    ⚠️ Use fones de ouvido para batidas binaurais e estimulação
+                    estéreo adequada.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab: System -->
+              <div id="tab-system" class="tab-content hidden">
+                <div class="text-xs space-y-2 text-neutral-600">
+                  <div class="flex justify-between">
+                    <span>Platform:</span
+                    ><span id="platform" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>OS:</span
+                    ><span id="os-name" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Device Type:</span
+                    ><span id="device-type" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>CPU Cores:</span
+                    ><span id="cpu-cores" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Screen Resolution:</span
+                    ><span id="screen-resolution" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Pixel Ratio:</span
+                    ><span id="pixel-ratio" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Touch Support:</span
+                    ><span id="touch-support" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Online:</span
+                    ><span id="online-status" class="font-mono">--</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span>Connection:</span
+                    ><span id="connection-type" class="font-mono">--</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Copy Diagnostics Button -->
+              <button
+                id="copy-diagnostics"
+                class="w-full mt-3 px-3 py-2 text-xs bg-neutral-100 hover:bg-neutral-200 rounded-lg font-medium transition-colors"
+              >
+                📋 Copiar Diagnóstico Completo
+              </button>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- BioSynCare Lab: o que é -->
+    <section id="avmedicine" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-3 gap-10"
+      >
+        <div class="md:col-span-2">
+          <h2 class="text-2xl font-bold">O que é o BioSynCare Lab</h2>
+          <p class="mt-4 leading-relaxed text-neutral-700">
+            O <strong>BioSynCare Lab</strong> é o holder do engine onde as
+            técnicas são testadas em tempo real, desenvolvido como
+            <strong>open source</strong> para máxima transparência. É um
+            conjunto de <em>protocolos</em> com padrões sonoros e visuais
+            (p.ex., senóides puras, batidas binaurais/monourais, isócronos,
+            simetrias, variações cromáticas, ritmos respiratórios) executados em
+            tempo real no navegador para <strong>neuromodulação</strong> não
+            invasiva e de baixo custo. O <strong>modelo</strong> é
+            <span class="font-medium">JS apenas no cliente</span>, hospedado em
+            <span class="font-medium">GitHub Pages</span>.
+          </p>
+          <p class="mt-4 leading-relaxed text-neutral-700">
+            Os <strong>princípios</strong> seguem o artigo de referência da casa
+            e a tradição consolidada de AVBE; as
+            <strong>técnicas base</strong> já estão implementadas e reutilizadas
+            dos repositórios <code>aeterni</code>, <code>harmonicare</code> e
+            <code>audiovisualmedicine</code>.
+          </p>
+        </div>
+        <aside class="md:col-span-1 rounded-2xl bg-neutral-50 border p-5">
+          <h3 class="font-semibold">Cliente‑side, por quê?</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+            <li>Baixa latência e máxima fidelidade (DSP local).</li>
+            <li>Privacidade por padrão (sem áudio subir ao servidor).</li>
+            <li>Facilidade de distribuição (Pages / PWA).</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Integração ONC -->
+    <section id="onc" class="border-t bg-neutral-50">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+        <h2 class="text-2xl font-bold">
+          Integração com a ONC (Open Neurosensory Commons)
+        </h2>
+        <p class="mt-4 text-neutral-700">
+          A <strong>ONC</strong> é onde as sessões de estimulação são definidas,
+          assim como os protocolos e dados, permitindo que sejam discutidos
+          entre especialistas, usuários e praticantes experientes. A ONC fornece
+          vocabulários/ontologias (OWL+SKOS) e JSON‑LD para descrever
+          protocolos, técnicas, parâmetros, evidências e organizações. Abaixo,
+          um parecer pragmático para o <em>BioSynCare Lab</em>:
+        </p>
+
+        <div class="mt-6 grid md:grid-cols-3 gap-6">
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">
+              Quando <span class="text-emerald-700">usar</span>
+            </h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                Para <strong>documentar</strong> cada protocolo (parâmetros,
+                indicações, segurança) em JSON‑LD/OWL.
+              </li>
+              <li>
+                Para <strong>reuso científico</strong> (links para fontes,
+                versões, evidências).
+              </li>
+              <li>
+                Para <strong>governança</strong> e interoperabilidade (SPARQL,
+                Wikidata/OpenAlex).
+              </li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">
+              Quando <span class="text-rose-700">não usar</span>
+            </h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                Em protótipos ultra‑rápidos onde o <em>schema</em> atrasa a
+                entrega.
+              </li>
+              <li>
+                Para features puramente <em>runtime</em> (DSP) que não exigem
+                metadados semânticos.
+              </li>
+              <li>Se o overhead de serialização impactar a UX.</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border bg-white p-5">
+            <h3 class="font-semibold">Benefícios no espectro ONC</h3>
+            <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+              <li>
+                <strong>Escrita</strong>: reduz ambiguidade, define nomes e
+                faixas válidas.
+              </li>
+              <li>
+                <strong>Desenvolvimento</strong>: valida presets, automatiza
+                testes de parâmetros.
+              </li>
+              <li>
+                <strong>Manutenção</strong>: versionamento semântico de
+                protocolos e evidências.
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <details class="mt-6 rounded-2xl border bg-white p-5 group" open>
+          <summary class="cursor-pointer font-medium">
+            Decisão recomendada (MVP → ONC‑ready)
+          </summary>
+          <div class="mt-3 text-sm leading-7 text-neutral-700">
+            <ol class="list-decimal pl-5 space-y-2">
+              <li>
+                <strong>MVP lean</strong> com presets locais (JSON) e tipos
+                TS/JS bem definidos.
+              </li>
+              <li>
+                <strong>Adapter ONC</strong>: função pura que mapeia presets ⇄
+                JSON‑LD/OWL.
+              </li>
+              <li>
+                <strong>Export</strong> opcional: botão “Exportar para ONC” para
+                cada protocolo.
+              </li>
+            </ol>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <!-- Engine / Reuso de código -->
+    <section id="engine" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid lg:grid-cols-2 gap-10 items-start"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">Engine de Áudio & Reuso</h2>
+          <p class="mt-4 text-neutral-700">
+            Reutilize os módulos já disponíveis nos repositórios
+            <a
+              class="underline"
+              href="https://github.com/aeterni/aeterni.github.io"
+              target="_blank"
+              rel="noopener"
+              >aeterni</a
+            >,
+            <a
+              class="underline"
+              href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+              target="_blank"
+              rel="noopener"
+              >audiovisualmedicine</a
+            >
+            e
+            <a
+              class="underline"
+              href="https://harmonicare.netlify.app/"
+              target="_blank"
+              rel="noopener"
+              >harmonicare</a
+            >
+            (histórico). O núcleo inclui: geradores senoidais, batidas
+            binaurais/monourais, isócronos, envelopes de amplitude, LFOs e
+            sincronização respiratória.
+          </p>
+          <ul class="mt-4 list-disc pl-5 text-neutral-700 text-sm leading-6">
+            <li>
+              <strong>API proposta</strong>:
+              <code
+                >engine.play({ type: 'binaural', base: 300, beat: 8, duration:
+                30 })</code
+              >
+            </li>
+            <li>
+              <strong>Sincronização</strong>:
+              <code>engine.breathe({ pattern: '4-7-8' })</code>
+            </li>
+            <li>
+              <strong>Visual</strong>:
+              <code>viz.flicker({ freq: 8, waveform: 'square' })</code>
+            </li>
+          </ul>
+          <p class="mt-3 text-xs text-neutral-500">
+            Obs.: Nesta página, os módulos são carregados <em>on‑demand</em> via
+            <code>type="module"</code>. Nada de servidor.
+          </p>
+          <div class="mt-5 flex gap-3">
+            <button
+              id="btn-tone"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Testar 300 Hz
+            </button>
+            <button
+              id="btn-binaural"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Binaural 300±4 Hz
+            </button>
+            <button
+              id="btn-stop"
+              class="rounded-xl border px-4 py-2 text-sm hover:bg-neutral-100"
+            >
+              Parar
+            </button>
+          </div>
+          <p class="mt-2 text-xs text-neutral-500">
+            Use fones de ouvido. Controle o volume do sistema.
+          </p>
+        </div>
+        <div class="rounded-2xl border p-5 bg-neutral-50">
+          <h3 class="font-semibold">Como organizar o código (client‑only)</h3>
+          <pre class="mt-3 text-xs overflow-x-auto"><code>src/
+  engine/
+    audio.js        // Web Audio primitives (osc, gain, envelope)
+    binaural.js     // helpers para batidas binaurais/monourais
+    breathe.js      // sincronização respiratória
+  viz/
+    flicker.js      // padrões visuais (canvas/webgl)
+  presets/
+    relax.json      // parâmetros nomeados
+    foco.json
+  onc/
+    adapter.js      // mapeia presets ⇄ JSON‑LD (opcional)
+index.html          // esta página
+assets/             // favicon, og, logos
+</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projetos/links existentes -->
+    <section id="projetos" class="border-t bg-neutral-50">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-14">
+        <h2 class="text-2xl font-bold">Outros projetos e referências</h2>
+        <div class="mt-6 grid md:grid-cols-3 gap-6">
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://aeterni.github.io/"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">Æterni · site atual</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Conteúdos e experimentos existentes.
+            </p>
+          </a>
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://harmonicare.netlify.app/"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">HarmoniCare (histórico)</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Gênese do app e protocolos base.
+            </p>
+          </a>
+          <a
+            class="block rounded-2xl border bg-white p-5 hover:shadow"
+            href="https://github.com/jacopodonati/audiovisualmedicine.github.io"
+            target="_blank"
+            rel="noopener"
+          >
+            <h3 class="font-semibold">AudiovisualMedicine · GitHub</h3>
+            <p class="mt-1 text-sm text-neutral-600">
+              Implementações abertas (client‑side).
+            </p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ curta -->
+    <section id="faq" class="border-t bg-white">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-14 grid md:grid-cols-2 gap-8"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">FAQ</h2>
+          <details class="mt-4 rounded-xl border p-4" open>
+            <summary class="font-medium">Precisa de servidor?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Não. Tudo roda no cliente (Web Audio + Canvas/WebGL). Integrações
+              ONC e exportações são arquivos locais/baixados.
+            </p>
+          </details>
+          <details class="mt-3 rounded-xl border p-4">
+            <summary class="font-medium">Compatível com mobile?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Sim, Safari/Chrome mobile modernos. Recomendado usar fones de
+              ouvido.
+            </p>
+          </details>
+          <details class="mt-3 rounded-xl border p-4">
+            <summary class="font-medium">Como versionar protocolos?</summary>
+            <p class="mt-2 text-sm text-neutral-700">
+              Via JSON local (SemVer) e, quando habilitado, exportar JSON‑LD ONC
+              com <em>version IRI</em>.
+            </p>
+          </details>
+        </div>
+        <div class="rounded-2xl border bg-neutral-50 p-5">
+          <h3 class="font-semibold">Boas práticas</h3>
+          <ul class="mt-3 list-disc pl-5 text-sm leading-6 text-neutral-700">
+            <li>Ganho seguro (limitar a −6 dBFS) e <em>fade</em> suave.</li>
+            <li>
+              Evitar flicker visual acima do limiar desconfortável do usuário.
+            </li>
+            <li>Documentar contra‑indicações e uso responsável.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contato -->
+    <section id="contato" class="border-t bg-neutral-900 text-neutral-100">
+      <div
+        class="mx-auto max-w-6xl px-4 sm:px-6 py-12 grid md:grid-cols-2 gap-8 items-center"
+      >
+        <div>
+          <h2 class="text-2xl font-bold">Contato</h2>
+          <p class="mt-2 text-neutral-300">
+            Questões técnicas, colaborações e pesquisa.
+          </p>
+          <p class="mt-4 text-sm text-neutral-400">
+            Envie PRs no GitHub ou abra uma <em>issue</em>.
+          </p>
+        </div>
+        <div class="md:justify-self-end">
+          <a
+            href="https://github.com/aeterni/aeterni.github.io"
+            class="inline-flex items-center gap-2 rounded-xl bg-white text-neutral-900 px-4 py-2 text-sm font-medium shadow hover:shadow-md"
+            target="_blank"
+            rel="noopener"
+            >GitHub · aeterni.github.io</a
+          >
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t bg-neutral-100">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 py-6">
+        <div class="flex items-center justify-between text-sm text-neutral-600">
+          <div>
+            <p>© 2025 BioSynCare Lab - Central de dados e transparência</p>
+          </div>
+          <div>
+            <p>
+              Baseado em
+              <a
+                href="https://aeterni.github.io/"
+                class="underline hover:text-neutral-900"
+                target="_blank"
+                rel="noopener"
+                >Æterni Anima</a
+              >
+            </p>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Floating System Diagnostics (lower-left) -->
+    <div id="diag-fab" class="fixed bottom-4 left-4 z-50">
+      <!-- Collapsed button -->
+      <button
+        id="diag-toggle"
+        aria-expanded="false"
+        aria-controls="diag-panel"
+        class="shadow-lg rounded-full bg-neutral-900 text-white w-12 h-12 grid place-items-center hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-400"
+        title="Diagnóstico do sistema"
+      >
+        <span class="sr-only">Abrir diagnóstico do sistema</span>
+        🔧
+      </button>
+
+      <!-- Expanded panel -->
+      <div
+        id="diag-panel"
+        class="hidden mt-2 w-[380px] max-w-[90vw] max-h-[80vh] overflow-y-auto rounded-xl border bg-white shadow-xl"
+        role="dialog"
+        aria-label="Diagnóstico do sistema"
+      >
+        <div
+          class="sticky top-0 bg-white p-3 border-b flex items-center gap-2 z-10"
+        >
+          <div class="flex-1">
+            <div class="text-sm font-semibold">Diagnóstico do Sistema</div>
+            <div id="diag-mini-summary" class="text-[11px] text-neutral-500">
+              Carregando…
+            </div>
+          </div>
+          <button
+            id="diag-close"
+            class="text-neutral-500 hover:text-neutral-800 px-2 py-1 rounded"
+            title="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-3 space-y-3 text-xs text-neutral-700">
+          <!-- Engines BSCLab -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🎵🎨 Engines BSCLab
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Engine de Áudio:</span>
+                <span id="engine-audio-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Status Áudio:</span>
+                <span id="engine-audio-status" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão Áudio:</span>
+                <span id="engine-audio-version" class="font-mono">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>Engine Visual:</span>
+                <span id="engine-visual-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Status Visual:</span>
+                <span id="engine-visual-status" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão Visual:</span>
+                <span id="engine-visual-version" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Audio Detalhado -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🔊 Áudio Detalhado
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Web Audio API:</span>
+                <span id="detailed-audio-api" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Taxa de Amostragem:</span>
+                <span id="detailed-sample-rate" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Bit Depth:</span>
+                <span id="detailed-bit-depth" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Canais Máximos:</span>
+                <span id="detailed-channels" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Estado do Contexto:</span>
+                <span id="detailed-audio-state" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Áudio Tocando:</span>
+                <span id="detailed-audio-playing" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Latência Base:</span>
+                <span id="detailed-base-latency" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Latência Output:</span>
+                <span id="detailed-output-latency" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Buffer Size (est):</span>
+                <span id="detailed-buffer-size" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Fones de Ouvido:</span>
+                <span id="detailed-headphones" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Dispositivos Entrada:</span>
+                <span id="detailed-input-devices" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Dispositivos Saída:</span>
+                <span id="detailed-output-devices" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Display & Visual -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🖥️ Display & Visual
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Resolução Tela:</span>
+                <span id="detailed-screen-res" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Área Disponível:</span>
+                <span id="detailed-avail-res" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Viewport:</span>
+                <span id="detailed-viewport" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Aspect Ratio:</span>
+                <span id="detailed-aspect-ratio" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Pixel Ratio:</span>
+                <span id="detailed-pixel-ratio" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>DPI:</span>
+                <span id="detailed-dpi" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Profundidade Cor:</span>
+                <span id="detailed-color-depth" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>HDR:</span>
+                <span id="detailed-hdr" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Orientação:</span>
+                <span id="detailed-orientation" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Multi-Monitor:</span>
+                <span id="detailed-multi-monitor" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Taxa Atualização:</span>
+                <span id="detailed-refresh-rate" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Hardware & Sistema -->
+          <details class="border rounded-lg">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              💻 Hardware & Sistema
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Dispositivo:</span>
+                <span id="detailed-device-model" class="font-mono text-[10px]"
+                  >--</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Sistema Operacional:</span>
+                <span id="detailed-os" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Arquitetura:</span>
+                <span id="detailed-arch" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Plataforma:</span>
+                <span id="detailed-platform" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>CPU Núcleos:</span>
+                <span id="detailed-cores" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>RAM Dispositivo:</span>
+                <span id="detailed-device-memory" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>GPU:</span>
+                <span id="detailed-gpu-model" class="font-mono text-[10px]"
+                  >--</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>GPU Score:</span>
+                <span id="detailed-gpu-score" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>WebGL:</span>
+                <span id="detailed-webgl" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Touch:</span>
+                <span id="detailed-touch" class="font-mono">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>Bateria:</span>
+                <span id="detailed-battery-level" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Carregando:</span>
+                <span id="detailed-battery-charging" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Browser Info -->
+          <details class="border rounded-lg">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🌐 Navegador
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Navegador:</span>
+                <span id="detailed-browser-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão:</span>
+                <span id="detailed-browser-version" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Engine:</span>
+                <span id="detailed-browser-engine" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Vendor:</span>
+                <span id="detailed-browser-vendor" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Idioma:</span>
+                <span id="detailed-language" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Online:</span>
+                <span id="detailed-online" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Conexão:</span>
+                <span id="detailed-connection" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Cookies:</span>
+                <span id="detailed-cookies" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Storage:</span>
+                <span id="detailed-storage" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Do Not Track:</span>
+                <span id="detailed-dnt" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Report composer -->
+          <div class="pt-1 border-t">
+            <label
+              for="diag-message"
+              class="block text-[11px] text-neutral-500 mb-1"
+              >Mensagem (opcional)</label
+            >
+            <textarea
+              id="diag-message"
+              rows="3"
+              class="w-full border rounded-md p-2 text-xs resize-y focus:outline-none focus:ring-2 focus:ring-neutral-300"
+              placeholder="Descreva o que aconteceu (ex.: oscilação de luz, áudio falhando, flicker, etc.)"
+            ></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              id="btn-send-report"
+              class="inline-flex items-center gap-1 rounded-md bg-neutral-900 text-white px-3 py-1.5 hover:bg-neutral-800"
+            >
+              Enviar relatório
+            </button>
+            <button
+              id="btn-copy-json"
+              class="inline-flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-neutral-100"
+            >
+              Copiar diagnóstico
+            </button>
+            <button
+              id="btn-download-json"
+              class="ml-auto inline-flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-neutral-100"
+              title="Baixar JSON com os dados do sistema"
+            >
+              Baixar JSON
+            </button>
+          </div>
+
+          <div class="text-[10px] text-neutral-500">
+            Os dados ficam no seu dispositivo (localStorage). Se um endpoint de
+            relatório for configurado, tentaremos enviar por HTTPS.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Minimal client-only lab demo (inline) -->
+    <script type="module">
+      // ========================================
+      // Import diagnostics module
+      // ========================================
+      import {
+        isMobile,
+        hasGoodGPU,
+        getGPUScore,
+        getRAMInfo,
+        getRefreshRate,
+        getBrowserInfo,
+        getOSInfo,
+        getAudioInfo,
+        getSystemInfo,
+        detectEngines,
+        getBatteryInfo,
+        gatherDiagnostics,
+      } from './src/ui/diagnostics.js';
+
+      // Performance grading system
+      function getPerformanceGrade(value, type) {
+        const grades = {
+          gpu: {
+            excellent: { min: 85, label: 'EXCELENTE', color: 'text-green-600' },
+            best: { min: 70, label: 'ÓTIMO', color: 'text-green-500' },
+            good: { min: 50, label: 'BOM', color: 'text-blue-500' },
+            ok: { min: 30, label: 'OK', color: 'text-yellow-500' },
+            poor: { min: 10, label: 'FRACO', color: 'text-orange-500' },
+            inexistent: { min: 0, label: 'INEXISTENTE', color: 'text-red-500' },
+          },
+          ram: {
+            excellent: { min: 85, label: 'EXCELENTE', color: 'text-green-600' },
+            best: { min: 70, label: 'ÓTIMO', color: 'text-green-500' },
+            good: { min: 50, label: 'BOM', color: 'text-blue-500' },
+            ok: { min: 30, label: 'OK', color: 'text-yellow-500' },
+            poor: { min: 15, label: 'BAIXO', color: 'text-orange-500' },
+            inexistent: { min: 0, label: 'CRÍTICO', color: 'text-red-500' },
+          },
+          refresh: {
+            excellent: {
+              min: 120,
+              label: 'EXCELENTE',
+              color: 'text-green-600',
+            },
+            best: { min: 90, label: 'ÓTIMO', color: 'text-green-500' },
+            good: { min: 60, label: 'BOM', color: 'text-blue-500' },
+            ok: { min: 45, label: 'OK', color: 'text-yellow-500' },
+            poor: { min: 30, label: 'BAIXO', color: 'text-orange-500' },
+            inexistent: { min: 0, label: 'MUITO BAIXO', color: 'text-red-500' },
+          },
+        };
+
+        const typeGrades = grades[type];
+        if (!typeGrades) return { label: 'N/A', color: 'text-gray-500' };
+
+        for (const [level, config] of Object.entries(typeGrades)) {
+          if (value >= config.min) {
+            return { label: config.label, color: config.color };
+          }
+        }
+
+        return typeGrades.inexistent;
+      }
+
+      // Update meter bars with grading
+      function updateMeterWithGrade(meterId, percentage, value, type) {
+        // Update the meter bar
+        const meter = document.getElementById(meterId);
+        if (meter) {
+          meter.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+
+          // Update meter color based on grade
+          const grade = getPerformanceGrade(value, type);
+          const colorClass = grade.color.includes('green')
+            ? 'bg-green-500'
+            : grade.color.includes('blue')
+            ? 'bg-blue-500'
+            : grade.color.includes('yellow')
+            ? 'bg-yellow-500'
+            : grade.color.includes('orange')
+            ? 'bg-orange-500'
+            : grade.color.includes('red')
+            ? 'bg-red-500'
+            : 'bg-gray-500';
+
+          meter.className = `h-2 rounded-full transition-all duration-500 ${colorClass}`;
+        }
+
+        // Update the grade label
+        const gradeElement = document.getElementById(
+          meterId.replace('-meter', '-grade')
+        );
+        if (gradeElement) {
+          const grade = getPerformanceGrade(value, type);
+          gradeElement.textContent = grade.label;
+          gradeElement.className = `font-semibold text-xs ${grade.color}`;
+        }
+      }
+
+      // Update meter bars
+      function updateMeter(meterId, percentage, color = null) {
+        const meter = document.getElementById(meterId);
+        if (meter) {
+          meter.style.width = `${Math.min(100, Math.max(0, percentage))}%`;
+          if (color) {
+            meter.className = meter.className.replace(/bg-\w+-\d+/, color);
+          }
+        }
+      }
+
+      // Update widget indicators
+      function updateIndicator(elementId, isGood, label) {
+        const indicator = document.getElementById(elementId);
+        const status = document.getElementById(
+          elementId.replace('-indicator', '-status')
+        );
+
+        if (indicator && status) {
+          indicator.className = `w-3 h-3 rounded-full ${
+            isGood ? 'bg-green-400' : 'bg-red-400'
+          }`;
+          status.textContent = label;
+        }
+      }
+
+      async function updateDiagnostics() {
+        // Browser info
+        const browser = getBrowserInfo();
+        document.getElementById('browser-name').textContent = browser.name;
+        document.getElementById('browser-version').textContent =
+          browser.version;
+        document.getElementById('browser-engine').textContent = browser.engine;
+        document.getElementById('user-agent').textContent = browser.userAgent;
+
+        // OS info
+        const os = getOSInfo();
+        document.getElementById('platform').textContent = os.platform;
+        document.getElementById('os-name').textContent = os.name;
+        document.getElementById('device-type').textContent = isMobile()
+          ? 'Mobile/Tablet'
+          : 'Desktop';
+
+        // Audio info
+        const audio = await getAudioInfo();
+        document.getElementById('audio-api').textContent = audio.supported
+          ? 'Suportado ✓'
+          : 'Não Suportado ✗';
+        document.getElementById('sample-rate').textContent =
+          audio.sampleRate || '--';
+        document.getElementById('max-channels').textContent =
+          audio.maxChannels || '--';
+        document.getElementById('audio-state').textContent =
+          audio.state || '--';
+        document.getElementById('output-latency').textContent =
+          audio.outputLatency !== 'N/A' ? audio.outputLatency : '--';
+        document.getElementById('headphones-detected').textContent =
+          audio.headphonesLikely || '--';
+
+        // System info
+        const system = getSystemInfo();
+        document.getElementById('cpu-cores').textContent = system.cores;
+        document.getElementById('screen-resolution').textContent =
+          system.screenResolution;
+        document.getElementById('pixel-ratio').textContent = system.pixelRatio;
+        document.getElementById('touch-support').textContent =
+          system.touchSupport;
+        document.getElementById('online-status').textContent = system.online;
+        document.getElementById('connection-type').textContent =
+          system.connection;
+        document.getElementById('cookies-enabled').textContent =
+          system.cookiesEnabled;
+        document.getElementById('storage-enabled').textContent =
+          system.storageEnabled;
+
+        // Get GPU renderer info
+        try {
+          const canvas = document.createElement('canvas');
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          if (gl) {
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            if (debugInfo) {
+              const renderer = gl.getParameter(
+                debugInfo.UNMASKED_RENDERER_WEBGL
+              );
+              document.getElementById('gpu-renderer').textContent = renderer;
+            }
+            const version = gl.getParameter(gl.VERSION);
+            document.getElementById('webgl-version').textContent = version;
+          }
+        } catch (e) {
+          document.getElementById('gpu-renderer').textContent = 'Error';
+        }
+
+        // Update summary
+        const deviceType = isMobile() ? '📱' : '💻';
+        document.getElementById(
+          'diagnostic-summary'
+        ).textContent = `${deviceType} ${os.name} · ${browser.name}`;
+      }
+
+      // Tab switching functionality
+      function setupTabs() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach((button) => {
+          button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+
+            // Update button states
+            tabButtons.forEach((btn) => {
+              btn.classList.remove('border-blue-500', 'text-blue-600');
+              btn.classList.add('border-transparent', 'text-neutral-500');
+            });
+            button.classList.remove('border-transparent', 'text-neutral-500');
+            button.classList.add('border-blue-500', 'text-blue-600');
+
+            // Update content visibility
+            tabContents.forEach((content) => {
+              content.classList.add('hidden');
+            });
+            document
+              .getElementById(`tab-${targetTab}`)
+              .classList.remove('hidden');
+          });
+        });
+      }
+
+      // Copy diagnostics to clipboard
+      function copyDiagnostics() {
+        const browser = getBrowserInfo();
+        const os = getOSInfo();
+        const system = getSystemInfo();
+        const caps = window.deviceCapabilities || {};
+
+        const report = `
+=== BioSynCare Lab - Diagnóstico do Sistema ===
+
+NAVEGADOR:
+- Nome: ${browser.name}
+- Versão: ${browser.version}
+- Engine: ${browser.engine}
+- User Agent: ${browser.userAgent}
+
+SISTEMA OPERACIONAL:
+- OS: ${os.name}
+- Platform: ${os.platform}
+- Tipo: ${isMobile() ? 'Mobile/Tablet' : 'Desktop'}
+
+PERFORMANCE:
+- GPU Score: ${caps.performance?.gpu?.score || 'N/A'}/100
+- RAM Disponível: ${caps.performance?.ram?.availablePercent || 'N/A'}%
+- Refresh Rate: ${caps.performance?.refresh?.fps || 'N/A'} Hz
+- Modo Recomendado: ${caps.recommendedMode || 'N/A'}
+
+SISTEMA:
+- CPU Cores: ${system.cores}
+- Resolução: ${system.screenResolution}
+- Pixel Ratio: ${system.pixelRatio}
+- Touch: ${system.touchSupport}
+- Online: ${system.online}
+- Conexão: ${system.connection}
+
+ÁUDIO:
+- Web Audio API: ${document.getElementById('audio-api')?.textContent || 'N/A'}
+- Sample Rate: ${document.getElementById('sample-rate')?.textContent || 'N/A'}
+- Canais: ${document.getElementById('max-channels')?.textContent || 'N/A'}
+- Latency: ${document.getElementById('output-latency')?.textContent || 'N/A'} ms
+
+Data: ${new Date().toLocaleString('pt-BR')}
+        `.trim();
+
+        navigator.clipboard
+          .writeText(report)
+          .then(() => {
+            const btn = document.getElementById('copy-diagnostics');
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Copiado!';
+            btn.classList.add('bg-green-100');
+            setTimeout(() => {
+              btn.textContent = originalText;
+              btn.classList.remove('bg-green-100');
+            }, 2000);
+          })
+          .catch((err) => {
+            alert('Erro ao copiar. Por favor, copie manualmente:\n\n' + report);
+          });
+      }
+
+      // Run detection and update widget
+      async function runDeviceDetection() {
+        const mobile = isMobile();
+        const goodGPU = await hasGoodGPU();
+
+        updateIndicator('mobile-indicator', !mobile, mobile ? 'SIM' : 'NÃO');
+        updateIndicator('gpu-indicator', goodGPU, goodGPU ? 'BOA' : 'BÁSICA');
+
+        // Get detailed performance metrics
+        const gpuScore = await getGPUScore();
+        const ramInfo = getRAMInfo();
+        const refreshInfo = await getRefreshRate();
+
+        // Update performance meters with grades
+        updateMeterWithGrade(
+          'gpu-meter',
+          gpuScore.score,
+          gpuScore.score,
+          'gpu'
+        );
+        document.getElementById(
+          'gpu-score'
+        ).textContent = `${gpuScore.score}/100`;
+
+        updateMeterWithGrade(
+          'ram-meter',
+          ramInfo.availablePercent,
+          ramInfo.availablePercent,
+          'ram'
+        );
+        document.getElementById('ram-amount').textContent = ramInfo.details;
+
+        // Refresh rate meter (normalize 60Hz as 50%, 120Hz as 100%)
+        const refreshPercent = Math.min(100, (refreshInfo.fps / 120) * 100);
+        updateMeterWithGrade(
+          'refresh-meter',
+          refreshPercent,
+          refreshInfo.fps,
+          'refresh'
+        );
+        document.getElementById('refresh-rate').textContent =
+          refreshInfo.details;
+
+        // Determine recommended mode
+        let recommendedMode;
+        let modeGood;
+
+        if (mobile && !goodGPU) {
+          recommendedMode = 'CANVAS LEVE';
+          modeGood = false;
+        } else if (mobile && goodGPU) {
+          recommendedMode = 'P5.JS OTIMIZADO';
+          modeGood = true;
+        } else if (!mobile && goodGPU) {
+          recommendedMode = 'THREE.JS COMPLETO';
+          modeGood = true;
+        } else {
+          recommendedMode = 'P5.JS PADRÃO';
+          modeGood = true;
+        }
+
+        updateIndicator('mode-indicator', modeGood, recommendedMode);
+
+        // Store results globally for use by other functions
+        window.deviceCapabilities = {
+          mobile,
+          goodGPU,
+          recommendedMode,
+          performance: {
+            gpu: gpuScore,
+            ram: ramInfo,
+            refresh: refreshInfo,
+          },
+        };
+
+        console.log('Device Detection Results:', {
+          mobile,
+          goodGPU,
+          recommendedMode,
+          performance: {
+            gpuScore: gpuScore.score,
+            ramAvailable: ramInfo.availablePercent,
+            refreshRate: refreshInfo.fps,
+          },
+          userAgent: navigator.userAgent,
+        });
+      }
+
+      // Run detection on page load
+      runDeviceDetection();
+      updateDiagnostics();
+      setupTabs();
+
+      // Setup copy diagnostics button
+      document
+        .getElementById('copy-diagnostics')
+        ?.addEventListener('click', copyDiagnostics);
+
+      // Translation functionality
+      function triggerTranslation() {
+        // Method 1: Try to use Google Translate if available
+        if (typeof google !== 'undefined' && google.translate) {
+          // Google Translate widget method (if loaded)
+          return;
+        }
+
+        // Method 2: Show instructions modal for manual translation
+        const userLang = navigator.language || navigator.userLanguage;
+        const browserName = navigator.userAgent.includes('Chrome')
+          ? 'Chrome'
+          : navigator.userAgent.includes('Safari')
+          ? 'Safari'
+          : navigator.userAgent.includes('Firefox')
+          ? 'Firefox'
+          : navigator.userAgent.includes('Edge')
+          ? 'Edge'
+          : 'seu navegador';
+
+        let instructions = '';
+
+        if (
+          navigator.userAgent.includes('Chrome') ||
+          navigator.userAgent.includes('Edge')
+        ) {
+          instructions = `Para traduzir esta página:
+
+1. Clique com botão direito na página
+2. Selecione "Traduzir para [seu idioma]"
+
+Ou clique no ícone de tradução na barra de endereços.
+
+---
+
+To translate this page:
+
+1. Right-click on the page
+2. Select "Translate to [your language]"
+
+Or click the translation icon in the address bar.`;
+        } else if (navigator.userAgent.includes('Safari')) {
+          instructions = `Para traduzir esta página:
+
+1. Clique no botão "Traduzir" na barra de endereços
+2. Ou vá em Configurações → Tradução
+
+---
+
+To translate this page:
+
+1. Click the "Translate" button in the address bar
+2. Or go to Settings → Translation`;
+        } else if (navigator.userAgent.includes('Firefox')) {
+          instructions = `Para traduzir esta página no Firefox:
+
+1. Instale o complemento "Firefox Translations"
+2. Ou use o menu de tradução (se disponível)
+
+---
+
+To translate this page in Firefox:
+
+1. Install the "Firefox Translations" add-on
+2. Or use the translation menu (if available)`;
+        } else {
+          instructions = `Use o recurso de tradução do seu navegador para visualizar esta página em outro idioma.
+
+---
+
+Use your browser's translation feature to view this page in another language.`;
+        }
+
+        alert(instructions);
+      }
+
+      // Language banner event listeners
+      document
+        .getElementById('translate-btn')
+        ?.addEventListener('click', triggerTranslation);
+
+      document.getElementById('close-banner')?.addEventListener('click', () => {
+        const banner = document.getElementById('language-banner');
+        if (banner) {
+          banner.style.display = 'none';
+          // Save preference to not show banner again
+          localStorage.setItem('hideLanguageBanner', 'true');
+        }
+      });
+
+      // Check if user previously closed the banner
+      if (localStorage.getItem('hideLanguageBanner') === 'true') {
+        const banner = document.getElementById('language-banner');
+        if (banner) banner.style.display = 'none';
+      }
+
+      // Web Audio minimal demo (client-only). Replace with engine/* imports as you refactor.
+      let ctx, master, osc, lfo, lfoGain;
+      const ensure = () => {
+        if (!ctx) {
+          ctx = new (window.AudioContext || window.webkitAudioContext)();
+          master = ctx.createGain();
+          master.gain.value = 0.2; // -14 dB aprox
+          master.connect(ctx.destination);
+        }
+      };
+
+      const stopAll = () => {
+        if (osc) {
+          try {
+            osc.stop();
+          } catch {}
+          osc.disconnect();
+          osc = null;
+        }
+        if (lfo) {
+          try {
+            lfo.stop();
+          } catch {}
+          lfo.disconnect();
+          lfo = null;
+        }
+        if (lfoGain) {
+          lfoGain.disconnect();
+          lfoGain = null;
+        }
+      };
+
+      const playTone = (freq = 300) => {
+        ensure();
+        stopAll();
+        osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        osc.connect(master);
+        osc.start();
+      };
+
+      const playBinaural = (base = 300, beat = 4) => {
+        ensure();
+        stopAll();
+        const left = ctx.createOscillator();
+        const right = ctx.createOscillator();
+        left.type = right.type = 'sine';
+        left.frequency.value = base - beat / 2; // 298 Hz
+        right.frequency.value = base + beat / 2; // 302 Hz
+        const gL = ctx.createGain();
+        const gR = ctx.createGain();
+        const splitter = ctx.createChannelMerger(2);
+        left.connect(gL).connect(splitter, 0, 0);
+        right.connect(gR).connect(splitter, 0, 1);
+        const masterStereo = ctx.createGain();
+        masterStereo.gain.value = 0.18;
+        splitter.connect(masterStereo).connect(master);
+        left.start();
+        right.start();
+        // keep references for stop
+        osc = {
+          stop: () => {
+            left.stop();
+            right.stop();
+          },
+          disconnect: () => {
+            left.disconnect();
+            right.disconnect();
+            splitter.disconnect();
+            masterStereo.disconnect();
+          },
+        };
+      };
+
+      document
+        .querySelector('#btn-tone')
+        ?.addEventListener('click', () => playTone(300));
+      document
+        .querySelector('#btn-binaural')
+        ?.addEventListener('click', () => playBinaural(300, 8));
+      document.querySelector('#btn-stop')?.addEventListener('click', stopAll);
+
+      // Optional: tiny ONC adapter sketch
+      // export function toJSONLD(preset) { /* map fields to JSON-LD */ }
+
+      // ===============================
+      // Floating diagnostics widget JS
+      // ===============================
+      const $ = (id) => document.getElementById(id);
+
+      function getReportEndpoint() {
+        const meta = document.querySelector('meta[name="report-endpoint"]');
+        const fromMeta = meta?.getAttribute('content');
+        // Allow setting via window.BioSynCareReportEndpoint for flexibility
+        // eslint-disable-next-line no-undef
+        const fromWindow = window.BioSynCareReportEndpoint;
+        return fromWindow || fromMeta || null;
+      }
+
+      function persistReportLocal(report) {
+        try {
+          const key = 'biosyncare_reports';
+          const existing = JSON.parse(localStorage.getItem(key) || '[]');
+          existing.push(report);
+          localStorage.setItem(key, JSON.stringify(existing));
+        } catch (e) {
+          console.warn('Falha ao salvar localmente:', e);
+        }
+      }
+
+      async function trySendReport(report) {
+        const endpoint = getReportEndpoint();
+        if (!endpoint) return { ok: false, reason: 'no-endpoint' };
+        try {
+          const body = JSON.stringify(report);
+          if (navigator.sendBeacon) {
+            const blob = new Blob([body], { type: 'application/json' });
+            const ok = navigator.sendBeacon(endpoint, blob);
+            return { ok, method: 'beacon' };
+          }
+          const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body,
+            keepalive: true,
+          });
+          return { ok: res.ok, status: res.status, method: 'fetch' };
+        } catch (e) {
+          console.warn('Falha ao enviar relatório:', e);
+          return { ok: false, reason: 'network-error' };
+        }
+      }
+
+      function downloadReport(report) {
+        const ts = new Date(report.timestamp)
+          .toISOString()
+          .replace(/[:.]/g, '-');
+        const filename = `biosyncare-system-report-${ts}.json`;
+        const blob = new Blob([JSON.stringify(report, null, 2)], {
+          type: 'application/json',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      async function sendReportFlow() {
+        const btn = $('btn-send-report');
+        const original = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Enviando…';
+        try {
+          const message = $('diag-message').value?.trim() || '';
+          const diag = await gatherDiagnostics();
+          const report = { ...diag, message };
+          persistReportLocal(report);
+          const result = await trySendReport(report);
+          if (result.ok) {
+            btn.textContent = '✓ Enviado';
+          } else {
+            btn.textContent = '✓ Salvo (baixe o JSON)';
+          }
+          // Always offer a fresh downloadable copy
+          downloadReport(report);
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.disabled = false;
+          }, 1800);
+        } catch (e) {
+          console.error(e);
+          btn.textContent = 'Falha (ver console)';
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.disabled = false;
+          }, 2000);
+        }
+      }
+
+      async function copyJsonDiagnostics() {
+        const btn = $('btn-copy-json');
+        const original = btn.textContent;
+        try {
+          const diag = await gatherDiagnostics();
+          await navigator.clipboard.writeText(JSON.stringify(diag, null, 2));
+          btn.textContent = '✓ Copiado';
+        } catch (e) {
+          console.warn('Clipboard falhou, baixando em vez disso.');
+          const diag = await gatherDiagnostics();
+          downloadReport(diag);
+          btn.textContent = 'Baixado';
+        } finally {
+          setTimeout(() => (btn.textContent = original), 1500);
+        }
+      }
+
+      function updateFloatingWidgetUI() {
+        try {
+          const browser = getBrowserInfo();
+          const os = getOSInfo();
+          const sys = getSystemInfo();
+          const caps = window.deviceCapabilities || {};
+          const engines = detectEngines();
+
+          // Engines BSCLab
+          $('engine-audio-name').textContent = engines.audio.name;
+          $('engine-audio-status').textContent = engines.audio.status;
+          $('engine-audio-version').textContent =
+            engines.audio.version || 'N/A';
+          $('engine-visual-name').textContent = engines.visual.name;
+          $('engine-visual-status').textContent = engines.visual.status;
+          $('engine-visual-version').textContent =
+            engines.visual.version || 'N/A';
+
+          // Audio detalhado (will be filled asynchronously)
+          getAudioInfo().then((audio) => {
+            $('detailed-audio-api').textContent = audio.supported
+              ? 'Suportado ✓'
+              : 'Não Suportado ✗';
+            $('detailed-sample-rate').textContent = audio.sampleRate
+              ? audio.sampleRate + ' Hz'
+              : '--';
+            $('detailed-bit-depth').textContent = audio.bitDepth || '--';
+            $('detailed-channels').textContent = audio.maxChannels || '--';
+            $('detailed-audio-state').textContent = audio.state || '--';
+            $('detailed-audio-playing').textContent = audio.isPlaying || '--';
+            $('detailed-base-latency').textContent = audio.baseLatencyMs
+              ? audio.baseLatencyMs + ' ms'
+              : '--';
+            $('detailed-output-latency').textContent = audio.outputLatencyMs
+              ? audio.outputLatencyMs + ' ms'
+              : '--';
+            $('detailed-buffer-size').textContent = audio.bufferSize || '--';
+            $('detailed-headphones').textContent =
+              audio.headphonesLikely || '--';
+            $('detailed-input-devices').textContent =
+              audio.inputDevices !== undefined ? audio.inputDevices : '--';
+            $('detailed-output-devices').textContent =
+              audio.outputDevices !== undefined ? audio.outputDevices : '--';
+          });
+
+          // Display & Visual
+          const hz = caps.performance?.refresh?.fps;
+          $(
+            'detailed-screen-res'
+          ).textContent = `${sys.screenWidth}x${sys.screenHeight}`;
+          $(
+            'detailed-avail-res'
+          ).textContent = `${sys.availWidth}x${sys.availHeight}`;
+          $(
+            'detailed-viewport'
+          ).textContent = `${sys.viewportWidth}x${sys.viewportHeight}`;
+          $('detailed-aspect-ratio').textContent = sys.viewportRatio || '--';
+          $('detailed-pixel-ratio').textContent = sys.pixelRatio || '--';
+          $('detailed-dpi').textContent = sys.dpi || '--';
+          $('detailed-color-depth').textContent = sys.colorDepth
+            ? sys.colorDepth + '-bit'
+            : '--';
+          $('detailed-hdr').textContent = sys.hdrSupport || '--';
+          $('detailed-orientation').textContent = sys.orientation || '--';
+          $('detailed-multi-monitor').textContent =
+            sys.possibleMultiMonitor || '--';
+          $('detailed-refresh-rate').textContent = hz ? hz + ' Hz' : '--';
+
+          // Hardware & Sistema
+          $('detailed-device-model').textContent = browser.deviceModel || '--';
+          $('detailed-os').textContent = os.name || '--';
+          $('detailed-arch').textContent = os.architecture || '--';
+          $('detailed-platform').textContent = os.platform || '--';
+          $('detailed-cores').textContent = sys.cores || '--';
+          $('detailed-device-memory').textContent = sys.deviceMemoryGB
+            ? sys.deviceMemoryGB + ' GB'
+            : '--';
+
+          // GPU info
+          try {
+            const canvas = document.createElement('canvas');
+            const gl =
+              canvas.getContext('webgl2') || canvas.getContext('webgl');
+            if (gl) {
+              const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+              if (debugInfo) {
+                const renderer = gl.getParameter(
+                  debugInfo.UNMASKED_RENDERER_WEBGL
+                );
+                $('detailed-gpu-model').textContent = renderer || '--';
+              }
+              const version = gl.getParameter(gl.VERSION);
+              $('detailed-webgl').textContent = version || '--';
+            }
+          } catch (e) {
+            $('detailed-gpu-model').textContent = 'Error';
+            $('detailed-webgl').textContent = 'Error';
+          }
+
+          const gpuScore = caps.performance?.gpu?.score;
+          $('detailed-gpu-score').textContent =
+            typeof gpuScore === 'number' ? gpuScore + '/100' : '--';
+          $('detailed-touch').textContent = sys.touchSupport || '--';
+
+          // Battery (async)
+          getBatteryInfo().then((battery) => {
+            $('detailed-battery-level').textContent = battery.supported
+              ? battery.level + '%'
+              : 'N/A';
+            $('detailed-battery-charging').textContent = battery.supported
+              ? battery.charging
+                ? 'Sim'
+                : 'Não'
+              : 'N/A';
+          });
+
+          // Browser
+          $('detailed-browser-name').textContent = browser.name || '--';
+          $('detailed-browser-version').textContent = browser.version || '--';
+          $('detailed-browser-engine').textContent = browser.engine || '--';
+          $('detailed-browser-vendor').textContent = browser.vendor || '--';
+          $('detailed-language').textContent = browser.language || '--';
+          $('detailed-online').textContent = sys.online || '--';
+          $('detailed-connection').textContent = sys.connection || '--';
+          $('detailed-cookies').textContent = sys.cookiesEnabled || '--';
+          $('detailed-storage').textContent = sys.storageEnabled || '--';
+          $('detailed-dnt').textContent = browser.doNotTrack || '--';
+
+          // Summary
+          const deviceIcon = window.deviceCapabilities?.mobile ? '📱' : '💻';
+          const mini = `${deviceIcon} ${os.name || 'SO'} · ${
+            browser.name || 'Navegador'
+          }${typeof gpuScore === 'number' ? ` · GPU ${gpuScore}` : ''}`;
+          $('diag-mini-summary').textContent = mini;
+        } catch (e) {
+          console.error('Error updating widget UI:', e);
+        }
+      }
+
+      // Wire up UI
+      $('diag-toggle')?.addEventListener('click', () => {
+        const panel = $('diag-panel');
+        const isOpen = !panel.classList.contains('hidden');
+        if (isOpen) {
+          panel.classList.add('hidden');
+          $('diag-toggle').setAttribute('aria-expanded', 'false');
+        } else {
+          panel.classList.remove('hidden');
+          $('diag-toggle').setAttribute('aria-expanded', 'true');
+          updateFloatingWidgetUI();
+        }
+      });
+      $('diag-close')?.addEventListener('click', () => {
+        $('diag-panel')?.classList.add('hidden');
+        $('diag-toggle')?.setAttribute('aria-expanded', 'false');
+      });
+      $('btn-send-report')?.addEventListener('click', sendReportFlow);
+      $('btn-copy-json')?.addEventListener('click', copyJsonDiagnostics);
+      $('btn-download-json')?.addEventListener('click', async () => {
+        const diag = await gatherDiagnostics();
+        downloadReport(diag);
+      });
+
+      // Update floating widget when detection completes
+      const __origRunDeviceDetection = runDeviceDetection;
+      // Monkey-patch to update UI after the original completes (without changing behavior)
+      runDeviceDetection = async function () {
+        try {
+          await __origRunDeviceDetection();
+        } catch (e) {
+          // original already logs errors; keep silent here
+        } finally {
+          updateFloatingWidgetUI();
+        }
+      };
+
+      // If capabilities already exist (fast loads), update once; otherwise, poll briefly
+      if (window.deviceCapabilities) {
+        updateFloatingWidgetUI();
+      } else {
+        const capPoll = setInterval(() => {
+          if (window.deviceCapabilities) {
+            clearInterval(capPoll);
+            updateFloatingWidgetUI();
+          }
+        }, 300);
+        // safety stop after ~6s
+        setTimeout(() => clearInterval(capPoll), 6000);
+      }
+    </script>
+  </body>
+</html>

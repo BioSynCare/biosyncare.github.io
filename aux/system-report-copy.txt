@@ -1,0 +1,104 @@
+{
+  "timestamp": "2025-11-04T01:08:23.148Z",
+  "locale": "it-IT",
+  "url": "http://localhost:3000/",
+  "visibility": "visible",
+  "browser": {
+    "name": "Chrome",
+    "version": "141.0",
+    "engine": "Chromium",
+    "userAgent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+    "deviceModel": "Mac (macOS 10.15.7)",
+    "language": "it-IT",
+    "languages": "it-IT, pt-BR, en-US, pt, en, it",
+    "platform": "MacIntel",
+    "vendor": "Google Inc.",
+    "cookieEnabled": true,
+    "doNotTrack": "Not set"
+  },
+  "os": {
+    "name": "macOS 10.15",
+    "platform": "MacIntel",
+    "architecture": "Unknown"
+  },
+  "system": {
+    "cores": 10,
+    "screenResolution": "1728x1117",
+    "pixelRatio": 2,
+    "touchSupport": "Não",
+    "online": "Sim",
+    "connection": "4g",
+    "cookiesEnabled": "Sim",
+    "storageEnabled": "Sim",
+    "screenWidth": 1728,
+    "screenHeight": 1117,
+    "availWidth": 1728,
+    "availHeight": 1079,
+    "colorDepth": 30,
+    "pixelDepth": 30,
+    "orientation": "landscape-primary",
+    "viewportWidth": 1728,
+    "viewportHeight": 958,
+    "viewportRatio": "1.80",
+    "possibleMultiMonitor": "Improvável",
+    "hdrSupport": "Sim",
+    "dpi": 192,
+    "deviceMemoryGB": 8
+  },
+  "audio": {
+    "supported": true,
+    "sampleRate": 48000,
+    "maxChannels": 2,
+    "state": "running",
+    "baseLatency": "5.33",
+    "outputLatency": "N/A",
+    "headphonesLikely": "Possível",
+    "bitDepth": "32-bit float (estimado)",
+    "isPlaying": "Sim",
+    "baseLatencyMs": "5.33",
+    "outputLatencyMs": "0.00",
+    "bufferSize": 800,
+    "inputDevices": 1,
+    "outputDevices": 1,
+    "deviceList": {
+      "inputs": [
+        "Unnamed input"
+      ],
+      "outputs": [
+        "Unnamed output"
+      ]
+    }
+  },
+  "battery": {
+    "supported": true,
+    "charging": true,
+    "level": 80,
+    "chargingTime": "N/A",
+    "dischargingTime": "N/A"
+  },
+  "engines": {
+    "audio": {
+      "name": "Web Audio API (nativo)",
+      "status": "Disponível",
+      "version": null
+    },
+    "visual": {
+      "name": "Canvas 2D (nativo)",
+      "status": "Disponível",
+      "version": null
+    },
+    "webAudio": {
+      "supported": true,
+      "version": "Standard API"
+    }
+  },
+  "gpuDetails": {
+    "renderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M1 Max, Unspecified Version)",
+    "vendor": "Google Inc. (Apple)",
+    "version": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+    "shadingLanguageVersion": "WebGL GLSL ES 3.00 (OpenGL ES GLSL ES 3.0 Chromium)",
+    "maxTextureSize": 16384,
+    "maxRenderbufferSize": 16384,
+    "maxVertexAttribs": 16
+  }
+}

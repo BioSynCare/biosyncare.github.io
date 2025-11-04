@@ -1,0 +1,710 @@
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix sso: <https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@base <http://www.w3.org/2002/07/owl#> .
+
+[ rdf:type owl:Ontology
+ ] .
+
+#################################################################
+#    Annotation properties
+#################################################################
+
+###  http://www.w3.org/2004/02/skos/core#definition
+skos:definition rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#prefLabel
+skos:prefLabel rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#related
+skos:related rdf:type owl:AnnotationProperty .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ActiveCollaborator
+sso:ActiveCollaborator rdf:type owl:AnnotationProperty .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ConfirmedCollaborator
+sso:ConfirmedCollaborator rdf:type owl:AnnotationProperty .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#PotentialCollaborator
+sso:PotentialCollaborator rdf:type owl:AnnotationProperty .
+
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#administeredBy
+sso:administeredBy rdf:type owl:ObjectProperty ;
+                   rdfs:domain sso:Session ;
+                   rdfs:range sso:Expert ;
+                   rdfs:comment "Session is administered by a specialist or organization." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#appliesTechnique
+sso:appliesTechnique rdf:type owl:ObjectProperty ;
+                     rdfs:domain sso:Expert ;
+                     rdfs:range sso:Technique ;
+                     rdfs:comment "Technique applied by an expert." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#employsTechnique
+sso:employsTechnique rdf:type owl:ObjectProperty ;
+                     rdfs:domain sso:Neuromodulation ;
+                     rdfs:range sso:Technique ;
+                     rdfs:comment "Neuromodulation employs specific techniques." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#enhances
+sso:enhances rdf:type owl:ObjectProperty ;
+             rdfs:domain sso:Technique ;
+             rdfs:range sso:CognitiveModulation ;
+             rdfs:comment "Technique that enhances cognitive functions." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#isPotentialCollaborator
+sso:isPotentialCollaborator rdf:type owl:ObjectProperty ;
+                            rdfs:domain sso:Expert ;
+                            rdfs:range sso:Collaborator ;
+                            rdfs:comment "Potential collaboration between experts and SSO." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#providedBy
+sso:providedBy rdf:type owl:ObjectProperty ;
+               rdfs:domain sso:SpecializedNeuromodulationDevice ;
+               rdfs:range sso:Company ;
+               rdfs:comment "Device provided by a company for neuromodulation." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#recommendsTechnique
+sso:recommendsTechnique rdf:type owl:ObjectProperty ;
+                        rdfs:domain sso:Collaborator ;
+                        rdfs:range sso:Technique ;
+                        rdfs:comment "Technique recommended by a collaborator." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#supportsDevice
+sso:supportsDevice rdf:type owl:ObjectProperty ;
+                   rdfs:domain sso:Company ;
+                   rdfs:range sso:SpecializedNeuromodulationDevice ;
+                   rdfs:comment "Device supported by the company." .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#usesDevice
+sso:usesDevice rdf:type owl:ObjectProperty ;
+               rdfs:domain sso:Session ;
+               rdfs:range sso:Device ;
+               rdfs:comment "Session uses a specific device for stimulation." .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://www.w3.org/2004/02/skos/core#Concept
+skos:Concept rdf:type owl:Class .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudioStimulation
+sso:AudioStimulation rdf:type owl:Class ;
+                     rdfs:subClassOf sso:AudiovisualStimulation ;
+                     rdfs:comment "Stimulation using audio signals like isochronic or binaural beats." ;
+                     rdfs:label "AudioStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudioTechniques
+sso:AudioTechniques rdf:type owl:Class ;
+                    rdfs:subClassOf sso:Technique ;
+                    rdfs:comment "Audio-based modulation techniques for brain and sensory stimulation." ;
+                    rdfs:label "AudioTechniques" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudiovisualStimulation
+sso:AudiovisualStimulation rdf:type owl:Class ;
+                           rdfs:subClassOf sso:SensoryStimulation ;
+                           rdfs:comment "Stimulation using both audio and visual cues together." ;
+                           rdfs:label "AudiovisualStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BinauralBeats
+sso:BinauralBeats rdf:type owl:Class ;
+                  rdfs:subClassOf sso:AudioTechniques ;
+                  rdfs:comment "Dual-tone auditory beats used to create a perceived third beat for entrainment." ;
+                  rdfs:label "BinauralBeats" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BrainStimulation
+sso:BrainStimulation rdf:type owl:Class ;
+                     rdfs:subClassOf sso:Neuromodulation ;
+                     rdfs:comment "Direct stimulation targeted at brain regions for therapeutic effects." ;
+                     rdfs:label "BrainStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BrainwaveEntrainment
+sso:BrainwaveEntrainment rdf:type owl:Class ;
+                         rdfs:subClassOf sso:Technique ;
+                         rdfs:comment "Techniques aligning brainwave frequencies with external rhythms." ;
+                         rdfs:label "BrainwaveEntrainment" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ChemicalStimulation
+sso:ChemicalStimulation rdf:type owl:Class ;
+                        rdfs:subClassOf sso:Neuromodulation ;
+                        rdfs:comment "Stimulation using chemical agents or drugs." ;
+                        rdfs:label "ChemicalStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Chromosound
+sso:Chromosound rdf:type owl:Class ;
+                rdfs:subClassOf sso:AudiovisualStimulation ;
+                rdfs:comment "A specific type of audiovisual stimulation involving coordinated sound and color." ;
+                rdfs:label "Chromosound" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#CognitiveModulation
+sso:CognitiveModulation rdf:type owl:Class ;
+                        rdfs:subClassOf sso:Neuromodulation ;
+                        rdfs:comment "Modulation techniques that affect cognitive functions and states." ;
+                        rdfs:label "CognitiveModulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Collaborator
+sso:Collaborator rdf:type owl:Class ;
+                 rdfs:comment "Potential collaborators for the SSO project, including experts and organizations." ;
+                 rdfs:label "Collaborator" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ColorTherapy
+sso:ColorTherapy rdf:type owl:Class ;
+                 rdfs:subClassOf sso:VisualTechniques ;
+                 rdfs:comment "Therapy using color exposure to influence mental and physical health." ;
+                 rdfs:label "ColorTherapy" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Company
+sso:Company rdf:type owl:Class ;
+            rdfs:subClassOf sso:Expert ;
+            rdfs:comment "An organization providing neuromodulation devices or services." ;
+            rdfs:label "Company" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Context
+sso:Context rdf:type owl:Class ;
+            rdfs:subClassOf sso:CognitiveModulation ;
+            rdfs:comment "Context in which stimulation is administered, impacting efficacy." ;
+            rdfs:label "Context" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#DeepBrainStimulation
+sso:DeepBrainStimulation rdf:type owl:Class ;
+                         rdfs:subClassOf sso:ElectricalStimulation ;
+                         rdfs:comment "Stimulation of deep brain structures using implanted electrodes." ;
+                         rdfs:label "DeepBrainStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Device
+sso:Device rdf:type owl:Class ;
+           rdfs:comment "Device used for various stimulation techniques." ;
+           rdfs:label "Device" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ElectricalStimulation
+sso:ElectricalStimulation rdf:type owl:Class ;
+                          rdfs:subClassOf sso:BrainStimulation ;
+                          rdfs:comment "Stimulation via low-level electrical currents." ;
+                          rdfs:label "ElectricalStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Expert
+sso:Expert rdf:type owl:Class ;
+           rdfs:comment "An expert in neuromodulation, could be a person or a company." ;
+           rdfs:label "Expert" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Flickering
+sso:Flickering rdf:type owl:Class ;
+               rdfs:subClassOf sso:VisualTechniques ;
+               rdfs:comment "Visual technique using flickering lights to stimulate the brain." ;
+               rdfs:label "Flickering" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GeneralPurposeDevice
+sso:GeneralPurposeDevice rdf:type owl:Class ;
+                         rdfs:subClassOf sso:Device ;
+                         rdfs:comment "Devices like smartphones and laptops that can run software for stimulation." ;
+                         rdfs:label "GeneralPurposeDevice" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GroupSession
+sso:GroupSession rdf:type owl:Class ;
+                 rdfs:subClassOf sso:Session ;
+                 rdfs:comment "A session involving multiple users undergoing the same stimulation protocol." ;
+                 rdfs:label "GroupSession" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GuidingStimulation
+sso:GuidingStimulation rdf:type owl:Class ;
+                       rdfs:subClassOf sso:SensoryStimulation ;
+                       rdfs:comment "Stimulation guided by rhythms or cycles, such as breathing cycles." ;
+                       rdfs:label "GuidingStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#IndividualSession
+sso:IndividualSession rdf:type owl:Class ;
+                      rdfs:subClassOf sso:Session ;
+                      rdfs:comment "A single-user session of neuromodulation or stimulation." ;
+                      rdfs:label "IndividualSession" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#IsochronousSounds
+sso:IsochronousSounds rdf:type owl:Class ;
+                      rdfs:subClassOf sso:AudioTechniques ;
+                      rdfs:comment "Sounds with equal intervals, often used for entrainment." ;
+                      rdfs:label "IsochronousSounds" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Language
+sso:Language rdf:type owl:Class ;
+             rdfs:subClassOf sso:CognitiveModulation ;
+             rdfs:comment "Stimulation involving human language." ;
+             rdfs:label "Language" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#MonauralBeats
+sso:MonauralBeats rdf:type owl:Class ;
+                  rdfs:subClassOf sso:AudioTechniques ;
+                  rdfs:comment "Single-tone auditory beats used for stimulation." ;
+                  rdfs:label "MonauralBeats" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Neuromodulation
+sso:Neuromodulation rdf:type owl:Class ;
+                    rdfs:comment "Techniques to alter brain activity through various forms of stimulation." ;
+                    rdfs:label "Neuromodulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SensoryStimulation
+sso:SensoryStimulation rdf:type owl:Class ;
+                       rdfs:subClassOf sso:Neuromodulation ;
+                       rdfs:comment "Stimulation via sensory inputs such as audio, visual, and tactile cues." ;
+                       rdfs:label "SensoryStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Session
+sso:Session rdf:type owl:Class ;
+            rdfs:comment "A session instance involving stimulation, either guided or unguided." ;
+            rdfs:label "Session" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SpecialistPerson
+sso:SpecialistPerson rdf:type owl:Class ;
+                     rdfs:subClassOf sso:Expert ;
+                     rdfs:comment "A human specialist in neuromodulation techniques." ;
+                     rdfs:label "SpecialistPerson" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SpecializedNeuromodulationDevice
+sso:SpecializedNeuromodulationDevice rdf:type owl:Class ;
+                                     rdfs:subClassOf sso:Device ;
+                                     rdfs:comment "Devices specifically built for neuromodulation, like MindAlive devices." ;
+                                     rdfs:label "SpecializedNeuromodulationDevice" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TactileStimulation
+sso:TactileStimulation rdf:type owl:Class ;
+                       rdfs:subClassOf sso:SensoryStimulation ;
+                       rdfs:comment "Stimulation through tactile feedback, using vibrations or touch." ;
+                       rdfs:label "TactileStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Technique
+sso:Technique rdf:type owl:Class ;
+              rdfs:comment "Techniques used for neuromodulation." ;
+              rdfs:label "Technique" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TranscranialMagneticStimulation
+sso:TranscranialMagneticStimulation rdf:type owl:Class ;
+                                    rdfs:subClassOf sso:TranscranialStimulation ;
+                                    rdfs:comment "Magnetic stimulation applied to the brain non-invasively." ;
+                                    rdfs:label "TranscranialMagneticStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TranscranialStimulation
+sso:TranscranialStimulation rdf:type owl:Class ;
+                            rdfs:subClassOf sso:Neuromodulation ;
+                            rdfs:comment "Techniques applied directly to the skull or scalp." ;
+                            rdfs:label "TranscranialStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#VisualStimulation
+sso:VisualStimulation rdf:type owl:Class ;
+                      rdfs:subClassOf sso:AudiovisualStimulation ;
+                      rdfs:comment "Stimulation using visual signals, including flickering lights and color." ;
+                      rdfs:label "VisualStimulation" .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#VisualTechniques
+sso:VisualTechniques rdf:type owl:Class ;
+                     rdfs:subClassOf sso:Technique ;
+                     rdfs:comment "Visual-based modulation techniques for stimulation." ;
+                     rdfs:label "VisualTechniques" .
+
+
+#################################################################
+#    Individuals
+#################################################################
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudioStimulationConcept
+sso:AudioStimulationConcept rdf:type owl:NamedIndividual ,
+                                     skos:Concept ;
+                            skos:definition "Stimulation using audio signals like isochronic or binaural beats." ;
+                            skos:prefLabel "AudioStimulation Concept" ;
+                            skos:related sso:AudioStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudioTechniquesConcept
+sso:AudioTechniquesConcept rdf:type owl:NamedIndividual ,
+                                    skos:Concept ;
+                           skos:definition "Audio-based modulation techniques for brain and sensory stimulation." ;
+                           skos:prefLabel "AudioTechniques Concept" ;
+                           skos:related sso:AudioTechniques .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#AudiovisualStimulationConcept
+sso:AudiovisualStimulationConcept rdf:type owl:NamedIndividual ,
+                                           skos:Concept ;
+                                  skos:definition "Stimulation using both audio and visual cues together." ;
+                                  skos:prefLabel "AudiovisualStimulation Concept" ;
+                                  skos:related sso:AudiovisualStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BinauralBeatsConcept
+sso:BinauralBeatsConcept rdf:type owl:NamedIndividual ,
+                                  skos:Concept ;
+                         skos:definition "Dual-tone auditory beats used to create a perceived third beat for entrainment." ;
+                         skos:prefLabel "BinauralBeats Concept" ;
+                         skos:related sso:BinauralBeats .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BrainStimulationConcept
+sso:BrainStimulationConcept rdf:type owl:NamedIndividual ,
+                                     skos:Concept ;
+                            skos:definition "Direct stimulation targeted at brain regions for therapeutic effects." ;
+                            skos:prefLabel "BrainStimulation Concept" ;
+                            skos:related sso:BrainStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#BrainwaveEntrainmentConcept
+sso:BrainwaveEntrainmentConcept rdf:type owl:NamedIndividual ,
+                                         skos:Concept ;
+                                skos:definition "Techniques aligning brainwave frequencies with external rhythms." ;
+                                skos:prefLabel "BrainwaveEntrainment Concept" ;
+                                skos:related sso:BrainwaveEntrainment .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ChemicalStimulationConcept
+sso:ChemicalStimulationConcept rdf:type owl:NamedIndividual ,
+                                        skos:Concept ;
+                               skos:definition "Stimulation using chemical agents or drugs." ;
+                               skos:prefLabel "ChemicalStimulation Concept" ;
+                               skos:related sso:ChemicalStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ChromosoundConcept
+sso:ChromosoundConcept rdf:type owl:NamedIndividual ,
+                                skos:Concept ;
+                       skos:definition "A specific type of audiovisual stimulation involving coordinated sound and color." ;
+                       skos:prefLabel "Chromosound Concept" ;
+                       skos:related sso:Chromosound .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#CognitiveModulationConcept
+sso:CognitiveModulationConcept rdf:type owl:NamedIndividual ,
+                                        skos:Concept ;
+                               skos:definition "Modulation techniques that affect cognitive functions and states." ;
+                               skos:prefLabel "CognitiveModulation Concept" ;
+                               skos:related sso:CognitiveModulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#CollaboratorConcept
+sso:CollaboratorConcept rdf:type owl:NamedIndividual ,
+                                 skos:Concept ;
+                        skos:definition "Potential collaborators for the SSO project, including experts and organizations." ;
+                        skos:prefLabel "Collaborator Concept" ;
+                        skos:related sso:Collaborator .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ColorTherapyConcept
+sso:ColorTherapyConcept rdf:type owl:NamedIndividual ,
+                                 skos:Concept ;
+                        skos:definition "Therapy using color exposure to influence mental and physical health." ;
+                        skos:prefLabel "ColorTherapy Concept" ;
+                        skos:related sso:ColorTherapy .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#CompanyConcept
+sso:CompanyConcept rdf:type owl:NamedIndividual ,
+                            skos:Concept ;
+                   skos:definition "An organization providing neuromodulation devices or services." ;
+                   skos:prefLabel "Company Concept" ;
+                   skos:related sso:Company .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ContextConcept
+sso:ContextConcept rdf:type owl:NamedIndividual ,
+                            skos:Concept ;
+                   skos:definition "Context in which stimulation is administered, impacting efficacy." ;
+                   skos:prefLabel "Context Concept" ;
+                   skos:related sso:Context .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#DeepBrainStimulationConcept
+sso:DeepBrainStimulationConcept rdf:type owl:NamedIndividual ,
+                                         skos:Concept ;
+                                skos:definition "Stimulation of deep brain structures using implanted electrodes." ;
+                                skos:prefLabel "DeepBrainStimulation Concept" ;
+                                skos:related sso:DeepBrainStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#DeviceConcept
+sso:DeviceConcept rdf:type owl:NamedIndividual ,
+                           skos:Concept ;
+                  skos:definition "Device used for various stimulation techniques." ;
+                  skos:prefLabel "Device Concept" ;
+                  skos:related sso:Device .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ElectricalStimulationConcept
+sso:ElectricalStimulationConcept rdf:type owl:NamedIndividual ,
+                                          skos:Concept ;
+                                 skos:definition "Stimulation via low-level electrical currents." ;
+                                 skos:prefLabel "ElectricalStimulation Concept" ;
+                                 skos:related sso:ElectricalStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Emerson_Marques_Pedro
+sso:Emerson_Marques_Pedro rdf:type owl:NamedIndividual ,
+                                   sso:Collaborator ;
+                          skos:prefLabel "Emerson_Marques_Pedro" ;
+                          sso:PotentialCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#ExpertConcept
+sso:ExpertConcept rdf:type owl:NamedIndividual ,
+                           skos:Concept ;
+                  skos:definition "An expert in neuromodulation, could be a person or a company." ;
+                  skos:prefLabel "Expert Concept" ;
+                  skos:related sso:Expert .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#FlickeringConcept
+sso:FlickeringConcept rdf:type owl:NamedIndividual ,
+                               skos:Concept ;
+                      skos:definition "Visual technique using flickering lights to stimulate the brain." ;
+                      skos:prefLabel "Flickering Concept" ;
+                      skos:related sso:Flickering .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GeneralPurposeDeviceConcept
+sso:GeneralPurposeDeviceConcept rdf:type owl:NamedIndividual ,
+                                         skos:Concept ;
+                                skos:definition "Devices like smartphones and laptops that can run software for stimulation." ;
+                                skos:prefLabel "GeneralPurposeDevice Concept" ;
+                                skos:related sso:GeneralPurposeDevice .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Giorgia_Crimi
+sso:Giorgia_Crimi rdf:type owl:NamedIndividual ,
+                           sso:Collaborator ;
+                  skos:prefLabel "Giorgia_Crimi" ;
+                  sso:PotentialCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GroupSessionConcept
+sso:GroupSessionConcept rdf:type owl:NamedIndividual ,
+                                 skos:Concept ;
+                        skos:definition "A session involving multiple users undergoing the same stimulation protocol." ;
+                        skos:prefLabel "GroupSession Concept" ;
+                        skos:related sso:GroupSession .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#GuidingStimulationConcept
+sso:GuidingStimulationConcept rdf:type owl:NamedIndividual ,
+                                       skos:Concept ;
+                              skos:definition "Stimulation guided by rhythms or cycles, such as breathing cycles." ;
+                              skos:prefLabel "GuidingStimulation Concept" ;
+                              skos:related sso:GuidingStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#IndividualSessionConcept
+sso:IndividualSessionConcept rdf:type owl:NamedIndividual ,
+                                      skos:Concept ;
+                             skos:definition "A single-user session of neuromodulation or stimulation." ;
+                             skos:prefLabel "IndividualSession Concept" ;
+                             skos:related sso:IndividualSession .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#IsochronousSoundsConcept
+sso:IsochronousSoundsConcept rdf:type owl:NamedIndividual ,
+                                      skos:Concept ;
+                             skos:definition "Sounds with equal intervals, often used for entrainment." ;
+                             skos:prefLabel "IsochronousSounds Concept" ;
+                             skos:related sso:IsochronousSounds .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Ivan_Maero
+sso:Ivan_Maero rdf:type owl:NamedIndividual ,
+                        sso:Collaborator ;
+               skos:prefLabel "Ivan_Maero" ;
+               sso:ActiveCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Jacopo_Donati
+sso:Jacopo_Donati rdf:type owl:NamedIndividual ,
+                           sso:Collaborator ;
+                  skos:prefLabel "Jacopo_Donati" ;
+                  sso:ActiveCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Jorge_Antunes
+sso:Jorge_Antunes rdf:type owl:NamedIndividual ,
+                           sso:Collaborator ;
+                  skos:prefLabel "Jorge_Antunes" ;
+                  sso:PotentialCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#LanguageConcept
+sso:LanguageConcept rdf:type owl:NamedIndividual ,
+                             skos:Concept ;
+                    skos:definition "Stimulation involving human language." ;
+                    skos:prefLabel "Language Concept" ;
+                    skos:related sso:Language .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Marco_Schonhaut
+sso:Marco_Schonhaut rdf:type owl:NamedIndividual ,
+                             sso:Collaborator ;
+                    skos:prefLabel "Marco_Schonhaut" ;
+                    sso:PotentialCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#MonauralBeatsConcept
+sso:MonauralBeatsConcept rdf:type owl:NamedIndividual ,
+                                  skos:Concept ;
+                         skos:definition "Single-tone auditory beats used for stimulation." ;
+                         skos:prefLabel "MonauralBeats Concept" ;
+                         skos:related sso:MonauralBeats .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#NeuromodulationConcept
+sso:NeuromodulationConcept rdf:type owl:NamedIndividual ,
+                                    skos:Concept ;
+                           skos:definition "Techniques to alter brain activity through various forms of stimulation." ;
+                           skos:prefLabel "Neuromodulation Concept" ;
+                           skos:related sso:Neuromodulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Renato_Fabbri
+sso:Renato_Fabbri rdf:type owl:NamedIndividual ,
+                           sso:Collaborator ;
+                  skos:prefLabel "Renato_Fabbri" ;
+                  sso:ConfirmedCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SensoryStimulationConcept
+sso:SensoryStimulationConcept rdf:type owl:NamedIndividual ,
+                                       skos:Concept ;
+                              skos:definition "Stimulation via sensory inputs such as audio, visual, and tactile cues." ;
+                              skos:prefLabel "SensoryStimulation Concept" ;
+                              skos:related sso:SensoryStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#Sergio_Basbaum
+sso:Sergio_Basbaum rdf:type owl:NamedIndividual ,
+                            sso:Collaborator ;
+                   skos:prefLabel "Sergio_Basbaum" ;
+                   sso:PotentialCollaborator "true"^^xsd:boolean .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SessionConcept
+sso:SessionConcept rdf:type owl:NamedIndividual ,
+                            skos:Concept ;
+                   skos:definition "A session instance involving stimulation, either guided or unguided." ;
+                   skos:prefLabel "Session Concept" ;
+                   skos:related sso:Session .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SpecialistPersonConcept
+sso:SpecialistPersonConcept rdf:type owl:NamedIndividual ,
+                                     skos:Concept ;
+                            skos:definition "A human specialist in neuromodulation techniques." ;
+                            skos:prefLabel "SpecialistPerson Concept" ;
+                            skos:related sso:SpecialistPerson .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#SpecializedNeuromodulationDeviceConcept
+sso:SpecializedNeuromodulationDeviceConcept rdf:type owl:NamedIndividual ,
+                                                     skos:Concept ;
+                                            skos:definition "Devices specifically built for neuromodulation, like MindAlive devices." ;
+                                            skos:prefLabel "SpecializedNeuromodulationDevice Concept" ;
+                                            skos:related sso:SpecializedNeuromodulationDevice .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TactileStimulationConcept
+sso:TactileStimulationConcept rdf:type owl:NamedIndividual ,
+                                       skos:Concept ;
+                              skos:definition "Stimulation through tactile feedback, using vibrations or touch." ;
+                              skos:prefLabel "TactileStimulation Concept" ;
+                              skos:related sso:TactileStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TechniqueConcept
+sso:TechniqueConcept rdf:type owl:NamedIndividual ,
+                              skos:Concept ;
+                     skos:definition "Techniques used for neuromodulation." ;
+                     skos:prefLabel "Technique Concept" ;
+                     skos:related sso:Technique .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TranscranialMagneticStimulationConcept
+sso:TranscranialMagneticStimulationConcept rdf:type owl:NamedIndividual ,
+                                                    skos:Concept ;
+                                           skos:definition "Magnetic stimulation applied to the brain non-invasively." ;
+                                           skos:prefLabel "TranscranialMagneticStimulation Concept" ;
+                                           skos:related sso:TranscranialMagneticStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#TranscranialStimulationConcept
+sso:TranscranialStimulationConcept rdf:type owl:NamedIndividual ,
+                                            skos:Concept ;
+                                   skos:definition "Techniques applied directly to the skull or scalp." ;
+                                   skos:prefLabel "TranscranialStimulation Concept" ;
+                                   skos:related sso:TranscranialStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#VisualStimulationConcept
+sso:VisualStimulationConcept rdf:type owl:NamedIndividual ,
+                                      skos:Concept ;
+                             skos:definition "Stimulation using visual signals, including flickering lights and color." ;
+                             skos:prefLabel "VisualStimulation Concept" ;
+                             skos:related sso:VisualStimulation .
+
+
+###  https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#VisualTechniquesConcept
+sso:VisualTechniquesConcept rdf:type owl:NamedIndividual ,
+                                     skos:Concept ;
+                            skos:definition "Visual-based modulation techniques for stimulation." ;
+                            skos:prefLabel "VisualTechniques Concept" ;
+                            skos:related sso:VisualTechniques .
+
+
+###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
