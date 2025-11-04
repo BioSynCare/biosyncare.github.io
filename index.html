@@ -69,6 +69,8 @@
         background-color: #f3f4f6;
       }
       .visual-display {
+        position: relative;
+        overflow: hidden;
         border-radius: 0.75rem;
         border: 1px solid #e5e7eb;
         background: radial-gradient(
@@ -78,10 +80,6 @@
         );
         transition: background 0.6s ease, transform 0.6s ease;
         min-height: 12rem;
-      }
-      .visual-display.bright-text {
-        color: #f8fafc;
-        text-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
       }
       @keyframes blinkPalette {
         0%,
@@ -154,6 +152,80 @@
       .undulate-animation {
         animation: undulatePalette 10s infinite alternate;
       }
+      .track-section {
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+      }
+      .track-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .track-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1rem;
+      }
+      .track-item h4 {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .track-item p {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.125rem;
+      }
+      .track-item button {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        background-color: #fee2e2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
+        transition: background 0.2s, color 0.2s;
+      }
+      .track-item button:hover {
+        background-color: #fecaca;
+        color: #7f1d1d;
+      }
+      .track-empty {
+        font-size: 0.875rem;
+        color: #6b7280;
+        padding: 0.75rem 0.5rem;
+      }
+      .visual-layer-container {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        pointer-events: none;
+        z-index: 1;
+      }
+      .visual-layer {
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        mix-blend-mode: screen;
+        opacity: 0.85;
+        transition: transform 0.6s ease, opacity 0.6s ease;
+        pointer-events: none;
+      }
+      .visual-status-text {
+        position: relative;
+        z-index: 5;
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: #374151;
+        text-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+      }
+      .visual-status-text.active {
+        color: #f8fafc;
+        text-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
+      }
       @media (prefers-reduced-motion: reduce) {
         .blink-animation,
         .undulate-animation {
@@ -199,37 +271,65 @@
           <p id="status" class="text-gray-600 mb-4">
             Click Initialize to start
           </p>
-          <div class="space-y-4">
-            <div>
-              <label
-                for="audio-menu"
-                class="block text-sm font-medium text-gray-700 mb-1"
-                >Audio feature</label
-              >
-              <select
-                id="audio-menu"
-                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-              >
-                <option value="sine">Pure sine • 440Hz</option>
-                <option value="binaural">Binaural beat • Alpha 10Hz</option>
-                <option value="monaural">Monaural beat • Theta 6Hz</option>
-              </select>
+          <div class="space-y-6">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <label
+                  for="audio-menu"
+                  class="block text-sm font-medium text-gray-700"
+                  >Audio feature</label
+                >
+                <span class="text-xs text-gray-400"
+                  >Layer tracks to craft a session</span
+                >
+              </div>
+              <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <select
+                  id="audio-menu"
+                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                  <option value="sine">Pure sine • 440Hz</option>
+                  <option value="binaural">Binaural beat • Alpha 10Hz</option>
+                  <option value="monaural">Monaural beat • Theta 6Hz</option>
+                  <option value="isochronic">
+                    Isochronic pulse • 12Hz breathing
+                  </option>
+                  <option value="martigli">Martigli harmonics</option>
+                  <option value="noise-white">Noise • White spectrum</option>
+                  <option value="noise-pink">Noise • Pink spectrum</option>
+                  <option value="noise-brown">Noise • Brown spectrum</option>
+                </select>
+                <button id="btn-add-audio" class="btn-primary">
+                  ➕ Add track
+                </button>
+              </div>
               <p
                 id="audio-description"
-                class="mt-2 text-xs text-gray-500 leading-relaxed"
+                class="text-xs text-gray-500 leading-relaxed"
               >
                 Pure sine tone at 440Hz for quick calibration and reference.
               </p>
             </div>
-            <div
-              class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
-            >
-              <button id="btn-play-audio" class="btn-primary md:flex-1">
-                ▶ Start audio
+            <div class="flex flex-wrap gap-3">
+              <button id="btn-stop-all-audio" class="btn-secondary text-sm">
+                ⏹ Stop all audio
               </button>
-              <button id="btn-stop-audio" class="btn-secondary md:flex-none">
-                ⏹ Stop audio
-              </button>
+            </div>
+            <div class="track-section">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-700">
+                  Active audio tracks
+                </h3>
+                <span
+                  id="audio-track-count"
+                  class="text-xs font-medium text-gray-400"
+                  >0 layers</span
+                >
+              </div>
+              <div id="audio-active-empty" class="track-empty">
+                No audio layers running. Add a track to begin.
+              </div>
+              <div id="audio-active-list" class="track-list"></div>
             </div>
           </div>
         </div>
@@ -238,36 +338,39 @@
           <p class="text-gray-600 mb-4">
             Pair color entrainment with audio sessions or run standalone.
           </p>
-          <div class="space-y-4">
-            <div>
-              <label
-                for="visual-menu"
-                class="block text-sm font-medium text-gray-700 mb-1"
-                >Visual feature</label
-              >
-              <select
-                id="visual-menu"
-                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-              >
-                <option value="blink">Blinking colors</option>
-                <option value="undulate">Undulating colors</option>
-              </select>
+          <div class="space-y-6">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between gap-2">
+                <label
+                  for="visual-menu"
+                  class="block text-sm font-medium text-gray-700"
+                  >Visual feature</label
+                >
+                <span class="text-xs text-gray-400">Stack light cues</span>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                <select
+                  id="visual-menu"
+                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                >
+                  <option value="blink">Blinking colors</option>
+                  <option value="undulate">Undulating colors</option>
+                </select>
+                <button id="btn-add-visual" class="btn-primary">
+                  ➕ Add visual
+                </button>
+              </div>
               <p
                 id="visual-description"
-                class="mt-2 text-xs text-gray-500 leading-relaxed"
+                class="text-xs text-gray-500 leading-relaxed"
               >
                 High-contrast blinking palette for alert focus and breathing
                 cadence.
               </p>
             </div>
-            <div
-              class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
-            >
-              <button id="btn-start-visual" class="btn-primary md:flex-1">
-                🌈 Start visual
-              </button>
-              <button id="btn-stop-visual" class="btn-secondary md:flex-none">
-                ⏹ Stop visual
+            <div class="flex flex-wrap gap-3">
+              <button id="btn-stop-all-visual" class="btn-secondary text-sm">
+                ⏹ Stop all visual
               </button>
             </div>
           </div>
@@ -275,11 +378,32 @@
             id="visual-display"
             class="visual-display mt-6 flex h-48 items-center justify-center px-4 text-center text-sm font-medium text-gray-600 transition-colors"
           >
+            <div
+              id="visual-layer-container"
+              class="visual-layer-container"
+              aria-hidden="true"
+            ></div>
             <span
               id="visual-status-text"
-              class="transition-colors duration-300 text-gray-600"
+              class="visual-status-text transition-colors duration-300"
               >Visual output appears here once started.</span
             >
+          </div>
+          <div class="track-section mt-6">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-gray-700">
+                Active visual layers
+              </h3>
+              <span
+                id="visual-track-count"
+                class="text-xs font-medium text-gray-400"
+                >0 layers</span
+              >
+            </div>
+            <div id="visual-active-empty" class="track-empty">
+              No visual layers running. Add a cue to illuminate the panel.
+            </div>
+            <div id="visual-active-list" class="track-list"></div>
           </div>
         </div>
       </div>
@@ -288,97 +412,171 @@
     <script type="module">
       import { AudioEngine } from './src/core/audio-engine.js';
 
+      const generateTrackId = (prefix) =>
+        `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
       let engine = null;
-      let activeAudioId = null;
-      let activeVisualCleanup = null;
-      let visualTimer = null;
-      let visualFrame = null;
-      let visualActive = false;
+
+      const initBtn = document.getElementById('btn-init');
+      const stopBtn = document.getElementById('btn-stop');
 
       const statusEl = document.getElementById('status');
       const audioMenu = document.getElementById('audio-menu');
       const audioDescriptionEl = document.getElementById('audio-description');
-      const playAudioBtn = document.getElementById('btn-play-audio');
-      const stopAudioBtn = document.getElementById('btn-stop-audio');
+      const addAudioBtn = document.getElementById('btn-add-audio');
+      const stopAllAudioBtn = document.getElementById('btn-stop-all-audio');
+      const audioActiveList = document.getElementById('audio-active-list');
+      const audioActiveEmpty = document.getElementById('audio-active-empty');
+      const audioTrackCount = document.getElementById('audio-track-count');
 
       const visualMenu = document.getElementById('visual-menu');
       const visualDescriptionEl = document.getElementById('visual-description');
-      const startVisualBtn = document.getElementById('btn-start-visual');
-      const stopVisualBtn = document.getElementById('btn-stop-visual');
-      const visualDisplay = document.getElementById('visual-display');
+      const addVisualBtn = document.getElementById('btn-add-visual');
+      const stopAllVisualBtn = document.getElementById('btn-stop-all-visual');
+      const visualLayerContainer = document.getElementById(
+        'visual-layer-container'
+      );
+      const visualActiveList = document.getElementById('visual-active-list');
+      const visualActiveEmpty = document.getElementById('visual-active-empty');
+      const visualTrackCount = document.getElementById('visual-track-count');
       const visualStatusText = document.getElementById('visual-status-text');
 
-      const setVisualTextBase = () => {
-        visualStatusText.classList.remove('text-white');
-        visualStatusText.classList.add('text-gray-600');
-      };
-
-      const setVisualTextBright = () => {
-        visualStatusText.classList.add('text-white');
-        visualStatusText.classList.remove('text-gray-600');
-      };
-
-      const clearVisualAnimations = () => {
-        visualActive = false;
-        if (visualTimer) {
-          clearInterval(visualTimer);
-          visualTimer = null;
-        }
-        if (visualFrame) {
-          cancelAnimationFrame(visualFrame);
-          visualFrame = null;
-        }
-      };
-
-      const resetVisualDisplay = () => {
-        if (typeof activeVisualCleanup === 'function') {
-          activeVisualCleanup();
-        }
-        activeVisualCleanup = null;
-        clearVisualAnimations();
-        visualDisplay.classList.remove('bright-text');
-        visualDisplay.style.background = '';
-        visualDisplay.style.transform = 'scale(1)';
-        visualStatusText.textContent =
-          'Visual output appears here once started.';
-        setVisualTextBase();
-      };
+      const activeAudioTracks = new Map();
+      const activeVisualTracks = new Map();
 
       const audioPresets = {
         sine: {
           label: 'Pure sine • 440Hz',
           description:
             'Pure sine tone at 440Hz for quick calibration and reference.',
-          play: () =>
-            engine.playWaveform({
+          start: () => {
+            const nodeId = engine.playWaveform({
               type: 'sine',
               freq: 440,
               gain: 0.2,
-            }),
+            });
+            return {
+              nodeId,
+              detail: '440 Hz reference tone at moderate gain.',
+            };
+          },
         },
         binaural: {
           label: 'Binaural beat • Alpha 10Hz',
           description:
             'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
-          play: () =>
-            engine.playBinaural({
+          start: () => {
+            const nodeId = engine.playBinaural({
               base: 200,
               beat: 10,
               duration: 0,
               gain: 0.25,
-            }),
+            });
+            return {
+              nodeId,
+              detail: 'Carrier 200 Hz, beat 10 Hz (alpha window).',
+            };
+          },
         },
         monaural: {
           label: 'Monaural beat • Theta 6Hz',
           description:
             'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
-          play: () =>
-            engine.playMonaural({
+          start: () => {
+            const nodeId = engine.playMonaural({
               base: 210,
               beat: 6,
               duration: 0,
               gain: 0.3,
-            }),
+            });
+            return {
+              nodeId,
+              detail: 'Carrier 210 Hz, beat 6 Hz (theta).',
+            };
+          },
+        },
+        isochronic: {
+          label: 'Isochronic pulse • 12Hz breathing',
+          description:
+            'Amplitude-gated tone delivering crisp rhythmic cues for breath pacing.',
+          start: () => {
+            const nodeId = engine.playIsochronic({
+              freq: 180,
+              pulseFreq: 12,
+              duration: null,
+              gain: 0.22,
+            });
+            return {
+              nodeId,
+              detail: '180 Hz carrier with 12 Hz gating pulses.',
+            };
+          },
+        },
+        martigli: {
+          label: 'Martigli harmonics',
+          description:
+            'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
+          start: () => {
+            const nodeId = engine.playMartigliWave({
+              fundamental: 220,
+              harmonics: [1, 1.5, 2, 3, 5, 8, 13],
+              duration: null,
+              gain: 0.14,
+              fadeIn: 0.6,
+              fadeOut: 0.6,
+            });
+            return {
+              nodeId,
+              detail: 'Fundamental 220 Hz with Martigli/Fibonacci ratios.',
+            };
+          },
+        },
+        'noise-white': {
+          label: 'Noise • White spectrum',
+          description: 'Broad-spectrum white noise for masking and focus.',
+          start: () => {
+            const nodeId = engine.playNoise({
+              type: 'white',
+              duration: null,
+              gain: 0.18,
+            });
+            return {
+              nodeId,
+              detail: 'Flat broadband spectrum.',
+            };
+          },
+        },
+        'noise-pink': {
+          label: 'Noise • Pink spectrum',
+          description:
+            '1/f pink noise with gentle energy taper, supportive for relaxation.',
+          start: () => {
+            const nodeId = engine.playNoise({
+              type: 'pink',
+              duration: null,
+              gain: 0.18,
+            });
+            return {
+              nodeId,
+              detail: 'Pink noise (1/f falloff).',
+            };
+          },
+        },
+        'noise-brown': {
+          label: 'Noise • Brown spectrum',
+          description:
+            'Low-frequency weighted brown noise ideal for grounding and masking.',
+          start: () => {
+            const nodeId = engine.playNoise({
+              type: 'brown',
+              duration: null,
+              gain: 0.22,
+            });
+            return {
+              nodeId,
+              detail: 'Brown noise with warm low emphasis.',
+            };
+          },
         },
       };
 
@@ -387,32 +585,45 @@
           label: 'Blinking colors',
           description:
             'High-contrast blinking palette to energize focus and breathing cadence.',
-          activate: () => {
-            clearVisualAnimations();
-            visualActive = true;
-            visualDisplay.classList.add('bright-text');
-            setVisualTextBright();
+          start: () => {
+            const layer = document.createElement('div');
+            layer.className = 'visual-layer';
+            layer.style.opacity = '0.9';
+            visualLayerContainer.appendChild(layer);
+
             const palettes = [
               { inner: '#1d4ed8', outer: '#1e293b', scale: 1 },
               { inner: '#0ea5e9', outer: '#0369a1', scale: 1.03 },
               { inner: '#22d3ee', outer: '#14b8a6', scale: 0.98 },
-              { inner: '#f97316', outer: '#c2410c', scale: 1.04 },
+              { inner: '#f97316', outer: '#c2410c', scale: 1.05 },
             ];
-            let index = 0;
+            let index = Math.floor(Math.random() * palettes.length);
+
             const applyPalette = () => {
               const { inner, outer, scale } = palettes[index];
-              visualDisplay.style.background = `radial-gradient(circle at center, ${inner} 0%, ${outer} 75%)`;
-              visualDisplay.style.transform = `scale(${scale ?? 1})`;
+              layer.style.background = `radial-gradient(circle at center, ${inner} 0%, ${outer} 78%)`;
+              layer.style.transform = `scale(${scale ?? 1})`;
             };
+
             applyPalette();
-            visualTimer = setInterval(() => {
+            const interval = 250; // ≈4 Hz
+            const timer = setInterval(() => {
               index = (index + 1) % palettes.length;
               applyPalette();
-            }, 450);
-            return () => {
-              clearVisualAnimations();
-              visualDisplay.classList.remove('bright-text');
-              visualDisplay.style.transform = 'scale(1)';
+            }, interval);
+
+            let active = true;
+            const cleanup = () => {
+              if (!active) return;
+              active = false;
+              clearInterval(timer);
+              layer.remove();
+            };
+
+            return {
+              element: layer,
+              detail: '≈4 Hz multicolor pulse.',
+              cleanup,
             };
           },
         },
@@ -420,30 +631,58 @@
           label: 'Undulating colors',
           description:
             'Slow undulating gradients for ambient relaxation and coherence.',
-          activate: () => {
-            clearVisualAnimations();
-            visualActive = true;
-            visualDisplay.classList.add('bright-text');
-            setVisualTextBright();
-            let phase = 0;
-            const animate = () => {
-              const x = 50 + 40 * Math.sin(phase * 0.6);
-              const y = 50 + 40 * Math.cos(phase * 0.4);
-              const innerHue = 220 + 40 * Math.sin(phase);
-              const midHue = 200 + 30 * Math.cos(phase * 0.8);
-              const outerHue = 180 + 25 * Math.sin(phase * 1.3);
-              const scale = 1 + 0.03 * Math.sin(phase * 0.5);
-              visualDisplay.style.background = `radial-gradient(circle at ${x}% ${y}%, hsl(${innerHue}, 88%, 62%) 0%, hsl(${midHue}, 82%, 55%) 45%, hsl(${outerHue}, 78%, 48%) 100%)`;
-              visualDisplay.style.transform = `scale(${scale.toFixed(3)})`;
-              phase += 0.02;
-              if (!visualActive) return;
-              visualFrame = requestAnimationFrame(animate);
+          start: () => {
+            const layer = document.createElement('div');
+            layer.className = 'visual-layer';
+            layer.style.opacity = '0.8';
+            visualLayerContainer.appendChild(layer);
+
+            let active = true;
+            let phase = Math.random() * Math.PI * 2;
+            let frameId = null;
+            let last = performance.now();
+
+            const animate = (now) => {
+              if (!active) return;
+              const delta = (now - last) / 1000;
+              last = now;
+              const targetHz = 9;
+              phase += delta * targetHz * Math.PI * 2;
+
+              const x = 50 + 35 * Math.sin(phase * 0.25);
+              const y = 50 + 35 * Math.cos(phase * 0.31);
+              const innerHue =
+                (210 + 60 * Math.sin(phase * 0.5)) % 360;
+              const midHue =
+                (180 + 50 * Math.sin(phase * 0.35 + Math.PI / 4)) % 360;
+              const outerHue =
+                (200 + 40 * Math.cos(phase * 0.42)) % 360;
+              const scale = 1 + 0.04 * Math.sin(phase * 0.18);
+              const rotate = 2 * Math.sin(phase * 0.12);
+              const opacity = 0.75 + 0.15 * Math.sin(phase * 0.1);
+
+              layer.style.background = `radial-gradient(circle at ${x}% ${y}%, hsl(${innerHue}, 90%, 62%) 0%, hsl(${midHue}, 85%, 55%) 55%, hsl(${outerHue}, 80%, 48%) 100%)`;
+              layer.style.transform = `scale(${scale.toFixed(
+                3
+              )}) rotate(${rotate.toFixed(2)}deg)`;
+              layer.style.opacity = opacity.toFixed(3);
+
+              frameId = requestAnimationFrame(animate);
             };
-            animate();
-            return () => {
-              clearVisualAnimations();
-              visualDisplay.classList.remove('bright-text');
-              visualDisplay.style.transform = 'scale(1)';
+
+            frameId = requestAnimationFrame(animate);
+
+            const cleanup = () => {
+              if (!active) return;
+              active = false;
+              if (frameId) cancelAnimationFrame(frameId);
+              layer.remove();
+            };
+
+            return {
+              element: layer,
+              detail: '≈9 Hz hue undulation with spatial drift.',
+              cleanup,
             };
           },
         },
@@ -463,77 +702,301 @@
           : 'Select a visual feature to display.';
       };
 
+      const renderAudioTracks = ({ message } = {}) => {
+        audioActiveList.innerHTML = '';
+        const entries = Array.from(activeAudioTracks.entries());
+        const count = entries.length;
+
+        audioTrackCount.textContent = `${count} layer${count === 1 ? '' : 's'}`;
+        audioActiveEmpty.hidden = count !== 0;
+        audioActiveList.hidden = count === 0;
+
+        entries.forEach(([id, track]) => {
+          const item = document.createElement('div');
+          item.className = 'track-item';
+
+          const info = document.createElement('div');
+          info.className = 'flex-1 pr-4';
+
+          const title = document.createElement('h4');
+          title.textContent = track.label;
+          info.appendChild(title);
+
+          if (track.detail) {
+            const detail = document.createElement('p');
+            detail.textContent = track.detail;
+            info.appendChild(detail);
+          }
+
+          const stopButton = document.createElement('button');
+          stopButton.type = 'button';
+          stopButton.dataset.trackId = id;
+          stopButton.textContent = 'Stop';
+          stopButton.classList.add('track-stop');
+
+          item.appendChild(info);
+          item.appendChild(stopButton);
+          audioActiveList.appendChild(item);
+        });
+
+        if (!engine) return;
+
+        if (message) {
+          statusEl.textContent = message;
+        } else if (count === 0) {
+          statusEl.textContent = 'Audio engine ready. No active layers.';
+        } else {
+          statusEl.textContent = `${count} audio layer${
+            count === 1 ? '' : 's'
+          } running.`;
+        }
+      };
+
+      const renderVisualTracks = ({ message } = {}) => {
+        visualActiveList.innerHTML = '';
+        const entries = Array.from(activeVisualTracks.entries());
+        const count = entries.length;
+
+        visualTrackCount.textContent = `${count} layer${
+          count === 1 ? '' : 's'
+        }`;
+        visualActiveEmpty.hidden = count !== 0;
+        visualActiveList.hidden = count === 0;
+
+        entries.forEach(([id, track]) => {
+          const item = document.createElement('div');
+          item.className = 'track-item';
+
+          const info = document.createElement('div');
+          info.className = 'flex-1 pr-4';
+
+          const title = document.createElement('h4');
+          title.textContent = track.label;
+          info.appendChild(title);
+
+          if (track.detail) {
+            const detail = document.createElement('p');
+            detail.textContent = track.detail;
+            info.appendChild(detail);
+          }
+
+          const stopButton = document.createElement('button');
+          stopButton.type = 'button';
+          stopButton.dataset.trackId = id;
+          stopButton.textContent = 'Stop';
+          stopButton.classList.add('track-stop');
+
+          item.appendChild(info);
+          item.appendChild(stopButton);
+          visualActiveList.appendChild(item);
+        });
+
+        if (count === 0) {
+          visualStatusText.textContent =
+            message ?? 'Visual output appears here once started.';
+          visualStatusText.classList.remove('active');
+        } else {
+          visualStatusText.textContent =
+            message ??
+            `Running ${count} visual layer${count === 1 ? '' : 's'}.`;
+          visualStatusText.classList.add('active');
+        }
+      };
+
+      const stopAllAudio = ({ message } = {}) => {
+        if (engine) {
+          try {
+            engine.stopAll();
+          } catch (error) {
+            console.warn('Failed to stop audio nodes', error);
+          }
+        }
+        activeAudioTracks.clear();
+        renderAudioTracks({
+          message: message ?? 'All audio layers stopped.',
+        });
+      };
+
+      const stopAllVisual = ({ message } = {}) => {
+        activeVisualTracks.forEach((track) => {
+          try {
+            track.cleanup();
+          } catch (error) {
+            console.warn('Failed to stop visual layer', error);
+          }
+        });
+        activeVisualTracks.clear();
+        renderVisualTracks({
+          message: message ?? 'Visual layers cleared.',
+        });
+      };
+
       audioMenu.addEventListener('change', updateAudioDescription);
       visualMenu.addEventListener('change', updateVisualDescription);
 
-      updateAudioDescription();
-      updateVisualDescription();
-
-      document
-        .getElementById('btn-init')
-        .addEventListener('click', async () => {
-          engine = new AudioEngine();
-          await engine.init();
-          statusEl.textContent = 'Audio engine ready. Select a feature to play.';
-          document.getElementById('btn-init').classList.add('hidden');
-          document.getElementById('btn-stop').classList.remove('hidden');
-        });
-
-      document.getElementById('btn-stop').addEventListener('click', () => {
-        if (engine) {
-          engine.stopAll();
-          activeAudioId = null;
-          statusEl.textContent = 'Audio stopped.';
-        }
-        resetVisualDisplay();
-      });
-
-      playAudioBtn.addEventListener('click', async () => {
+      addAudioBtn.addEventListener('click', async () => {
         if (!engine) {
           alert('Initialize first!');
           return;
         }
 
-        const preset = audioPresets[audioMenu.value];
+        const presetKey = audioMenu.value;
+        const preset = audioPresets[presetKey];
         if (!preset) return;
-
-        if (activeAudioId) {
-          engine.stop(activeAudioId);
-          activeAudioId = null;
-        }
-
-        await engine.resume();
 
         try {
-          activeAudioId = preset.play();
-          statusEl.textContent = `Now playing: ${preset.label}`;
+          await engine.resume();
+          const result = preset.start();
+          if (!result || !result.nodeId) {
+            throw new Error('Preset did not return a node id');
+          }
+
+          const trackId = generateTrackId('audio');
+          activeAudioTracks.set(trackId, {
+            presetKey,
+            label: preset.label,
+            detail: result.detail || '',
+            nodeId: result.nodeId,
+            startedAt: Date.now(),
+          });
+
+          const count = activeAudioTracks.size;
+          renderAudioTracks({
+            message: `Started ${preset.label}. ${count} audio layer${
+              count === 1 ? '' : 's'
+            } active.`,
+          });
         } catch (error) {
           console.error('Failed to start audio preset', error);
-          statusEl.textContent = 'Unable to start audio preset.';
+          statusEl.textContent = 'Unable to add audio track.';
         }
       });
 
-      stopAudioBtn.addEventListener('click', () => {
-        if (!engine) return;
-        engine.stopAll();
-        activeAudioId = null;
-        statusEl.textContent = 'Audio stopped.';
+      stopAllAudioBtn.addEventListener('click', () =>
+        stopAllAudio({ message: 'All audio layers stopped.' })
+      );
+
+      audioActiveList.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-track-id]');
+        if (!button) return;
+
+        const trackId = button.dataset.trackId;
+        const track = activeAudioTracks.get(trackId);
+        if (!track) return;
+
+        if (engine && track.nodeId) {
+          try {
+            engine.stop(track.nodeId);
+          } catch (error) {
+            console.warn('Failed to stop audio track', error);
+          }
+        }
+
+        activeAudioTracks.delete(trackId);
+        const count = activeAudioTracks.size;
+        renderAudioTracks({
+          message:
+            count === 0
+              ? 'Audio engine ready. No active layers.'
+              : `Stopped ${track.label}. ${count} audio layer${
+                  count === 1 ? '' : 's'
+                } active.`,
+        });
       });
 
-      startVisualBtn.addEventListener('click', () => {
-        const preset = visualPresets[visualMenu.value];
+      addVisualBtn.addEventListener('click', () => {
+        const presetKey = visualMenu.value;
+        const preset = visualPresets[presetKey];
         if (!preset) return;
 
-        resetVisualDisplay();
-        const cleanup = preset.activate();
-        activeVisualCleanup =
-          typeof cleanup === 'function' ? cleanup : null;
-        visualStatusText.textContent = `Now showing: ${preset.label}`;
+        try {
+          const result = preset.start();
+          const cleanup =
+            typeof result?.cleanup === 'function'
+              ? result.cleanup
+              : () => {};
+
+          const trackId = generateTrackId('visual');
+          activeVisualTracks.set(trackId, {
+            presetKey,
+            label: preset.label,
+            detail: result?.detail || '',
+            cleanup,
+          });
+
+          const count = activeVisualTracks.size;
+          renderVisualTracks({
+            message: `Started ${preset.label}. ${count} visual layer${
+              count === 1 ? '' : 's'
+            } active.`,
+          });
+        } catch (error) {
+          console.error('Failed to start visual preset', error);
+          renderVisualTracks({
+            message: 'Unable to start visual preset.',
+          });
+        }
       });
 
-      stopVisualBtn.addEventListener('click', () => {
-        resetVisualDisplay();
+      stopAllVisualBtn.addEventListener('click', () =>
+        stopAllVisual({ message: 'Visual layers cleared.' })
+      );
+
+      visualActiveList.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-track-id]');
+        if (!button) return;
+
+        const trackId = button.dataset.trackId;
+        const track = activeVisualTracks.get(trackId);
+        if (!track) return;
+
+        try {
+          track.cleanup();
+        } catch (error) {
+          console.warn('Failed to cleanup visual track', error);
+        }
+
+        activeVisualTracks.delete(trackId);
+        const count = activeVisualTracks.size;
+        renderVisualTracks({
+          message:
+            count === 0
+              ? 'Visual layers cleared.'
+              : `Stopped ${track.label}. ${count} visual layer${
+                  count === 1 ? '' : 's'
+                } active.`,
+        });
       });
+
+      initBtn.addEventListener('click', async () => {
+        if (!engine) {
+          engine = new AudioEngine();
+        }
+
+        initBtn.disabled = true;
+        try {
+          await engine.init();
+          statusEl.textContent =
+            'Audio engine ready. Layer tracks freely.';
+          initBtn.classList.add('hidden');
+          stopBtn.classList.remove('hidden');
+        } catch (error) {
+          console.error('Failed to initialise audio engine', error);
+          statusEl.textContent = 'Audio engine failed to initialise.';
+        } finally {
+          initBtn.disabled = false;
+        }
+      });
+
+      stopBtn.addEventListener('click', () => {
+        stopAllAudio({ message: 'All audio layers stopped.' });
+        stopAllVisual({ message: 'Visual layers cleared.' });
+      });
+
+      updateAudioDescription();
+      updateVisualDescription();
+      renderAudioTracks();
+      renderVisualTracks();
     </script>
   </body>
 </html>
