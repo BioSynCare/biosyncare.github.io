@@ -1,0 +1,41 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Diagnostic Reports - Write-only para todos (anônimo ok)
+    // Apenas admin pode ler via Firebase Console
+    match /diagnostic_reports/{reportId} {
+      // Qualquer um pode criar um relatório
+      allow create: if true;
+
+      // Apenas o próprio usuário autenticado pode ler seu relatório
+      // (ou ninguém, se quisermos 100% write-only)
+      allow read: if false; // write-only puro
+
+      // Validação do documento
+      allow create: if request.resource.data.keys().hasAll([
+        'timestamp', 'browser', 'os', 'system'
+      ]) && request.resource.data.message is string
+         && request.resource.data.message.size() < 1000; // max 1000 chars
+    }
+
+    // Protocolos públicos - Read-only para todos
+    // Apenas admin pode escrever via Firebase Console
+    match /protocols/{protocolId} {
+      allow read: if true; // público
+      allow write: if false; // apenas admin via console
+    }
+
+    // Sessões de usuário (futuro) - requer autenticação
+    match /sessions/{sessionId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == resource.data.userId;
+    }
+
+    // Bloquear tudo que não está explicitamente permitido
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
