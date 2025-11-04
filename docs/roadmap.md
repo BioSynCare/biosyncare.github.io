@@ -48,5 +48,8 @@ we should test BSCLab and update firebase if rules changed
 
 ## Urgent
 
-- [x] system diagnostics widget disappeared from the bottom left corner.
 - [ ] mobile iphone safari not working
+
+## Done
+
+- [x] system diagnostics widget disappeared from the bottom left corner.
