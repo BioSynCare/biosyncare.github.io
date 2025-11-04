@@ -291,6 +291,9 @@
       let engine = null;
       let activeAudioId = null;
       let activeVisualCleanup = null;
+      let visualTimer = null;
+      let visualFrame = null;
+      let visualActive = false;
 
       const statusEl = document.getElementById('status');
       const audioMenu = document.getElementById('audio-menu');
@@ -315,17 +318,27 @@
         visualStatusText.classList.remove('text-gray-600');
       };
 
+      const clearVisualAnimations = () => {
+        visualActive = false;
+        if (visualTimer) {
+          clearInterval(visualTimer);
+          visualTimer = null;
+        }
+        if (visualFrame) {
+          cancelAnimationFrame(visualFrame);
+          visualFrame = null;
+        }
+      };
+
       const resetVisualDisplay = () => {
         if (typeof activeVisualCleanup === 'function') {
           activeVisualCleanup();
         }
         activeVisualCleanup = null;
-        visualDisplay.classList.remove(
-          'blink-animation',
-          'undulate-animation',
-          'bright-text'
-        );
+        clearVisualAnimations();
+        visualDisplay.classList.remove('bright-text');
         visualDisplay.style.background = '';
+        visualDisplay.style.transform = 'scale(1)';
         visualStatusText.textContent =
           'Visual output appears here once started.';
         setVisualTextBase();
@@ -375,10 +388,31 @@
           description:
             'High-contrast blinking palette to energize focus and breathing cadence.',
           activate: () => {
-            visualDisplay.classList.add('blink-animation', 'bright-text');
+            clearVisualAnimations();
+            visualActive = true;
+            visualDisplay.classList.add('bright-text');
             setVisualTextBright();
+            const palettes = [
+              { inner: '#1d4ed8', outer: '#1e293b', scale: 1 },
+              { inner: '#0ea5e9', outer: '#0369a1', scale: 1.03 },
+              { inner: '#22d3ee', outer: '#14b8a6', scale: 0.98 },
+              { inner: '#f97316', outer: '#c2410c', scale: 1.04 },
+            ];
+            let index = 0;
+            const applyPalette = () => {
+              const { inner, outer, scale } = palettes[index];
+              visualDisplay.style.background = `radial-gradient(circle at center, ${inner} 0%, ${outer} 75%)`;
+              visualDisplay.style.transform = `scale(${scale ?? 1})`;
+            };
+            applyPalette();
+            visualTimer = setInterval(() => {
+              index = (index + 1) % palettes.length;
+              applyPalette();
+            }, 450);
             return () => {
-              visualDisplay.classList.remove('blink-animation', 'bright-text');
+              clearVisualAnimations();
+              visualDisplay.classList.remove('bright-text');
+              visualDisplay.style.transform = 'scale(1)';
             };
           },
         },
@@ -387,13 +421,29 @@
           description:
             'Slow undulating gradients for ambient relaxation and coherence.',
           activate: () => {
-            visualDisplay.classList.add('undulate-animation', 'bright-text');
+            clearVisualAnimations();
+            visualActive = true;
+            visualDisplay.classList.add('bright-text');
             setVisualTextBright();
+            let phase = 0;
+            const animate = () => {
+              const x = 50 + 40 * Math.sin(phase * 0.6);
+              const y = 50 + 40 * Math.cos(phase * 0.4);
+              const innerHue = 220 + 40 * Math.sin(phase);
+              const midHue = 200 + 30 * Math.cos(phase * 0.8);
+              const outerHue = 180 + 25 * Math.sin(phase * 1.3);
+              const scale = 1 + 0.03 * Math.sin(phase * 0.5);
+              visualDisplay.style.background = `radial-gradient(circle at ${x}% ${y}%, hsl(${innerHue}, 88%, 62%) 0%, hsl(${midHue}, 82%, 55%) 45%, hsl(${outerHue}, 78%, 48%) 100%)`;
+              visualDisplay.style.transform = `scale(${scale.toFixed(3)})`;
+              phase += 0.02;
+              if (!visualActive) return;
+              visualFrame = requestAnimationFrame(animate);
+            };
+            animate();
             return () => {
-              visualDisplay.classList.remove(
-                'undulate-animation',
-                'bright-text'
-              );
+              clearVisualAnimations();
+              visualDisplay.classList.remove('bright-text');
+              visualDisplay.style.transform = 'scale(1)';
             };
           },
         },
