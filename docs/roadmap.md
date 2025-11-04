@@ -1,0 +1,43 @@
+# Refactor Roadmap – February 2025
+
+## Phase 1 – Module Extraction & Engine Switches
+
+- [ ] Move inline script from `index.html` into `src/main.js`
+- [ ] Introduce `src/state`, `src/ui/vanilla`, `src/services` folders
+- [ ] Add pluggable sensory engine registry (Web Audio vs Tone.js, Canvas vs Pixi.js/Three.js/p5.js, haptics)
+- [ ] Surface currently selected engines in the diagnostics widget
+
+## Phase 2 – Tooling & Quality
+
+- [ ] Add ESLint + Prettier configuration
+- [ ] (Optional) Set up Husky + lint-staged for pre-commit checks
+
+## Phase 3 – State Management Stores
+
+- [ ] Introduce Zustand stores for auth, activity, and usage state
+- [ ] Update UI modules to consume stores instead of manual globals
+
+## Phase 4 – RDF & Ontology
+
+- [ ] Replace custom parser with `n3` and build an `onc-service`
+- [ ] Add unit tests for ontology parsing (Vitest/Jest)
+
+# Extra
+
+## ToDo
+
+get documentation:
+
+- Mass framework
+- Music Python Package
+- audiovisualMedicine, artigo conceitual
+
+add visualization of sonic output:
+
+- Spectrograms 2D, 3D, represented in shapes and other visual features.
+- aeterni anima-style shapes with particles moving from and to places in trajectories.
+
+## Urgent
+
+- [ ] system diagnostics widget disappeared from the bottom left corner.
+- [ ]

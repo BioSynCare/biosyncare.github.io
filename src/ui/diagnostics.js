@@ -17,6 +17,12 @@
 // Detection Functions
 // ============================================================================
 
+let selectedEnginesSnapshot = null;
+
+export function setSelectedEngines(snapshot) {
+  selectedEnginesSnapshot = snapshot;
+}
+
 export function isMobile() {
   const userAgent = navigator.userAgent.toLowerCase();
   const mobileKeywords = [
