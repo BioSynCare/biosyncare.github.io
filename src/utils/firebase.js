@@ -368,8 +368,18 @@ export async function ensureAnonymousUser() {
     return serializeUser(authInstance.currentUser);
   }
 
-  const credential = await authModule.signInAnonymously(authInstance);
-  return normalizeAuthResult(credential, { providerId: 'anonymous' });
+  try {
+    const credential = await authModule.signInAnonymously(authInstance);
+    return normalizeAuthResult(credential, { providerId: 'anonymous' });
+  } catch (error) {
+    if (error?.code === 'auth/admin-restricted-operation') {
+      console.warn(
+        '[Firebase] Anonymous auth is disabled for this project. Proceeding without auto sign-in.'
+      );
+      return null;
+    }
+    throw error;
+  }
 }
 
 function cloneSettings(settings = {}) {
