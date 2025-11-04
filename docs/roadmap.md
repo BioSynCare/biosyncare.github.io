@@ -37,7 +37,13 @@ add visualization of sonic output:
 - Spectrograms 2D, 3D, represented in shapes and other visual features.
 - aeterni anima-style shapes with particles moving from and to places in trajectories.
 
+freakcoding integration:
+simple commands start and control/substitute the neurosensory stimulation tracks
+
+use UI libs:
+bootstrap? preact, react?
+
 ## Urgent
 
-- [ ] system diagnostics widget disappeared from the bottom left corner.
-- [ ]
+- [x] system diagnostics widget disappeared from the bottom left corner.
+- [ ] mobile iphone safari not working

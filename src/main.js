@@ -24,7 +24,21 @@ import {
   setEngineSelection,
   describeEngines,
 } from './services/engine-registry.js';
-import { initDiagnostics, setSelectedEngines } from './ui/diagnostics.js';
+import {
+  initDiagnostics,
+  setSelectedEngines,
+  gatherDiagnostics,
+  getBrowserInfo,
+  getOSInfo,
+  getSystemInfo,
+  getAudioInfo,
+  getBatteryInfo,
+  detectEngines,
+  getRefreshRate,
+  getPerformanceMetrics,
+  getActiveTracksInfo,
+  assessSystemHealth,
+} from './ui/diagnostics.js';
 
 const generateTrackId = (prefix) =>
   `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
@@ -1971,3 +1985,499 @@ const usageStats = {
       updateVisualDescription();
       renderAudioTracks();
       renderVisualTracks();
+
+      // ====================================================================
+      // Diagnostics Widget Integration
+      // ====================================================================
+
+      const $ = (id) => document.getElementById(id);
+
+      /**
+       * Updates the floating diagnostics widget UI with system information
+       */
+      async function updateFloatingWidgetUI() {
+        try {
+          const browser = getBrowserInfo();
+          const os = getOSInfo();
+          const sys = getSystemInfo();
+          const caps = window.deviceCapabilities || {};
+          const engines = detectEngines();
+
+          // ===== SYSTEM HEALTH ASSESSMENT =====
+          const healthData = await assessSystemHealth();
+
+          // Update FAB button color based on health
+          const fabButton = $('diag-toggle');
+          if (fabButton) {
+            fabButton.style.backgroundColor = healthData.health.color;
+            fabButton.setAttribute(
+              'title',
+              `System Health: ${healthData.health.status}\nHardware: ${healthData.hardware.level}\nSoftware: ${healthData.software.level}\nMemory: ${healthData.memory.level}\nNetwork: ${healthData.network.level}`
+            );
+          }
+
+          // Update health summary card
+          const healthIndicator = $('health-indicator');
+          if (healthIndicator) {
+            healthIndicator.style.backgroundColor = healthData.health.color;
+          }
+
+          $('health-status-text').textContent = healthData.health.status;
+          $('health-status-text').style.color = healthData.health.color;
+
+          $('health-hardware-text').textContent = healthData.hardware.level;
+          $('health-software-text').textContent = healthData.software.level;
+          $('health-memory-text').textContent = healthData.memory.level;
+          $('health-network-text').textContent = healthData.network.level;
+
+          // Show issues if any
+          const issuesContainer = $('health-issues-container');
+          const issuesList = $('health-issues-list');
+          if (healthData.health.issues.length > 0) {
+            issuesContainer.classList.remove('hidden');
+            issuesList.innerHTML = healthData.health.issues
+              .map((issue) => `<li>${issue}</li>`)
+              .join('');
+          } else {
+            issuesContainer.classList.add('hidden');
+          }
+
+          // Engines BSCLab with status indicators
+          $('engine-audio-name').textContent = engines.audio.name;
+
+          const audioStatusEl = $('engine-audio-status');
+          audioStatusEl.textContent = engines.audio.status;
+          audioStatusEl.className =
+            engines.audio.status === 'ready' || engines.audio.status === 'active'
+              ? 'font-mono text-green-600 font-semibold'
+              : engines.audio.status === 'initializing'
+              ? 'font-mono text-yellow-600'
+              : engines.audio.status === 'error'
+              ? 'font-mono text-red-600 font-semibold'
+              : 'font-mono';
+
+          $('engine-audio-version').textContent =
+            engines.audio.version || 'N/A';
+          $('engine-visual-name').textContent = engines.visual.name;
+
+          const visualStatusEl = $('engine-visual-status');
+          visualStatusEl.textContent = engines.visual.status;
+          visualStatusEl.className =
+            engines.visual.status === 'ready' || engines.visual.status === 'active'
+              ? 'font-mono text-green-600 font-semibold'
+              : engines.visual.status === 'initializing'
+              ? 'font-mono text-yellow-600'
+              : engines.visual.status === 'error'
+              ? 'font-mono text-red-600 font-semibold'
+              : 'font-mono';
+
+          $('engine-visual-version').textContent =
+            engines.visual.version || 'N/A';
+
+          // Performance & Active Tracks
+          const tracksInfo = getActiveTracksInfo();
+          const perfMetrics = getPerformanceMetrics();
+
+          $('perf-audio-tracks').textContent = tracksInfo.audioTracksCount || '0';
+          $('perf-visual-tracks').textContent = tracksInfo.visualTracksCount || '0';
+
+          if (perfMetrics.memory) {
+            $('perf-heap-used').textContent = perfMetrics.memory.usedJSHeapSize + ' MB';
+            $('perf-heap-limit').textContent = perfMetrics.memory.jsHeapSizeLimit + ' MB';
+            const usageClass =
+              perfMetrics.memory.usagePercent > 80
+                ? 'text-red-600 font-semibold'
+                : perfMetrics.memory.usagePercent > 60
+                ? 'text-yellow-600'
+                : 'text-green-600';
+            $('perf-memory-usage').textContent = perfMetrics.memory.usagePercent + '%';
+            $('perf-memory-usage').className = 'font-mono ' + usageClass;
+          } else {
+            $('perf-heap-used').textContent = 'N/A';
+            $('perf-heap-limit').textContent = 'N/A';
+            $('perf-memory-usage').textContent = 'N/A';
+          }
+
+          if (perfMetrics.timing) {
+            $('perf-page-load').textContent =
+              perfMetrics.timing.pageLoadTime > 0
+                ? perfMetrics.timing.pageLoadTime + ' ms'
+                : '--';
+            $('perf-dom-interactive').textContent =
+              perfMetrics.timing.domInteractive > 0
+                ? perfMetrics.timing.domInteractive + ' ms'
+                : '--';
+          } else {
+            $('perf-page-load').textContent = 'N/A';
+            $('perf-dom-interactive').textContent = 'N/A';
+          }
+
+          // Audio detalhado (async)
+          getAudioInfo().then((audio) => {
+            // Audio API support with color coding
+            const apiEl = $('detailed-audio-api');
+            if (audio.supported) {
+              apiEl.textContent = 'Suportado ✓';
+              apiEl.className = 'font-mono text-green-600 font-semibold';
+            } else {
+              apiEl.textContent = 'Não Suportado ✗';
+              apiEl.className = 'font-mono text-red-600 font-semibold';
+            }
+
+            // Sample rate with quality indicator
+            const sampleRateEl = $('detailed-sample-rate');
+            if (audio.sampleRate) {
+              sampleRateEl.textContent = audio.sampleRate + ' Hz';
+              sampleRateEl.className =
+                audio.sampleRate >= 48000
+                  ? 'font-mono text-green-600'
+                  : audio.sampleRate >= 44100
+                  ? 'font-mono text-yellow-600'
+                  : 'font-mono text-orange-600';
+            } else {
+              sampleRateEl.textContent = '--';
+              sampleRateEl.className = 'font-mono';
+            }
+
+            $('detailed-bit-depth').textContent = audio.bitDepth || '--';
+            $('detailed-channels').textContent = audio.maxChannels || '--';
+
+            // Audio state with color coding
+            const stateEl = $('detailed-audio-state');
+            stateEl.textContent = audio.state || '--';
+            stateEl.className =
+              audio.state === 'running'
+                ? 'font-mono text-green-600'
+                : audio.state === 'suspended'
+                ? 'font-mono text-yellow-600'
+                : 'font-mono';
+
+            $('detailed-audio-playing').textContent = audio.isPlaying || '--';
+
+            // Latency with performance indicators
+            const baseLatencyEl = $('detailed-base-latency');
+            if (audio.baseLatencyMs) {
+              baseLatencyEl.textContent = audio.baseLatencyMs + ' ms';
+              baseLatencyEl.className =
+                audio.baseLatencyMs <= 10
+                  ? 'font-mono text-green-600'
+                  : audio.baseLatencyMs <= 20
+                  ? 'font-mono text-yellow-600'
+                  : 'font-mono text-red-600';
+            } else {
+              baseLatencyEl.textContent = '--';
+              baseLatencyEl.className = 'font-mono';
+            }
+
+            const outputLatencyEl = $('detailed-output-latency');
+            if (audio.outputLatencyMs) {
+              outputLatencyEl.textContent = audio.outputLatencyMs + ' ms';
+              outputLatencyEl.className =
+                audio.outputLatencyMs <= 20
+                  ? 'font-mono text-green-600'
+                  : audio.outputLatencyMs <= 50
+                  ? 'font-mono text-yellow-600'
+                  : 'font-mono text-red-600';
+            } else {
+              outputLatencyEl.textContent = '--';
+              outputLatencyEl.className = 'font-mono';
+            }
+
+            $('detailed-buffer-size').textContent = audio.bufferSize || '--';
+            $('detailed-headphones').textContent =
+              audio.headphonesLikely || '--';
+            $('detailed-input-devices').textContent =
+              audio.inputDevices !== undefined ? audio.inputDevices : '--';
+            $('detailed-output-devices').textContent =
+              audio.outputDevices !== undefined ? audio.outputDevices : '--';
+          });
+
+          // Display & Visual
+          const hz = caps.performance?.refresh?.fps;
+          $(
+            'detailed-screen-res'
+          ).textContent = `${sys.screenWidth}x${sys.screenHeight}`;
+          $(
+            'detailed-avail-res'
+          ).textContent = `${sys.availWidth}x${sys.availHeight}`;
+          $(
+            'detailed-viewport'
+          ).textContent = `${sys.viewportWidth}x${sys.viewportHeight}`;
+          $('detailed-aspect-ratio').textContent = sys.viewportRatio || '--';
+          $('detailed-pixel-ratio').textContent = sys.pixelRatio || '--';
+          $('detailed-dpi').textContent = sys.dpi || '--';
+          $('detailed-color-depth').textContent = sys.colorDepth
+            ? sys.colorDepth + '-bit'
+            : '--';
+          $('detailed-hdr').textContent = sys.hdrSupport || '--';
+          $('detailed-orientation').textContent = sys.orientation || '--';
+          $('detailed-multi-monitor').textContent =
+            sys.possibleMultiMonitor || '--';
+
+          // Refresh rate with quality indicator
+          const refreshRateEl = $('detailed-refresh-rate');
+          if (hz) {
+            refreshRateEl.textContent = hz + ' Hz';
+            refreshRateEl.className =
+              hz >= 120
+                ? 'font-mono text-green-600'
+                : hz >= 60
+                ? 'font-mono text-green-600'
+                : hz >= 30
+                ? 'font-mono text-yellow-600'
+                : 'font-mono text-red-600';
+          } else {
+            refreshRateEl.textContent = '--';
+            refreshRateEl.className = 'font-mono';
+          }
+
+          // Hardware & Sistema
+          $('detailed-device-model').textContent = browser.deviceModel || '--';
+          $('detailed-os').textContent = os.name || '--';
+          $('detailed-arch').textContent = os.architecture || '--';
+          $('detailed-platform').textContent = os.platform || '--';
+          $('detailed-cores').textContent = sys.cores || '--';
+          $('detailed-device-memory').textContent = sys.deviceMemoryGB
+            ? sys.deviceMemoryGB + ' GB'
+            : '--';
+
+          // GPU info
+          try {
+            const canvas = document.createElement('canvas');
+            const gl =
+              canvas.getContext('webgl2') || canvas.getContext('webgl');
+            if (gl) {
+              const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+              if (debugInfo) {
+                const renderer = gl.getParameter(
+                  debugInfo.UNMASKED_RENDERER_WEBGL
+                );
+                $('detailed-gpu-model').textContent = renderer || '--';
+              }
+              const version = gl.getParameter(gl.VERSION);
+              $('detailed-webgl').textContent = version || '--';
+            }
+          } catch (e) {
+            $('detailed-gpu-model').textContent = 'Error';
+            $('detailed-webgl').textContent = 'Error';
+          }
+
+          // GPU Score with performance indicator
+          const gpuScore = caps.performance?.gpu?.score;
+          const gpuScoreEl = $('detailed-gpu-score');
+          if (typeof gpuScore === 'number') {
+            gpuScoreEl.textContent = gpuScore + '/100';
+            gpuScoreEl.className =
+              gpuScore >= 70
+                ? 'font-mono text-green-600 font-semibold'
+                : gpuScore >= 40
+                ? 'font-mono text-yellow-600'
+                : 'font-mono text-red-600';
+          } else {
+            gpuScoreEl.textContent = '--';
+            gpuScoreEl.className = 'font-mono';
+          }
+
+          $('detailed-touch').textContent = sys.touchSupport || '--';
+
+          // Battery (async) with status indicators
+          getBatteryInfo().then((battery) => {
+            const batteryLevelEl = $('detailed-battery-level');
+            const batteryChargingEl = $('detailed-battery-charging');
+
+            if (battery.supported) {
+              batteryLevelEl.textContent = battery.level + '%';
+              batteryLevelEl.className =
+                battery.level >= 50
+                  ? 'font-mono text-green-600'
+                  : battery.level >= 20
+                  ? 'font-mono text-yellow-600'
+                  : 'font-mono text-red-600 font-semibold';
+
+              if (battery.charging) {
+                batteryChargingEl.textContent = 'Sim ⚡';
+                batteryChargingEl.className = 'font-mono text-blue-600';
+              } else {
+                batteryChargingEl.textContent = 'Não';
+                batteryChargingEl.className = 'font-mono';
+              }
+            } else {
+              batteryLevelEl.textContent = 'N/A';
+              batteryLevelEl.className = 'font-mono';
+              batteryChargingEl.textContent = 'N/A';
+              batteryChargingEl.className = 'font-mono';
+            }
+          });
+
+          // Browser
+          $('detailed-browser-name').textContent = browser.name || '--';
+          $('detailed-browser-version').textContent = browser.version || '--';
+          $('detailed-browser-engine').textContent = browser.engine || '--';
+          $('detailed-browser-vendor').textContent = browser.vendor || '--';
+          $('detailed-language').textContent = browser.language || '--';
+          $('detailed-online').textContent = sys.online || '--';
+          $('detailed-connection').textContent = sys.connection || '--';
+          $('detailed-cookies').textContent = sys.cookiesEnabled || '--';
+          $('detailed-storage').textContent = sys.storageEnabled || '--';
+          $('detailed-dnt').textContent = browser.doNotTrack || '--';
+
+          // Summary
+          const deviceIcon = window.deviceCapabilities?.mobile ? '📱' : '💻';
+          const mini = `${deviceIcon} ${os.name || 'SO'} · ${
+            browser.name || 'Navegador'
+          }${typeof gpuScore === 'number' ? ` · GPU ${gpuScore}` : ''}`;
+          $('diag-mini-summary').textContent = mini;
+        } catch (e) {
+          console.error('Error updating widget UI:', e);
+        }
+      }
+
+      /**
+       * Sends diagnostic report to server and downloads a copy
+       */
+      async function sendReportFlow() {
+        const btn = $('btn-send-report');
+        const original = btn.textContent;
+        btn.disabled = true;
+        try {
+          const message = $('diag-message').value?.trim() || '';
+          const diag = await gatherDiagnostics();
+          const report = { ...diag, message };
+
+          // Save to localStorage
+          try {
+            const reports = JSON.parse(localStorage.getItem('biosyncare_diagnostic_reports') || '[]');
+            reports.push({ timestamp: Date.now(), report });
+            // Keep only last 10 reports
+            if (reports.length > 10) reports.shift();
+            localStorage.setItem('biosyncare_diagnostic_reports', JSON.stringify(reports));
+          } catch (e) {
+            console.warn('Failed to save report locally:', e);
+          }
+
+          btn.textContent = '✓ Salvo (baixe o JSON)';
+
+          // Always offer a fresh downloadable copy
+          downloadReport(report);
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.disabled = false;
+          }, 1800);
+        } catch (e) {
+          console.error(e);
+          btn.textContent = 'Falha (ver console)';
+          setTimeout(() => {
+            btn.textContent = original;
+            btn.disabled = false;
+          }, 2000);
+        }
+      }
+
+      /**
+       * Copies diagnostic data to clipboard
+       */
+      async function copyJsonDiagnostics() {
+        const btn = $('btn-copy-json');
+        const original = btn.textContent;
+        try {
+          const diag = await gatherDiagnostics();
+          await navigator.clipboard.writeText(JSON.stringify(diag, null, 2));
+          btn.textContent = '✓ Copiado';
+        } catch (e) {
+          console.warn('Clipboard falhou, baixando em vez disso.');
+          const diag = await gatherDiagnostics();
+          downloadReport(diag);
+          btn.textContent = 'Baixado';
+        } finally {
+          setTimeout(() => (btn.textContent = original), 1500);
+        }
+      }
+
+      /**
+       * Downloads diagnostic report as JSON file
+       */
+      function downloadReport(report) {
+        const blob = new Blob([JSON.stringify(report, null, 2)], {
+          type: 'application/json',
+        });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `biosyncare-diagnostics-${Date.now()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      /**
+       * Initialize diagnostics widget event listeners and update UI
+       */
+      function initDiagnosticsWidget() {
+        let updateInterval = null;
+
+        // Wire up toggle button
+        $('diag-toggle')?.addEventListener('click', () => {
+          const panel = $('diag-panel');
+          const isOpen = !panel.classList.contains('hidden');
+          if (isOpen) {
+            panel.classList.add('hidden');
+            $('diag-toggle').setAttribute('aria-expanded', 'false');
+            // Stop real-time updates when panel closes
+            if (updateInterval) {
+              clearInterval(updateInterval);
+              updateInterval = null;
+            }
+          } else {
+            panel.classList.remove('hidden');
+            $('diag-toggle').setAttribute('aria-expanded', 'true');
+            updateFloatingWidgetUI();
+            // Start real-time updates when panel opens (every 2 seconds)
+            if (!updateInterval) {
+              updateInterval = setInterval(() => {
+                if (!$('diag-panel')?.classList.contains('hidden')) {
+                  updateFloatingWidgetUI();
+                }
+              }, 2000);
+            }
+          }
+        });
+
+        // Wire up close button
+        $('diag-close')?.addEventListener('click', () => {
+          $('diag-panel')?.classList.add('hidden');
+          $('diag-toggle')?.setAttribute('aria-expanded', 'false');
+          // Stop real-time updates when panel closes
+          if (updateInterval) {
+            clearInterval(updateInterval);
+            updateInterval = null;
+          }
+        });
+
+        // Wire up action buttons
+        $('btn-send-report')?.addEventListener('click', sendReportFlow);
+        $('btn-copy-json')?.addEventListener('click', copyJsonDiagnostics);
+        $('btn-download-json')?.addEventListener('click', async () => {
+          const diag = await gatherDiagnostics();
+          downloadReport(diag);
+        });
+
+        // Update widget when device capabilities are ready
+        if (window.deviceCapabilities) {
+          updateFloatingWidgetUI();
+        } else {
+          const capPoll = setInterval(() => {
+            if (window.deviceCapabilities) {
+              clearInterval(capPoll);
+              updateFloatingWidgetUI();
+            }
+          }, 300);
+          // safety stop after ~6s
+          setTimeout(() => clearInterval(capPoll), 6000);
+        }
+
+        console.log('[BioSynCare] Diagnostics widget initialized with real-time monitoring');
+      }
+
+      // Initialize diagnostics widget
+      initDiagnosticsWidget();

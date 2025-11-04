@@ -512,6 +512,268 @@ export async function getBatteryInfo() {
   return { supported: false };
 }
 
+/**
+ * Get current performance metrics
+ */
+export function getPerformanceMetrics() {
+  const metrics = {
+    memory: null,
+    timing: null,
+    fps: null,
+  };
+
+  // Memory info (Chrome/Edge only)
+  if (performance.memory) {
+    metrics.memory = {
+      usedJSHeapSize: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024),
+      totalJSHeapSize: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024),
+      jsHeapSizeLimit: Math.round(performance.memory.jsHeapSizeLimit / 1024 / 1024),
+      usagePercent: Math.round(
+        (performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit) * 100
+      ),
+    };
+  }
+
+  // Navigation timing
+  if (performance.timing) {
+    const timing = performance.timing;
+    metrics.timing = {
+      pageLoadTime: timing.loadEventEnd - timing.navigationStart,
+      domContentLoaded: timing.domContentLoadedEventEnd - timing.navigationStart,
+      domInteractive: timing.domInteractive - timing.navigationStart,
+      connectTime: timing.connectEnd - timing.connectStart,
+      responseTime: timing.responseEnd - timing.requestStart,
+    };
+  }
+
+  return metrics;
+}
+
+/**
+ * Get active track information
+ */
+export function getActiveTracksInfo() {
+  const audioTracks = document.querySelectorAll('#audio-active-list .track-item');
+  const visualTracks = document.querySelectorAll('#visual-active-list .visual-track-item');
+
+  return {
+    audioTracksCount: audioTracks.length,
+    visualTracksCount: visualTracks.length,
+    totalTracks: audioTracks.length + visualTracks.length,
+  };
+}
+
+/**
+ * Assess overall system health and resources
+ * Returns health status with color coding and descriptions
+ */
+export async function assessSystemHealth() {
+  const browser = getBrowserInfo();
+  const os = getOSInfo();
+  const sys = getSystemInfo();
+  const audio = await getAudioInfo();
+  const battery = await getBatteryInfo();
+  const perfMetrics = getPerformanceMetrics();
+  const caps = window.deviceCapabilities || {};
+
+  // ===== HEALTH ASSESSMENT =====
+  let healthScore = 100;
+  let healthIssues = [];
+
+  // Audio health (30 points)
+  if (!audio.supported) {
+    healthScore -= 30;
+    healthIssues.push('Audio API not supported');
+  } else {
+    if (audio.state !== 'running') {
+      healthScore -= 10;
+      healthIssues.push('Audio context not running');
+    }
+    if (audio.baseLatencyMs > 20) {
+      healthScore -= 10;
+      healthIssues.push('High audio latency');
+    }
+    if (audio.sampleRate < 44100) {
+      healthScore -= 10;
+      healthIssues.push('Low sample rate');
+    }
+  }
+
+  // Memory health (20 points)
+  if (perfMetrics.memory) {
+    if (perfMetrics.memory.usagePercent > 80) {
+      healthScore -= 20;
+      healthIssues.push('Critical memory usage');
+    } else if (perfMetrics.memory.usagePercent > 60) {
+      healthScore -= 10;
+      healthIssues.push('High memory usage');
+    }
+  }
+
+  // GPU health (20 points)
+  const gpuScore = caps.performance?.gpu?.score;
+  if (typeof gpuScore === 'number') {
+    if (gpuScore < 40) {
+      healthScore -= 20;
+      healthIssues.push('Weak GPU performance');
+    } else if (gpuScore < 70) {
+      healthScore -= 10;
+      healthIssues.push('Moderate GPU performance');
+    }
+  }
+
+  // Display health (15 points)
+  const refreshRate = caps.performance?.refresh?.fps;
+  if (refreshRate) {
+    if (refreshRate < 30) {
+      healthScore -= 15;
+      healthIssues.push('Very low refresh rate');
+    } else if (refreshRate < 60) {
+      healthScore -= 8;
+      healthIssues.push('Low refresh rate');
+    }
+  }
+
+  // Battery health (15 points) - only if on battery
+  if (battery.supported && !battery.charging) {
+    if (battery.level < 20) {
+      healthScore -= 15;
+      healthIssues.push('Critical battery level');
+    } else if (battery.level < 50) {
+      healthScore -= 8;
+      healthIssues.push('Low battery level');
+    }
+  }
+
+  // Determine overall health status
+  let healthStatus, healthColor, healthClass;
+  if (healthScore >= 90) {
+    healthStatus = 'Excellent';
+    healthColor = '#16a34a'; // green-600
+    healthClass = 'bg-green-600';
+  } else if (healthScore >= 75) {
+    healthStatus = 'Good';
+    healthColor = '#22c55e'; // green-500
+    healthClass = 'bg-green-500';
+  } else if (healthScore >= 60) {
+    healthStatus = 'Caution';
+    healthColor = '#eab308'; // yellow-500
+    healthClass = 'bg-yellow-500';
+  } else if (healthScore >= 40) {
+    healthStatus = 'Poor';
+    healthColor = '#f97316'; // orange-500
+    healthClass = 'bg-orange-500';
+  } else {
+    healthStatus = 'Critical';
+    healthColor = '#ef4444'; // red-500
+    healthClass = 'bg-red-500';
+  }
+
+  // ===== HARDWARE RESOURCES =====
+  let hardwareLevel = 'Unknown';
+  let hardwareScore = 0;
+
+  if (sys.cores) hardwareScore += Math.min(sys.cores * 10, 40); // max 40
+  if (sys.deviceMemoryGB) hardwareScore += Math.min(sys.deviceMemoryGB * 5, 30); // max 30
+  if (typeof gpuScore === 'number') hardwareScore += Math.min(gpuScore * 0.3, 30); // max 30
+
+  if (hardwareScore >= 80) hardwareLevel = 'Powerful';
+  else if (hardwareScore >= 60) hardwareLevel = 'High';
+  else if (hardwareScore >= 40) hardwareLevel = 'Moderate';
+  else if (hardwareScore >= 20) hardwareLevel = 'Economic';
+  else hardwareLevel = 'Limited';
+
+  // ===== SOFTWARE RESOURCES =====
+  let softwareLevel = 'Unknown';
+  const browserVersionNum = parseInt(browser.version);
+
+  // Check if browser is recent (very rough heuristic)
+  const isModernBrowser =
+    (browser.name === 'Chrome' && browserVersionNum >= 120) ||
+    (browser.name === 'Firefox' && browserVersionNum >= 120) ||
+    (browser.name === 'Safari' && browserVersionNum >= 17) ||
+    (browser.name === 'Edge' && browserVersionNum >= 120);
+
+  if (audio.supported && isModernBrowser) {
+    softwareLevel = 'Bleeding Edge';
+  } else if (audio.supported && browserVersionNum >= 100) {
+    softwareLevel = 'Updated';
+  } else if (audio.supported) {
+    softwareLevel = 'Stable';
+  } else {
+    softwareLevel = 'Outdated';
+  }
+
+  // ===== MEMORY RESOURCES =====
+  let memoryLevel = 'Unknown';
+  if (perfMetrics.memory) {
+    if (perfMetrics.memory.usagePercent < 40) {
+      memoryLevel = 'Abundant';
+    } else if (perfMetrics.memory.usagePercent < 60) {
+      memoryLevel = 'Sufficient';
+    } else if (perfMetrics.memory.usagePercent < 80) {
+      memoryLevel = 'Limited';
+    } else {
+      memoryLevel = 'Scarce';
+    }
+  } else if (sys.deviceMemoryGB) {
+    if (sys.deviceMemoryGB >= 16) memoryLevel = 'High';
+    else if (sys.deviceMemoryGB >= 8) memoryLevel = 'Sufficient';
+    else if (sys.deviceMemoryGB >= 4) memoryLevel = 'Moderate';
+    else memoryLevel = 'Low';
+  }
+
+  // ===== NETWORK RESOURCES =====
+  let networkLevel = 'Unknown';
+  const connection = sys.connection;
+
+  if (sys.online === 'Yes' || sys.online === true) {
+    if (connection === '4g' || connection === 'wifi' || connection === 'ethernet') {
+      networkLevel = 'Stable';
+    } else if (connection === '3g' || connection === 'slow-2g' || connection === '2g') {
+      networkLevel = 'Limited';
+    } else {
+      networkLevel = 'Connected';
+    }
+  } else {
+    networkLevel = 'Offline';
+  }
+
+  return {
+    health: {
+      status: healthStatus,
+      score: healthScore,
+      color: healthColor,
+      class: healthClass,
+      issues: healthIssues,
+    },
+    hardware: {
+      level: hardwareLevel,
+      score: hardwareScore,
+      cores: sys.cores,
+      memory: sys.deviceMemoryGB,
+      gpu: gpuScore,
+    },
+    software: {
+      level: softwareLevel,
+      browser: browser.name,
+      version: browser.version,
+      os: os.name,
+    },
+    memory: {
+      level: memoryLevel,
+      usage: perfMetrics.memory?.usagePercent,
+      used: perfMetrics.memory?.usedJSHeapSize,
+      limit: perfMetrics.memory?.jsHeapSizeLimit,
+    },
+    network: {
+      level: networkLevel,
+      online: sys.online,
+      connection: connection,
+    },
+  };
+}
+
 // ============================================================================
 // Main API
 // ============================================================================

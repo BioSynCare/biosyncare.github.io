@@ -849,6 +849,433 @@
       </div>
     </main>
 
+    <!-- System Diagnostics Widget (FAB: Floating Action Button) -->
+    <div id="diag-fab" class="fixed bottom-4 left-4 z-50">
+      <!-- Collapsed button -->
+      <button
+        id="diag-toggle"
+        aria-expanded="false"
+        aria-controls="diag-panel"
+        class="shadow-lg rounded-full bg-neutral-900 text-white w-12 h-12 grid place-items-center hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-neutral-400"
+        title="Diagnóstico do sistema"
+      >
+        <span class="sr-only">Abrir diagnóstico do sistema</span>
+        🔧
+      </button>
+
+      <!-- Expanded panel -->
+      <div
+        id="diag-panel"
+        class="hidden mt-2 w-[380px] max-w-[90vw] max-h-[80vh] overflow-y-auto rounded-xl border bg-white shadow-xl"
+        role="dialog"
+        aria-label="Diagnóstico do sistema"
+      >
+        <div
+          class="sticky top-0 bg-white p-3 border-b flex items-center gap-2 z-10"
+        >
+          <div class="flex-1">
+            <div class="text-sm font-semibold">Diagnóstico do Sistema</div>
+            <div id="diag-mini-summary" class="text-[11px] text-neutral-500">
+              Carregando…
+            </div>
+          </div>
+          <button
+            id="diag-close"
+            class="text-neutral-500 hover:text-neutral-800 px-2 py-1 rounded"
+            title="Fechar"
+          >
+            ✕
+          </button>
+        </div>
+
+        <div class="p-3 space-y-3 text-xs text-neutral-700">
+          <!-- System Health Summary Card -->
+          <div id="health-summary-card" class="border-2 rounded-lg p-3 bg-gradient-to-br from-neutral-50 to-neutral-100">
+            <div class="flex items-center gap-2 mb-2">
+              <div id="health-indicator" class="w-3 h-3 rounded-full bg-gray-400"></div>
+              <div class="text-sm font-bold text-neutral-800">System Health</div>
+            </div>
+            <div class="grid grid-cols-1 gap-1.5 text-[11px]">
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600">Health:</span>
+                <span id="health-status-text" class="font-semibold">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600">Hardware:</span>
+                <span id="health-hardware-text" class="font-medium">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600">Software:</span>
+                <span id="health-software-text" class="font-medium">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600">Memory:</span>
+                <span id="health-memory-text" class="font-medium">--</span>
+              </div>
+              <div class="flex justify-between items-center">
+                <span class="text-neutral-600">Network:</span>
+                <span id="health-network-text" class="font-medium">--</span>
+              </div>
+            </div>
+            <div id="health-issues-container" class="mt-2 pt-2 border-t border-neutral-300 hidden">
+              <div class="text-[10px] text-red-600 font-semibold mb-1">Issues:</div>
+              <ul id="health-issues-list" class="text-[10px] text-red-600 space-y-0.5 list-disc list-inside">
+              </ul>
+            </div>
+          </div>
+
+          <!-- Engines BSCLab -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🎵🎨 Engines BSCLab
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Engine de Áudio:</span>
+                <span id="engine-audio-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Status Áudio:</span>
+                <span id="engine-audio-status" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão Áudio:</span>
+                <span id="engine-audio-version" class="font-mono">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>Engine Visual:</span>
+                <span id="engine-visual-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Status Visual:</span>
+                <span id="engine-visual-status" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão Visual:</span>
+                <span id="engine-visual-version" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Performance & Active Tracks -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              ⚡ Performance & Tracks
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Active Audio Tracks:</span>
+                <span id="perf-audio-tracks" class="font-mono font-semibold text-blue-600">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Active Visual Tracks:</span>
+                <span id="perf-visual-tracks" class="font-mono font-semibold text-purple-600">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>JS Heap Used:</span>
+                <span id="perf-heap-used" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>JS Heap Limit:</span>
+                <span id="perf-heap-limit" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Memory Usage:</span>
+                <span id="perf-memory-usage" class="font-mono">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>Page Load Time:</span>
+                <span id="perf-page-load" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>DOM Interactive:</span>
+                <span id="perf-dom-interactive" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Audio Detalhado -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🔊 Áudio Detalhado
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Web Audio API:</span>
+                <span id="detailed-audio-api" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Taxa de Amostragem:</span>
+                <span id="detailed-sample-rate" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Bit Depth:</span>
+                <span id="detailed-bit-depth" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Canais Máximos:</span>
+                <span id="detailed-channels" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Estado do Contexto:</span>
+                <span id="detailed-audio-state" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Áudio Tocando:</span>
+                <span id="detailed-audio-playing" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Latência Base:</span>
+                <span id="detailed-base-latency" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Latência Output:</span>
+                <span id="detailed-output-latency" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Buffer Size (est):</span>
+                <span id="detailed-buffer-size" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Fones de Ouvido:</span>
+                <span id="detailed-headphones" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Dispositivos Entrada:</span>
+                <span id="detailed-input-devices" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Dispositivos Saída:</span>
+                <span id="detailed-output-devices" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Display & Visual -->
+          <details class="border rounded-lg" open>
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🖥️ Display & Visual
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Resolução Tela:</span>
+                <span id="detailed-screen-res" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Área Disponível:</span>
+                <span id="detailed-avail-res" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Viewport:</span>
+                <span id="detailed-viewport" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Aspect Ratio:</span>
+                <span id="detailed-aspect-ratio" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Pixel Ratio:</span>
+                <span id="detailed-pixel-ratio" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>DPI:</span>
+                <span id="detailed-dpi" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Profundidade Cor:</span>
+                <span id="detailed-color-depth" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>HDR:</span>
+                <span id="detailed-hdr" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Orientação:</span>
+                <span id="detailed-orientation" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Multi-Monitor:</span>
+                <span id="detailed-multi-monitor" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Taxa Atualização:</span>
+                <span id="detailed-refresh-rate" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Hardware & Sistema -->
+          <details class="border rounded-lg">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              💻 Hardware & Sistema
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Dispositivo:</span>
+                <span id="detailed-device-model" class="font-mono text-[10px]"
+                  >--</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>Sistema Operacional:</span>
+                <span id="detailed-os" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Arquitetura:</span>
+                <span id="detailed-arch" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Plataforma:</span>
+                <span id="detailed-platform" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>CPU Núcleos:</span>
+                <span id="detailed-cores" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>RAM Dispositivo:</span>
+                <span id="detailed-device-memory" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>GPU:</span>
+                <span id="detailed-gpu-model" class="font-mono text-[10px]"
+                  >--</span
+                >
+              </div>
+              <div class="flex justify-between">
+                <span>GPU Score:</span>
+                <span id="detailed-gpu-score" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>WebGL:</span>
+                <span id="detailed-webgl" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Touch:</span>
+                <span id="detailed-touch" class="font-mono">--</span>
+              </div>
+              <div class="border-t pt-2 mt-2"></div>
+              <div class="flex justify-between">
+                <span>Bateria:</span>
+                <span id="detailed-battery-level" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Carregando:</span>
+                <span id="detailed-battery-charging" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Browser Info -->
+          <details class="border rounded-lg">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
+              🌐 Navegador
+            </summary>
+            <div class="p-2 space-y-2 text-[11px]">
+              <div class="flex justify-between">
+                <span>Navegador:</span>
+                <span id="detailed-browser-name" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Versão:</span>
+                <span id="detailed-browser-version" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Engine:</span>
+                <span id="detailed-browser-engine" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Vendor:</span>
+                <span id="detailed-browser-vendor" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Idioma:</span>
+                <span id="detailed-language" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Online:</span>
+                <span id="detailed-online" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Conexão:</span>
+                <span id="detailed-connection" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Cookies:</span>
+                <span id="detailed-cookies" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Storage:</span>
+                <span id="detailed-storage" class="font-mono">--</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Do Not Track:</span>
+                <span id="detailed-dnt" class="font-mono">--</span>
+              </div>
+            </div>
+          </details>
+
+          <!-- Report composer -->
+          <div class="pt-1 border-t">
+            <label
+              for="diag-message"
+              class="block text-[11px] text-neutral-500 mb-1"
+              >Mensagem (opcional)</label
+            >
+            <textarea
+              id="diag-message"
+              rows="3"
+              class="w-full border rounded-md p-2 text-xs resize-y focus:outline-none focus:ring-2 focus:ring-neutral-300"
+              placeholder="Descreva o que aconteceu (ex.: oscilação de luz, áudio falhando, flicker, etc.)"
+            ></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="flex flex-wrap gap-2">
+            <button
+              id="btn-send-report"
+              class="inline-flex items-center gap-1 rounded-md bg-neutral-900 text-white px-3 py-1.5 hover:bg-neutral-800"
+            >
+              Enviar relatório
+            </button>
+            <button
+              id="btn-copy-json"
+              class="inline-flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-neutral-100"
+            >
+              Copiar diagnóstico
+            </button>
+            <button
+              id="btn-download-json"
+              class="ml-auto inline-flex items-center gap-1 rounded-md border px-3 py-1.5 hover:bg-neutral-100"
+              title="Baixar JSON com os dados do sistema"
+            >
+              Baixar JSON
+            </button>
+          </div>
+
+          <div class="text-[10px] text-neutral-500">
+            Os dados ficam no seu dispositivo (localStorage). Se um endpoint de
+            relatório for configurado, tentaremos enviar por HTTPS.
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
