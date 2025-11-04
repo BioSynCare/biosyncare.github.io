@@ -287,6 +287,109 @@
         font-size: 0.9rem;
         color: #475569;
       }
+      .toggle-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .toggle-option {
+        display: flex;
+        gap: 0.75rem;
+        align-items: flex-start;
+      }
+      .toggle-option input[type='checkbox'] {
+        margin-top: 0.3rem;
+      }
+      .toggle-option.disabled {
+        opacity: 0.6;
+      }
+      .toggle-title {
+        display: block;
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 0.9rem;
+      }
+      .toggle-desc {
+        display: block;
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 0.1rem;
+      }
+      .activity-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+      .activity-tabs {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .activity-tab {
+        padding: 0.35rem 0.9rem;
+        border-radius: 9999px;
+        border: 1px solid #cbd5f5;
+        background: #f8fafc;
+        color: #1f2937;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .activity-tab:hover {
+        background: #e0e7ff;
+      }
+      .activity-tab-active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+      }
+      .activity-refresh {
+        margin-left: auto;
+        font-size: 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid #e2e8f0;
+        padding: 0.3rem 0.8rem;
+        background: #ffffff;
+        color: #1f2937;
+      }
+      .activity-refresh:hover {
+        background: #f1f5f9;
+      }
+      .activity-note {
+        font-size: 0.75rem;
+        color: #64748b;
+      }
+      .activity-feed {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        padding: 0.85rem;
+        max-height: 18rem;
+        overflow-y: auto;
+      }
+      .activity-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.65rem;
+      }
+      .activity-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        font-size: 0.82rem;
+        color: #1f2937;
+      }
+      .activity-item .activity-meta {
+        font-size: 0.72rem;
+        color: #94a3b8;
+      }
+      .activity-empty {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
       @media (prefers-reduced-motion: reduce) {
         .blink-animation,
         .undulate-animation {
@@ -484,6 +587,79 @@
             No self-reported profile yet.
           </div>
         </div>
+        <div class="mt-8 grid gap-6 lg:grid-cols-2">
+          <div class="stat-panel">
+            <h3>Data & Privacy</h3>
+            <div class="toggle-group mt-3">
+              <label class="toggle-option" id="toggle-collect-wrapper">
+                <input type="checkbox" id="toggle-collect-data" checked />
+                <div>
+                  <span class="toggle-title">Collect usage statistics</span>
+                  <span class="toggle-desc"
+                    >Store personal metrics to resume sessions across devices.</span
+                  >
+                </div>
+              </label>
+              <label class="toggle-option" id="toggle-share-wrapper">
+                <input type="checkbox" id="toggle-share-anonymized" checked />
+                <div>
+                  <span class="toggle-title">Share anonymized logs publicly</span>
+                  <span class="toggle-desc"
+                    >Let others see your activity with an anonymous label.</span
+                  >
+                </div>
+              </label>
+              <label class="toggle-option" id="toggle-community-wrapper">
+                <input type="checkbox" id="toggle-include-community" checked />
+                <div>
+                  <span class="toggle-title">Contribute to community insights</span>
+                  <span class="toggle-desc"
+                    >Allow your anonymized data to be used in aggregate statistics.</span
+                  >
+                </div>
+              </label>
+            </div>
+          </div>
+          <div class="stat-panel activity-panel">
+            <h3>Your Activity Logs</h3>
+            <div class="activity-tabs">
+              <button
+                id="tab-my-activity"
+                class="activity-tab activity-tab-active"
+                type="button"
+              >
+                My activity
+              </button>
+              <button
+                id="tab-public-activity"
+                class="activity-tab"
+                type="button"
+              >
+                Public view
+              </button>
+              <button
+                id="btn-refresh-activity"
+                class="activity-refresh"
+                type="button"
+              >
+                ⟳ Refresh
+              </button>
+            </div>
+            <p id="activity-public-note" class="activity-note">
+              Public feed displays anonymized entries shared by you and the community.
+            </p>
+            <div id="activity-my-panel" class="activity-feed">
+              <ul id="activity-my-list" class="activity-list">
+                <li class="activity-empty">No activity logged yet.</li>
+              </ul>
+            </div>
+            <div id="activity-public-panel" class="activity-feed hidden">
+              <ul id="activity-public-list" class="activity-list">
+                <li class="activity-empty">Public feed loading…</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="grid gap-6 lg:grid-cols-2">
@@ -640,12 +816,19 @@
         signOutUser,
         getCurrentUser,
         isAnonymousUser,
+        fetchUserSettings,
+        saveUserSettings,
+        writeUsageEvent,
+        fetchUserEvents,
+        fetchPublicEvents,
+        getDefaultPrivacySettings,
       } from './src/utils/firebase.js';
 
       const generateTrackId = (prefix) =>
         `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
       let engine = null;
+      const sessionId = generateTrackId('session');
       const usageStats = {
         sessionStart: Date.now(),
         audioInitializations: 0,
@@ -655,7 +838,31 @@
         totalNeuroMs: 0,
         audioDurations: new Map(),
         visualDurations: new Map(),
+        baseline: {
+          audioInitializations: 0,
+          audioTrackAdds: 0,
+          visualAdds: 0,
+          trackStops: 0,
+          totalNeuroMs: 0,
+          audioDurations: {},
+          visualDurations: {},
+        },
       };
+      const userSettings = getDefaultPrivacySettings();
+      const SETTINGS_STORAGE_BASE_KEY = 'biosyncare_user_settings';
+      const activityState = {
+        myEvents: [],
+        publicEvents: [],
+        activeTab: 'mine',
+        fetchingUser: false,
+        fetchingPublic: false,
+        lastFetchedUserId: null,
+        lastPublicFetch: 0,
+      };
+      let pendingUserEventsRefresh = false;
+      let pendingPublicEventsRefresh = false;
+      const activeAudioTracks = new Map();
+      const activeVisualTracks = new Map();
 
       // --- Identity UI ---
       const authStatusEl = document.getElementById('auth-status');
@@ -689,8 +896,39 @@
         'stat-visual-duration-list'
       );
       const profileSummaryEl = document.getElementById('stat-profile');
-      const activeAudioTracks = new Map();
-      const activeVisualTracks = new Map();
+      const collectDataToggle = document.getElementById('toggle-collect-data');
+      const shareAnonymizedToggle = document.getElementById(
+        'toggle-share-anonymized'
+      );
+      const includeCommunityToggle = document.getElementById(
+        'toggle-include-community'
+      );
+      const toggleCollectWrapper = document.getElementById(
+        'toggle-collect-wrapper'
+      );
+      const toggleShareWrapper = document.getElementById(
+        'toggle-share-wrapper'
+      );
+      const toggleCommunityWrapper = document.getElementById(
+        'toggle-community-wrapper'
+      );
+      const myActivityTab = document.getElementById('tab-my-activity');
+      const publicActivityTab = document.getElementById(
+        'tab-public-activity'
+      );
+      const refreshActivityBtn = document.getElementById(
+        'btn-refresh-activity'
+      );
+      const activityMyPanel = document.getElementById('activity-my-panel');
+      const activityPublicPanel =
+        document.getElementById('activity-public-panel');
+      const myActivityList = document.getElementById('activity-my-list');
+      const publicActivityList = document.getElementById(
+        'activity-public-list'
+      );
+      const activityPublicNote = document.getElementById(
+        'activity-public-note'
+      );
 
       const authButtons = [
         btnLoginGoogle,
@@ -722,20 +960,6 @@
         if (!key || !Number.isFinite(delta) || delta <= 0) return;
         const previous = map.get(key) || 0;
         map.set(key, previous + delta);
-      };
-
-      const computeDurationSummary = (baseMap, activeTracks) => {
-        const summary = new Map();
-        baseMap.forEach((value, key) => summary.set(key, value));
-        const now = Date.now();
-        activeTracks.forEach((track) => {
-          if (!track || track.finalized) return;
-          const key = track.label || track.presetKey || 'Unknown';
-          const startedAt = track.startedAt || now;
-          const delta = Math.max(0, now - startedAt);
-          summary.set(key, (summary.get(key) || 0) + delta);
-        });
-        return summary;
       };
 
       const updateDurationList = (element, summaryMap, emptyMessage) => {
@@ -813,6 +1037,208 @@
         profileSummaryEl.textContent = formatProfileSummary(profile);
       };
 
+      const loadSettingsFromLocal = (uid) => {
+        const candidates = uid
+          ? [
+              `${SETTINGS_STORAGE_BASE_KEY}_${uid}`,
+              SETTINGS_STORAGE_BASE_KEY,
+            ]
+          : [SETTINGS_STORAGE_BASE_KEY];
+
+        for (const key of candidates) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) continue;
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') {
+              return parsed;
+            }
+          } catch (error) {
+            console.warn('[Settings] Failed to parse stored settings', error);
+          }
+        }
+        return null;
+      };
+
+      const saveSettingsToLocal = (uid, settings) => {
+        try {
+          const payload = JSON.stringify(settings);
+          localStorage.setItem(SETTINGS_STORAGE_BASE_KEY, payload);
+          if (uid) {
+            localStorage.setItem(
+              `${SETTINGS_STORAGE_BASE_KEY}_${uid}`,
+              payload
+            );
+          }
+        } catch (error) {
+          console.warn('[Settings] Failed to persist settings locally', error);
+        }
+      };
+
+      const applySettingsToUI = () => {
+        if (collectDataToggle) {
+          collectDataToggle.checked = Boolean(userSettings.collectData);
+        }
+        if (shareAnonymizedToggle) {
+          shareAnonymizedToggle.checked =
+            Boolean(userSettings.collectData) &&
+            Boolean(userSettings.shareAnonymized);
+          shareAnonymizedToggle.disabled = !userSettings.collectData;
+          toggleShareWrapper?.classList.toggle(
+            'disabled',
+            !userSettings.collectData
+          );
+        }
+        if (includeCommunityToggle) {
+          includeCommunityToggle.checked =
+            Boolean(userSettings.collectData) &&
+            Boolean(userSettings.shareAnonymized) &&
+            Boolean(userSettings.includeInCommunity);
+          includeCommunityToggle.disabled =
+            !userSettings.collectData || !userSettings.shareAnonymized;
+          toggleCommunityWrapper?.classList.toggle(
+            'disabled',
+            includeCommunityToggle.disabled
+          );
+        }
+        toggleCollectWrapper?.classList.toggle(
+          'disabled',
+          false
+        );
+        updatePublicNote();
+      };
+
+      const updatePublicNote = () => {
+        if (!activityPublicNote) return;
+        if (!userSettings.collectData) {
+          activityPublicNote.textContent =
+            'Public feed displays community entries. Your activity is not collected.';
+        } else if (!userSettings.shareAnonymized) {
+          activityPublicNote.textContent =
+            'Public feed shows community entries. Your logs are hidden from the public feed.';
+        } else if (!userSettings.includeInCommunity) {
+          activityPublicNote.textContent =
+            'Public feed displays anonymized community entries. Your logs are shown but excluded from community statistics.';
+        } else {
+          activityPublicNote.textContent =
+            'Public feed displays anonymized entries shared by you and the community.';
+        }
+      };
+
+      const cloneBaselineDurations = (source = {}) =>
+        new Map(Object.entries(source || {}));
+
+      const mergeDurationMaps = (baseObj, sessionMap, activeTracks) => {
+        const merged = cloneBaselineDurations(baseObj);
+        sessionMap.forEach((value, key) => {
+          merged.set(key, (merged.get(key) || 0) + value);
+        });
+        const now = Date.now();
+        activeTracks.forEach((track) => {
+          if (!track || track.finalized) return;
+          const key = track.label || track.presetKey || 'Unknown';
+          const startedAt = track.startedAt || now;
+          const delta = Math.max(0, now - startedAt);
+          merged.set(key, (merged.get(key) || 0) + delta);
+        });
+        return merged;
+      };
+
+      const addToDurationStore = (store, label, value) => {
+        if (!label || !Number.isFinite(value) || value <= 0) return;
+        store[label] = (store[label] || 0) + value;
+      };
+
+      const computeTotalsFromEvents = (events = []) => {
+        const totals = {
+          audioInitializations: 0,
+          audioTrackAdds: 0,
+          visualAdds: 0,
+          trackStops: 0,
+          totalNeuroMs: 0,
+          audioDurations: {},
+          visualDurations: {},
+        };
+
+        events.forEach((event) => {
+          if (!event) return;
+          const payload = event.payload || {};
+          switch (event.eventType) {
+            case 'audio_init':
+              totals.audioInitializations += payload.count || 1;
+              break;
+            case 'audio_add':
+              totals.audioTrackAdds += payload.count || 1;
+              break;
+            case 'visual_add':
+              totals.visualAdds += payload.count || 1;
+              break;
+            case 'track_stop': {
+              totals.trackStops += 1;
+              const duration = payload.durationMs || 0;
+              totals.totalNeuroMs += duration;
+              const label =
+                payload.label || payload.presetKey || payload.category || 'Track';
+              if (payload.kind === 'visual') {
+                addToDurationStore(totals.visualDurations, label, duration);
+              } else {
+                addToDurationStore(totals.audioDurations, label, duration);
+              }
+              break;
+            }
+            default:
+              break;
+          }
+        });
+
+        return totals;
+      };
+
+      const SETTINGS_SYNC_DEBOUNCE_MS = 1000;
+      let settingsSyncTimeout = null;
+      let settingsSyncInFlight = null;
+
+      const schedulePersistSettings = () => {
+        if (settingsSyncTimeout) {
+          clearTimeout(settingsSyncTimeout);
+        }
+        settingsSyncTimeout = setTimeout(() => {
+          settingsSyncTimeout = null;
+          persistUserSettings();
+        }, SETTINGS_SYNC_DEBOUNCE_MS);
+      };
+
+      const persistUserSettings = async () => {
+        const user = authState.currentUser;
+        const uid = user?.uid;
+        saveSettingsToLocal(uid, userSettings);
+        if (!uid) return;
+        const defaults = getDefaultPrivacySettings();
+        const cleanSettings = {
+          ...defaults,
+          collectData: Boolean(userSettings.collectData),
+          shareAnonymized: Boolean(userSettings.shareAnonymized),
+          includeInCommunity: Boolean(userSettings.includeInCommunity),
+          anonymizedLabel: userSettings.anonymizedLabel || null,
+        };
+        if (settingsSyncInFlight) {
+          try {
+            await settingsSyncInFlight;
+          } catch (error) {
+            // ignore
+          }
+        }
+        settingsSyncInFlight = saveUserSettings(uid, cleanSettings);
+        try {
+          await settingsSyncInFlight;
+        } catch (error) {
+          console.error('[Settings] Failed to persist to Firestore:', error);
+          showAuthFeedback('Failed to sync privacy settings.', 'error');
+        } finally {
+          settingsSyncInFlight = null;
+        }
+      };
+
       const AUTH_ERROR_MESSAGES = {
         'auth/invalid-email': 'Invalid email address.',
         'auth/user-disabled': 'This account has been disabled.',
@@ -854,23 +1280,46 @@
 
         usageStats.totalNeuroMs += duration;
         usageStats.trackStops += 1;
+        if (duration > 0) {
+          recordUsageEvent('track_stop', {
+            label,
+            presetKey: track.presetKey || null,
+            category: type,
+            durationMs: duration,
+            meta: track.meta || {},
+            kind: type,
+          });
+        }
+
         return duration;
       };
 
       const updateUsageView = () => {
         const now = Date.now();
 
+        const baseline = usageStats.baseline || {};
+        const totalAudioInits =
+          (baseline.audioInitializations || 0) +
+          usageStats.audioInitializations;
+        const totalAudioAdds =
+          (baseline.audioTrackAdds || 0) + usageStats.audioTrackAdds;
+        const totalVisualAdds =
+          (baseline.visualAdds || 0) + usageStats.visualAdds;
+        const totalStops =
+          (baseline.trackStops || 0) + usageStats.trackStops;
+        const baselineNeuro = baseline.totalNeuroMs || 0;
+
         if (statAudioInitsEl) {
-          statAudioInitsEl.textContent = usageStats.audioInitializations;
+          statAudioInitsEl.textContent = totalAudioInits;
         }
         if (statAudioAddsEl) {
-          statAudioAddsEl.textContent = usageStats.audioTrackAdds;
+          statAudioAddsEl.textContent = totalAudioAdds;
         }
         if (statVisualAddsEl) {
-          statVisualAddsEl.textContent = usageStats.visualAdds;
+          statVisualAddsEl.textContent = totalVisualAdds;
         }
         if (statTrackStopsEl) {
-          statTrackStopsEl.textContent = usageStats.trackStops;
+          statTrackStopsEl.textContent = totalStops;
         }
         if (statSessionTimeEl) {
           statSessionTimeEl.textContent = formatDuration(
@@ -895,11 +1344,15 @@
 
         if (statNeuroTimeEl) {
           statNeuroTimeEl.textContent = formatDuration(
-            usageStats.totalNeuroMs + activeAudioMs + activeVisualMs
+            baselineNeuro +
+              usageStats.totalNeuroMs +
+              activeAudioMs +
+              activeVisualMs
           );
         }
 
-        const audioSummary = computeDurationSummary(
+        const audioSummary = mergeDurationMaps(
+          baseline.audioDurations || {},
           usageStats.audioDurations,
           activeAudio
         );
@@ -909,7 +1362,8 @@
           'No audio tracks yet.'
         );
 
-        const visualSummary = computeDurationSummary(
+        const visualSummary = mergeDurationMaps(
+          baseline.visualDurations || {},
           usageStats.visualDurations,
           activeVisual
         );
@@ -921,7 +1375,9 @@
       };
 
       updateProfileSummary();
+      applySettingsToUI();
       updateUsageView();
+      renderActivityFeeds();
 
       const toggleElement = (element, show) => {
         if (!element) return;
@@ -958,6 +1414,296 @@
         } else {
           authFeedbackEl.classList.add('text-red-500');
         }
+      };
+
+      const formatMetaSummary = (meta = {}) => {
+        if (!meta || typeof meta !== 'object') return '';
+        const parts = [];
+        const carrier = meta.carrier ?? meta.base;
+        if (carrier !== undefined) {
+          parts.push(`${carrier} Hz`);
+        }
+        const modulator = meta.modulator ?? meta.beat;
+        if (modulator !== undefined) {
+          parts.push(`Δ ${modulator} Hz`);
+        }
+        if (meta.freq !== undefined && carrier === undefined) {
+          parts.push(`${meta.freq} Hz`);
+        }
+        if (meta.pattern) {
+          parts.push(titleize(meta.pattern));
+        }
+        if (meta.color) {
+          parts.push(titleize(meta.color));
+        }
+        return parts.join(' • ');
+      };
+
+      const formatEventDescription = (event, { anonymizedView = false } = {}) => {
+        if (!event) return 'Unknown activity';
+        const payload = event.payload || {};
+        const label =
+          payload.label || payload.presetKey || payload.category || 'Track';
+        const metaSummary = formatMetaSummary(payload.meta);
+        const duration =
+          payload.durationMs && payload.durationMs > 0
+            ? formatDuration(payload.durationMs)
+            : null;
+
+        switch (event.eventType) {
+          case 'audio_init':
+            return 'Initialized the audio engine';
+          case 'audio_add':
+            return `Added audio track • ${label}${
+              metaSummary ? ` (${metaSummary})` : ''
+            }`;
+          case 'visual_add':
+            return `Added visual cue • ${label}${
+              metaSummary ? ` (${metaSummary})` : ''
+            }`;
+          case 'track_stop':
+            return `Stopped ${payload.kind === 'visual' ? 'visual' : 'audio'} track • ${
+              label
+            }${duration ? ` after ${duration}` : ''}`;
+          case 'settings_update':
+            return anonymizedView
+              ? 'Updated privacy preferences'
+              : 'Updated data & privacy preferences';
+          default:
+            return titleize(event.eventType.replace(/_/g, ' '));
+        }
+      };
+
+      const renderActivityList = (container, events, { emptyMessage }) => {
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (!events || events.length === 0) {
+          const li = document.createElement('li');
+          li.className = 'activity-empty';
+          li.textContent = emptyMessage;
+          container.appendChild(li);
+          return;
+        }
+
+        events
+          .slice()
+          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+          .forEach((event) => {
+            const li = document.createElement('li');
+            li.className = 'activity-item';
+
+            const description = document.createElement('div');
+            description.textContent = formatEventDescription(event, {
+              anonymizedView: Boolean(event.userLabel),
+            });
+
+            const meta = document.createElement('div');
+            meta.className = 'activity-meta';
+            const timestamp = event.timestamp
+              ? new Date(event.timestamp)
+              : new Date();
+            const labelParts = [];
+            labelParts.push(timestamp.toLocaleString());
+            if (event.userLabel) {
+              labelParts.push(`by ${event.userLabel}`);
+            }
+            meta.textContent = labelParts.join(' • ');
+
+            li.appendChild(description);
+            li.appendChild(meta);
+            container.appendChild(li);
+          });
+      };
+
+      const renderActivityFeeds = () => {
+        if (activityState.activeTab !== 'mine') {
+          activityMyPanel?.classList.add('hidden');
+          myActivityTab?.classList.remove('activity-tab-active');
+        } else {
+          activityMyPanel?.classList.remove('hidden');
+          myActivityTab?.classList.add('activity-tab-active');
+        }
+
+        if (activityState.activeTab !== 'public') {
+          activityPublicPanel?.classList.add('hidden');
+          publicActivityTab?.classList.remove('activity-tab-active');
+        } else {
+          activityPublicPanel?.classList.remove('hidden');
+          publicActivityTab?.classList.add('activity-tab-active');
+        }
+
+        renderActivityList(myActivityList, activityState.myEvents, {
+          emptyMessage: userSettings.collectData
+            ? 'No activity logged yet.'
+            : 'Data collection is disabled.',
+        });
+
+        renderActivityList(publicActivityList, activityState.publicEvents, {
+          emptyMessage: 'Public feed is waiting for community activity.',
+        });
+      };
+
+      const setActiveActivityTab = (tab) => {
+        activityState.activeTab = tab;
+        renderActivityFeeds();
+      };
+
+      const EVENT_REFRESH_DEBOUNCE_MS = 1500;
+      let pendingEventRefreshTimeout = null;
+
+      const scheduleEventRefresh = () => {
+        if (pendingEventRefreshTimeout) return;
+        pendingEventRefreshTimeout = setTimeout(() => {
+          pendingEventRefreshTimeout = null;
+          refreshUserEvents({ force: true });
+          refreshPublicEvents({ force: true });
+        }, EVENT_REFRESH_DEBOUNCE_MS);
+      };
+
+      const recordUsageEvent = async (eventType, payload = {}) => {
+        if (!userSettings.collectData) return;
+        const user = authState.currentUser;
+        if (!user || !user.uid) return;
+
+        try {
+          const result = await writeUsageEvent({
+            user,
+            sessionId,
+            eventType,
+            payload,
+            settings: userSettings,
+          });
+          if (!result || result.success === false) {
+            throw new Error(result?.error || 'unknown-error');
+          }
+          scheduleEventRefresh();
+        } catch (error) {
+          console.error('[Usage] Failed to record event:', error);
+        }
+      };
+
+      const applySettingsFromSource = (settings) => {
+        const defaults = getDefaultPrivacySettings();
+        Object.assign(
+          userSettings,
+          defaults,
+          settings && typeof settings === 'object' ? settings : {}
+        );
+        applySettingsToUI();
+      };
+
+      const loadSettingsIntoState = (uid) => {
+        const local = loadSettingsFromLocal(uid);
+        if (local) {
+          applySettingsFromSource(local);
+        } else {
+          applySettingsFromSource(getDefaultPrivacySettings());
+        }
+      };
+
+      const loadUserSettingsFor = async (user) => {
+        const uid = user?.uid;
+        loadSettingsIntoState(uid);
+        if (!uid) return;
+
+        try {
+          const remote = await fetchUserSettings(uid);
+          applySettingsFromSource(remote);
+          saveSettingsToLocal(uid, userSettings);
+        } catch (error) {
+          console.warn('[Settings] Using local preferences due to fetch error.', error);
+        }
+      };
+
+      const refreshUserEvents = async ({ force = false } = {}) => {
+        const uid = authState.currentUser?.uid;
+        if (!uid) return;
+        if (activityState.fetchingUser) {
+          pendingUserEventsRefresh = true;
+          return;
+        }
+
+        activityState.fetchingUser = true;
+        try {
+          const events = await fetchUserEvents(uid, { pageSize: 200 });
+          activityState.myEvents = events;
+          activityState.lastFetchedUserId = uid;
+          usageStats.baseline = computeTotalsFromEvents(events);
+          updateUsageView();
+        } catch (error) {
+          console.error('[Usage] Failed to fetch user events:', error);
+        } finally {
+          activityState.fetchingUser = false;
+          if (pendingUserEventsRefresh) {
+            pendingUserEventsRefresh = false;
+            refreshUserEvents({ force: true });
+          }
+          renderActivityFeeds();
+        }
+      };
+
+      const refreshPublicEvents = async ({ force = false } = {}) => {
+        if (activityState.fetchingPublic) {
+          pendingPublicEventsRefresh = true;
+          return;
+        }
+        if (!force) {
+          const now = Date.now();
+          if (now - activityState.lastPublicFetch < EVENT_REFRESH_DEBOUNCE_MS) {
+            return;
+          }
+        }
+
+        activityState.fetchingPublic = true;
+        try {
+          const events = await fetchPublicEvents({ pageSize: 100 });
+          activityState.publicEvents = events;
+          activityState.lastPublicFetch = Date.now();
+        } catch (error) {
+          console.error('[Usage] Failed to fetch public events:', error);
+        } finally {
+          activityState.fetchingPublic = false;
+          if (pendingPublicEventsRefresh) {
+            pendingPublicEventsRefresh = false;
+            refreshPublicEvents({ force: true });
+          }
+          renderActivityFeeds();
+        }
+      };
+
+      const handleSettingsChange = (updates = {}) => {
+        Object.assign(userSettings, updates);
+
+        if (!userSettings.collectData) {
+          userSettings.shareAnonymized = false;
+          userSettings.includeInCommunity = false;
+        } else if (!userSettings.shareAnonymized) {
+          userSettings.includeInCommunity = false;
+        }
+
+        applySettingsToUI();
+        schedulePersistSettings();
+        refreshPublicEvents({ force: true });
+        if (updates.collectData !== undefined) {
+          refreshUserEvents({ force: true });
+        }
+
+        if (userSettings.collectData) {
+          recordUsageEvent('settings_update', {
+            settings: {
+              collectData: userSettings.collectData,
+              shareAnonymized: userSettings.shareAnonymized,
+              includeInCommunity: userSettings.includeInCommunity,
+            },
+          });
+        }
+      };
+
+      const handleUserContextChanged = async (user) => {
+        await loadUserSettingsFor(user);
+        await refreshUserEvents({ force: true });
+        await refreshPublicEvents({ force: true });
       };
 
       const describeUserLabel = (user) => {
@@ -1043,6 +1789,7 @@
         try {
           authState.unsubscribe = await onAuthChanged((user) => {
             updateAuthUI(user);
+            handleUserContextChanged(user);
           });
         } catch (error) {
           console.error('[Auth] Failed to attach listener:', error);
@@ -1058,6 +1805,7 @@
         try {
           const user = await getCurrentUser();
           updateAuthUI(user);
+          await handleUserContextChanged(user);
         } catch (error) {
           console.error('[Auth] Failed to fetch current user:', error);
         }
@@ -1152,9 +1900,45 @@
         }
       });
 
+      collectDataToggle?.addEventListener('change', (event) => {
+        handleSettingsChange({ collectData: Boolean(event.target.checked) });
+      });
+
+      shareAnonymizedToggle?.addEventListener('change', (event) => {
+        handleSettingsChange({ shareAnonymized: Boolean(event.target.checked) });
+      });
+
+      includeCommunityToggle?.addEventListener('change', (event) => {
+        handleSettingsChange({
+          includeInCommunity: Boolean(event.target.checked),
+        });
+      });
+
+      myActivityTab?.addEventListener('click', () =>
+        setActiveActivityTab('mine')
+      );
+      publicActivityTab?.addEventListener('click', () =>
+        setActiveActivityTab('public')
+      );
+      refreshActivityBtn?.addEventListener('click', () => {
+        refreshUserEvents({ force: true });
+        refreshPublicEvents({ force: true });
+      });
+
       window.addEventListener('storage', (event) => {
         if (event.key === 'biosyncare_user_profile') {
           updateProfileSummary();
+        }
+        if (
+          event.key === SETTINGS_STORAGE_BASE_KEY ||
+          (authState.currentUser &&
+            event.key ===
+              `${SETTINGS_STORAGE_BASE_KEY}_${authState.currentUser.uid}`)
+        ) {
+          loadSettingsIntoState(authState.currentUser?.uid);
+          applySettingsToUI();
+          refreshPublicEvents({ force: true });
+          refreshUserEvents({ force: true });
         }
       });
 
@@ -1197,14 +1981,20 @@
           description:
             'Pure sine tone at 440Hz for quick calibration and reference.',
           start: () => {
+            const freq = 440;
             const nodeId = engine.playWaveform({
               type: 'sine',
-              freq: 440,
+              freq,
               gain: 0.2,
             });
             return {
               nodeId,
               detail: '440 Hz reference tone at moderate gain.',
+              meta: {
+                type: 'waveform',
+                wave: 'sine',
+                freq,
+              },
             };
           },
         },
@@ -1213,15 +2003,27 @@
           description:
             'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
           start: () => {
+            const base = 200;
+            const beat = 10;
+            const leftFreq = base - beat / 2;
+            const rightFreq = base + beat / 2;
             const nodeId = engine.playBinaural({
-              base: 200,
-              beat: 10,
+              base,
+              beat,
               duration: 0,
               gain: 0.25,
             });
             return {
               nodeId,
               detail: 'Carrier 200 Hz, beat 10 Hz (alpha window).',
+              meta: {
+                type: 'binaural',
+                base,
+                beat,
+                carrier: base,
+                modulator: beat,
+                components: [leftFreq, rightFreq],
+              },
             };
           },
         },
@@ -1230,15 +2032,27 @@
           description:
             'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
           start: () => {
+            const base = 210;
+            const beat = 6;
+            const lowFreq = Math.max(20, base - beat / 2);
+            const highFreq = base + beat / 2;
             const nodeId = engine.playMonaural({
-              base: 210,
-              beat: 6,
+              base,
+              beat,
               duration: 0,
               gain: 0.3,
             });
             return {
               nodeId,
               detail: 'Carrier 210 Hz, beat 6 Hz (theta).',
+              meta: {
+                type: 'monaural',
+                base,
+                beat,
+                carrier: base,
+                modulator: beat,
+                components: [lowFreq, highFreq],
+              },
             };
           },
         },
@@ -1247,15 +2061,22 @@
           description:
             'Amplitude-gated tone delivering crisp rhythmic cues for breath pacing.',
           start: () => {
+            const freq = 180;
+            const pulseFreq = 12;
             const nodeId = engine.playIsochronic({
-              freq: 180,
-              pulseFreq: 12,
+              freq,
+              pulseFreq,
               duration: null,
               gain: 0.22,
             });
             return {
               nodeId,
               detail: '180 Hz carrier with 12 Hz gating pulses.',
+              meta: {
+                type: 'isochronic',
+                freq,
+                pulseFreq,
+              },
             };
           },
         },
@@ -1264,9 +2085,11 @@
           description:
             'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
           start: () => {
+            const fundamental = 220;
+            const harmonics = [1, 1.5, 2, 3, 5, 8, 13];
             const nodeId = engine.playMartigliWave({
-              fundamental: 220,
-              harmonics: [1, 1.5, 2, 3, 5, 8, 13],
+              fundamental,
+              harmonics,
               duration: null,
               gain: 0.14,
               fadeIn: 0.6,
@@ -1275,6 +2098,11 @@
             return {
               nodeId,
               detail: 'Fundamental 220 Hz with Martigli/Fibonacci ratios.',
+              meta: {
+                type: 'martigli',
+                fundamental,
+                harmonics,
+              },
             };
           },
         },
@@ -1282,14 +2110,19 @@
           label: 'Noise • White spectrum',
           description: 'Broad-spectrum white noise for masking and focus.',
           start: () => {
+            const color = 'white';
             const nodeId = engine.playNoise({
-              type: 'white',
+              type: color,
               duration: null,
               gain: 0.18,
             });
             return {
               nodeId,
               detail: 'Flat broadband spectrum.',
+              meta: {
+                type: 'noise',
+                color,
+              },
             };
           },
         },
@@ -1298,14 +2131,19 @@
           description:
             '1/f pink noise with gentle energy taper, supportive for relaxation.',
           start: () => {
+            const color = 'pink';
             const nodeId = engine.playNoise({
-              type: 'pink',
+              type: color,
               duration: null,
               gain: 0.18,
             });
             return {
               nodeId,
               detail: 'Pink noise (1/f falloff).',
+              meta: {
+                type: 'noise',
+                color,
+              },
             };
           },
         },
@@ -1314,14 +2152,19 @@
           description:
             'Low-frequency weighted brown noise ideal for grounding and masking.',
           start: () => {
+            const color = 'brown';
             const nodeId = engine.playNoise({
-              type: 'brown',
+              type: color,
               duration: null,
               gain: 0.22,
             });
             return {
               nodeId,
               detail: 'Brown noise with warm low emphasis.',
+              meta: {
+                type: 'noise',
+                color,
+              },
             };
           },
         },
@@ -1333,6 +2176,7 @@
           description:
             'High-contrast blinking palette to energize focus and breathing cadence.',
           start: () => {
+            const targetHz = 4;
             const layer = document.createElement('div');
             layer.className = 'visual-layer';
             layer.style.opacity = '0.9';
@@ -1370,6 +2214,11 @@
             return {
               element: layer,
               detail: '≈4 Hz multicolor pulse.',
+              meta: {
+                type: 'visual',
+                pattern: 'blink',
+                freq: targetHz,
+              },
               cleanup,
             };
           },
@@ -1379,6 +2228,7 @@
           description:
             'Slow undulating gradients for ambient relaxation and coherence.',
           start: () => {
+            const targetHz = 9;
             const layer = document.createElement('div');
             layer.className = 'visual-layer';
             layer.style.opacity = '0.8';
@@ -1429,6 +2279,11 @@
             return {
               element: layer,
               detail: '≈9 Hz hue undulation with spatial drift.',
+              meta: {
+                type: 'visual',
+                pattern: 'undulate',
+                freq: targetHz,
+              },
               cleanup,
             };
           },
@@ -1608,6 +2463,7 @@
           }
 
           const trackId = generateTrackId('audio');
+          const trackMeta = result.meta || { type: presetKey };
           activeAudioTracks.set(trackId, {
             presetKey,
             label: preset.label,
@@ -1615,8 +2471,16 @@
             nodeId: result.nodeId,
             startedAt: Date.now(),
             finalized: false,
+            meta: trackMeta,
           });
           usageStats.audioTrackAdds += 1;
+          recordUsageEvent('audio_add', {
+            label: preset.label,
+            presetKey,
+            category: 'audio',
+            count: 1,
+            meta: trackMeta,
+          });
 
           const count = activeAudioTracks.size;
           renderAudioTracks({
@@ -1676,15 +2540,24 @@
               : () => {};
 
           const trackId = generateTrackId('visual');
+          const trackMeta = result?.meta || { type: presetKey };
           activeVisualTracks.set(trackId, {
             presetKey,
             label: preset.label,
             detail: result?.detail || '',
             startedAt: Date.now(),
             finalized: false,
+            meta: trackMeta,
             cleanup,
           });
           usageStats.visualAdds += 1;
+          recordUsageEvent('visual_add', {
+            label: preset.label,
+            presetKey,
+            category: 'visual',
+            count: 1,
+            meta: trackMeta,
+          });
 
           const count = activeVisualTracks.size;
           renderVisualTracks({
@@ -1744,6 +2617,7 @@
           initBtn.classList.add('hidden');
           stopBtn.classList.remove('hidden');
           usageStats.audioInitializations += 1;
+          recordUsageEvent('audio_init', { count: 1 });
           updateUsageView();
         } catch (error) {
           console.error('Failed to initialise audio engine', error);
@@ -1756,6 +2630,7 @@
       stopBtn.addEventListener('click', () => {
         stopAllAudio({ message: 'All audio layers stopped.' });
         stopAllVisual({ message: 'Visual layers cleared.' });
+        recordUsageEvent('session_stop', { reason: 'manual_stop' });
       });
 
       updateAudioDescription();

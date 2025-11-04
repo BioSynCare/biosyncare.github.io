@@ -42,6 +42,13 @@ let firestoreModule = null;
 let authModule = null;
 let authProviders = null;
 
+const DEFAULT_PRIVACY_SETTINGS = Object.freeze({
+  collectData: true,
+  shareAnonymized: true,
+  includeInCommunity: true,
+  anonymizedLabel: null,
+});
+
 async function initFirebase() {
   if (firebaseApp) return firestore;
 
@@ -68,6 +75,24 @@ async function ensureFirestoreModule() {
     firestoreModule = await import(FIREBASE_FIRESTORE_URL);
   }
   return firestoreModule;
+}
+
+async function getFirestoreHelpers() {
+  const module = await ensureFirestoreModule();
+  return {
+    collection: module.collection,
+    doc: module.doc,
+    setDoc: module.setDoc,
+    getDoc: module.getDoc,
+    updateDoc: module.updateDoc,
+    addDoc: module.addDoc,
+    getDocs: module.getDocs,
+    query: module.query,
+    where: module.where,
+    orderBy: module.orderBy,
+    limit: module.limit,
+    serverTimestamp: module.serverTimestamp,
+  };
 }
 
 async function ensureAuthModule() {
@@ -345,4 +370,306 @@ export async function ensureAnonymousUser() {
 
   const credential = await authModule.signInAnonymously(authInstance);
   return normalizeAuthResult(credential, { providerId: 'anonymous' });
+}
+
+function cloneSettings(settings = {}) {
+  return {
+    collectData:
+      settings.collectData === false ? false : DEFAULT_PRIVACY_SETTINGS.collectData,
+    shareAnonymized:
+      settings.shareAnonymized === false
+        ? false
+        : DEFAULT_PRIVACY_SETTINGS.shareAnonymized,
+    includeInCommunity:
+      settings.includeInCommunity === false
+        ? false
+        : DEFAULT_PRIVACY_SETTINGS.includeInCommunity,
+    anonymizedLabel:
+      typeof settings.anonymizedLabel === 'string'
+        ? settings.anonymizedLabel
+        : DEFAULT_PRIVACY_SETTINGS.anonymizedLabel,
+  };
+}
+
+const PUBLIC_PAYLOAD_FIELDS = [
+  'label',
+  'presetKey',
+  'category',
+  'durationMs',
+  'count',
+];
+
+function summarizeMeta(meta = {}) {
+  if (!meta || typeof meta !== 'object') return undefined;
+  const summary = {};
+
+  [
+    'carrier',
+    'modulator',
+    'base',
+    'beat',
+    'freq',
+    'pulseFreq',
+    'pattern',
+    'color',
+  ].forEach((key) => {
+    if (meta[key] !== undefined && meta[key] !== null) {
+      summary[key] = meta[key];
+    }
+  });
+
+  if (Array.isArray(meta.components) && meta.components.length > 0) {
+    summary.components = meta.components.slice(0, 8);
+  }
+
+  if (Array.isArray(meta.harmonics) && meta.harmonics.length > 0) {
+    summary.harmonics = meta.harmonics.slice(0, 12);
+  }
+
+  if (Object.keys(summary).length === 0) {
+    return undefined;
+  }
+
+  return summary;
+}
+
+function sanitizePublicPayload(payload = {}) {
+  if (!payload || typeof payload !== 'object') return {};
+  const clean = {};
+
+  PUBLIC_PAYLOAD_FIELDS.forEach((field) => {
+    if (payload[field] !== undefined && payload[field] !== null) {
+      clean[field] = payload[field];
+    }
+  });
+
+  const metaSummary = summarizeMeta(payload.meta);
+  if (metaSummary) {
+    clean.meta = metaSummary;
+  }
+
+  return clean;
+}
+
+function normalizeTimestamp(value) {
+  if (!value) return null;
+  if (typeof value === 'number') return value;
+  if (typeof value.toMillis === 'function') {
+    return value.toMillis();
+  }
+  return null;
+}
+
+export function getDefaultPrivacySettings() {
+  return cloneSettings();
+}
+
+export async function fetchUserSettings(userId) {
+  if (!userId) {
+    return cloneSettings();
+  }
+
+  const db = await initFirebase();
+  const { doc, getDoc } = await getFirestoreHelpers();
+
+  try {
+    const ref = doc(db, 'user_settings', userId);
+    const snapshot = await getDoc(ref);
+    if (!snapshot.exists()) {
+      return cloneSettings();
+    }
+
+    const data = snapshot.data();
+    return cloneSettings(data);
+  } catch (error) {
+    console.error('[Firebase] Failed to fetch user settings:', error);
+    return cloneSettings();
+  }
+}
+
+export async function saveUserSettings(userId, settings = {}) {
+  if (!userId) return { success: false, error: 'missing-user' };
+
+  const db = await initFirebase();
+  const { doc, setDoc, serverTimestamp } = await getFirestoreHelpers();
+
+  try {
+    const ref = doc(db, 'user_settings', userId);
+    const cleanSettings = cloneSettings(settings);
+
+    await setDoc(
+      ref,
+      {
+        ...cleanSettings,
+        updatedAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+
+    return { success: true };
+  } catch (error) {
+    console.error('[Firebase] Failed to save user settings:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function writeUsageEvent({
+  user,
+  sessionId,
+  eventType,
+  payload = {},
+  settings = {},
+}) {
+  if (!user || !user.uid) {
+    console.warn('[Firebase] Cannot write usage event without user context');
+    return null;
+  }
+
+  const effectiveSettings = cloneSettings(settings);
+  if (!effectiveSettings.collectData) {
+    return null;
+  }
+
+  const db = await initFirebase();
+  const { collection, addDoc, serverTimestamp } = await getFirestoreHelpers();
+
+  const createdAt = serverTimestamp();
+  const visibility = effectiveSettings.shareAnonymized ? 'anonymized' : 'private';
+  const includeInCommunity =
+    effectiveSettings.includeInCommunity !== false;
+  const isAnonymous = Boolean(user.isAnonymous);
+
+  const eventDoc = {
+    userId: user.uid,
+    sessionId: sessionId || null,
+    eventType,
+    payload,
+    visibility,
+    includeInCommunity,
+    anonymous: isAnonymous,
+    createdAt,
+  };
+
+  let publicEntry = null;
+
+  try {
+    await addDoc(collection(db, 'usage_events'), eventDoc);
+
+    if (effectiveSettings.shareAnonymized) {
+      const publicLabel =
+        effectiveSettings.anonymizedLabel ||
+        (user.displayName
+          ? 'Member'
+          : `Anonymous #${user.uid.slice(-6)}`);
+
+      publicEntry = {
+        userLabel: publicLabel,
+        eventType,
+        payload: sanitizePublicPayload(payload),
+        createdAt,
+        includeInCommunity,
+      };
+
+      try {
+        await addDoc(collection(db, 'usage_events_public'), publicEntry);
+      } catch (publicError) {
+        console.warn('[Firebase] Failed to publish public usage event:', publicError);
+      }
+    }
+
+    return {
+      success: true,
+      event: {
+        eventType,
+        payload,
+        timestamp: Date.now(),
+        visibility,
+        includeInCommunity,
+      },
+      publicEvent: publicEntry
+        ? {
+            ...publicEntry,
+            timestamp: Date.now(),
+          }
+        : null,
+    };
+  } catch (error) {
+    console.error('[Firebase] Failed to write usage event:', error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function fetchUserEvents(userId, { pageSize = 100 } = {}) {
+  if (!userId) return [];
+
+  const db = await initFirebase();
+  const {
+    collection,
+    query,
+    where,
+    orderBy,
+    limit,
+    getDocs,
+  } = await getFirestoreHelpers();
+
+  try {
+    const eventsQuery = query(
+      collection(db, 'usage_events'),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+
+    const snapshot = await getDocs(eventsQuery);
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        eventType: data.eventType,
+        payload: data.payload || {},
+        timestamp: normalizeTimestamp(data.createdAt) || Date.now(),
+        visibility: data.visibility || 'private',
+        includeInCommunity:
+          data.includeInCommunity !== undefined
+            ? Boolean(data.includeInCommunity)
+            : true,
+      };
+    });
+  } catch (error) {
+    console.error('[Firebase] Failed to fetch user events:', error);
+    return [];
+  }
+}
+
+export async function fetchPublicEvents({ pageSize = 50 } = {}) {
+  const db = await initFirebase();
+  const { collection, query, orderBy, limit, getDocs } =
+    await getFirestoreHelpers();
+
+  try {
+    const publicQuery = query(
+      collection(db, 'usage_events_public'),
+      orderBy('createdAt', 'desc'),
+      limit(pageSize)
+    );
+
+    const snapshot = await getDocs(publicQuery);
+    return snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+      return {
+        id: docSnap.id,
+        eventType: data.eventType,
+        payload: data.payload || {},
+        userLabel: data.userLabel || 'Anonymous member',
+        timestamp: normalizeTimestamp(data.createdAt) || Date.now(),
+        includeInCommunity:
+          data.includeInCommunity !== undefined
+            ? Boolean(data.includeInCommunity)
+            : true,
+      };
+    });
+  } catch (error) {
+    console.error('[Firebase] Failed to fetch public events:', error);
+    return [];
+  }
 }

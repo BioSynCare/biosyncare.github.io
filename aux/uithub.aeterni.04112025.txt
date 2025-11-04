@@ -1,0 +1,641 @@
+├── assets
+    ├── UFRJ-logo.png
+    ├── aafav2.png
+    ├── audio
+    │   ├── aloop.mp3
+    │   ├── boom.mp3
+    │   └── ocean1.mp3
+    ├── donation
+    │   ├── qrBitcoin.png
+    │   └── qrPaypal.png
+    ├── fav5.png
+    ├── faviconGeneral.ico
+    ├── fish8.png
+    ├── flags
+    │   ├── br2.svg
+    │   └── uk2.svg
+    ├── imgs
+    │   ├── blank.jpeg
+    │   ├── blank2.jpeg
+    │   ├── coil.jpeg
+    │   ├── coil2.jpeg
+    │   ├── coil3.jpeg
+    │   ├── inf.jpeg
+    │   ├── inf2.jpeg
+    │   └── sine.jpeg
+    ├── loading.gif
+    ├── text
+    │   └── biblePt.txt
+    ├── you.zip
+    ├── you1.4.zip
+    ├── you1.5.zip
+    ├── you1.6.zip
+    ├── you1.7.zip
+    ├── you1.8.zip
+    ├── you1.9.zip
+    └── you1.9b.zip
+├── index.html
+└── scripts
+    └── bundle.js
+
+
+/assets/UFRJ-logo.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/UFRJ-logo.png
+
+
+--------------------------------------------------------------------------------
+/assets/aafav2.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/aafav2.png
+
+
+--------------------------------------------------------------------------------
+/assets/audio/aloop.mp3:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/audio/aloop.mp3
+
+
+--------------------------------------------------------------------------------
+/assets/audio/boom.mp3:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/audio/boom.mp3
+
+
+--------------------------------------------------------------------------------
+/assets/audio/ocean1.mp3:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/audio/ocean1.mp3
+
+
+--------------------------------------------------------------------------------
+/assets/donation/qrBitcoin.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/donation/qrBitcoin.png
+
+
+--------------------------------------------------------------------------------
+/assets/donation/qrPaypal.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/donation/qrPaypal.png
+
+
+--------------------------------------------------------------------------------
+/assets/fav5.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/fav5.png
+
+
+--------------------------------------------------------------------------------
+/assets/faviconGeneral.ico:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/faviconGeneral.ico
+
+
+--------------------------------------------------------------------------------
+/assets/fish8.png:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/fish8.png
+
+
+--------------------------------------------------------------------------------
+/assets/flags/br2.svg:
+--------------------------------------------------------------------------------
+ 1 | <svg xmlns="http://www.w3.org/2000/svg" height="480" width="640" viewBox="0 0 640 480">
+ 2 |   <g stroke-width="1pt">
+ 3 |     <path fill-rule="evenodd" fill="#229e45" d="M0 0h640v480H0z"/>
+ 4 |     <path d="M321.406 435.935l301.483-195.67-303.308-196.2L17.11 240.734l304.296 195.2z" fill-rule="evenodd" fill="#f8e509"/>
+ 5 |     <path d="M452.77 240.005c0 70.328-57.103 127.34-127.544 127.34-70.442 0-127.544-57.012-127.544-127.34s57.104-127.34 127.544-127.34c70.442 0 127.545 57.012 127.545 127.34z" fill-rule="evenodd" fill="#2b49a3"/>
+ 6 |     <path fill="#ffffef" fill-rule="evenodd" d="M283.3 316.274L279.357 314l-4.093 2.025.917-4.55-3.162-3.332 4.52-.53 2.124-4.08 1.894 4.22 4.46.81-3.345 3.13m86.098 26.224l-3.94-2.274-4.092 2.025.916-4.55-3.16-3.332 4.52-.53 2.122-4.08 1.894 4.22 4.46.81-3.345 3.13m-36.215-29.993l-3.404-1.964-3.536 1.748.792-3.93-2.73-2.88 3.904-.457 1.834-3.523 1.636 3.645 3.853.7-2.89 2.705m86.865-8.477l-3.342-1.928-3.472 1.718.777-3.858-2.68-2.827 3.833-.45 1.8-3.46 1.607 3.58 3.783.686-2.837 2.657M330.37 265.03l-3.94-2.273-4.093 2.025.916-4.55-3.162-3.332 4.522-.53 2.123-4.08 1.894 4.22 4.46.81-3.346 3.13M225.13 225.52l-3.94-2.274-4.094 2.025.916-4.548-3.16-3.333 4.52-.53 2.122-4.08 1.894 4.22 4.46.81-3.345 3.13m13.283 57.14l-3.94-2.275-4.094 2.025.916-4.548-3.16-3.334 4.52-.53 2.123-4.08 1.894 4.22 4.46.81-3.345 3.132m131.954-67.33l-3.48-2.007-3.616 1.788.81-4.017-2.794-2.944 3.994-.47 1.875-3.603 1.673 3.728 3.94.715-2.955 2.766m-6.665 38.24l-2.74-1.582-2.85 1.408.64-3.164-2.2-2.32 3.145-.368 1.477-2.838 1.318 2.936 3.103.563-2.327 2.18m-142.199 50.422l-2.63-1.518-2.734 1.352.61-3.037-2.11-2.225 3.02-.354 1.416-2.723 1.264 2.818 2.978.54-2.233 2.09m200.14 15.164l-2.144-1.135-2.227 1.01.5-2.27-1.72-1.666 2.46-.265 1.154-2.038 1.03 2.108 2.426.404-1.82 1.563"/>
+ 7 |     <path fill="#ffffef" fill-rule="evenodd" d="M219.263 287.603l-2.63-1.518-2.734 1.352.61-3.037-2.11-2.225 3.02-.354 1.416-2.723 1.264 2.818 2.978.54-2.233 2.09"/>
+ 8 |     <path fill="#ffffef" fill-rule="evenodd" d="M219.263 287.603l-2.63-1.518-2.734 1.352.61-3.037-2.11-2.225 3.02-.354 1.416-2.723 1.264 2.818 2.978.54-2.233 2.09m42.299 3.048l-2.63-1.52-2.733 1.353.61-3.037-2.11-2.225 3.02-.354 1.416-2.722 1.265 2.817 2.978.54-2.233 2.09m-4.786 16.989l-2.63-1.518-2.734 1.352.612-3.038-2.11-2.225 3.017-.354 1.417-2.724 1.265 2.817 2.977.54-2.233 2.09m87.381-22.301l-2.63-1.52-2.733 1.353.61-3.036-2.11-2.225 3.018-.353 1.417-2.724 1.265 2.817 2.977.54-2.233 2.09m-25.099 3.048l-2.63-1.518-2.734 1.352.612-3.037-2.11-2.225 3.018-.353 1.417-2.724 1.264 2.817 2.98.54-2.234 2.09m-68.8-5.838l-1.648-.952-1.714.847.384-1.902-1.323-1.394 1.89-.222.89-1.706.792 1.765 1.864.34-1.4 1.31m167.838 45.384l-2.63-1.518-2.733 1.35.612-3.035-2.11-2.226 3.017-.354 1.417-2.724 1.264 2.817 2.978.54-2.233 2.09m-20.832 5.844l-2.178-1.26-2.264 1.122.507-2.522-1.748-1.848 2.5-.294 1.174-2.262 1.048 2.34 2.466.45-1.85 1.735m10.371 2.297l-2.03-1.173-2.108 1.044.472-2.344-1.63-1.718 2.33-.274 1.093-2.103.976 2.177 2.296.417-1.723 1.615m29.11-22.761l-1.955-1.13-2.03 1.006.454-2.257-1.567-1.655 2.243-.262 1.053-2.024.94 2.092 2.21.402-1.658 1.553M394.24 327.69l-2.554-1.395-2.652 1.24.594-2.786-2.05-2.043 2.93-.325 1.376-2.5 1.227 2.586 2.89.496-2.167 1.92m.549 14.247l-2.33-1.395-2.418 1.24.542-2.786-1.87-2.044 2.673-.324 1.255-2.5 1.12 2.586 2.635.496-1.977 1.918m-18.929-23.055l-1.955-1.13-2.032 1.006.455-2.257-1.568-1.653 2.242-.263 1.054-2.025.94 2.093 2.213.402-1.66 1.554m-17.781 2.273l-1.954-1.13-2.03 1.006.454-2.257-1.57-1.653 2.244-.263 1.053-2.025.94 2.093 2.21.402-1.658 1.554m-30.408-24.59l-1.955-1.128-2.03 1.004.454-2.257-1.568-1.654 2.243-.264 1.053-2.024.94 2.094 2.212.402-1.66 1.553m3.734 57.024l-1.656-.956-1.72.85.386-1.91-1.33-1.4 1.9-.223.893-1.715.795 1.772 1.874.34-1.407 1.316m-46.131-86.63l-3.942-2.274-4.093 2.025.917-4.548-3.162-3.334 4.52-.53 2.124-4.08 1.894 4.22 4.46.81-3.345 3.132"/>
+ 9 |     <path d="M444.368 285.817c1.944-5.083 4.45-12.75 5.783-19.786-67.742-59.508-143.26-89.993-238.68-83.72-3.422 6.558-6.16 13.423-8.47 20.853 113.063-10.786 195.936 39.27 241.37 82.654z" fill-rule="evenodd" fill="#fff"/>
+10 |     <path d="M413.914 252.36l2.42 1.323c-.38.858-.48 1.61-.31 2.25.18.645.625 1.208 1.335 1.688.75.515 1.424.74 2.016.68.6-.06 1.045-.306 1.335-.734a1.27 1.27 0 0 0 .225-.863c-.027-.3-.192-.66-.495-1.075-.21-.28-.72-.873-1.53-1.777-1.04-1.16-1.66-2.138-1.86-2.936-.28-1.122-.11-2.14.51-3.06.4-.59.936-1.03 1.612-1.318.686-.29 1.433-.355 2.24-.198.81.157 1.664.54 2.55 1.143 1.453.987 2.33 2.048 2.63 3.184.305 1.138.117 2.253-.565 3.345l-2.404-1.484c.3-.665.375-1.24.218-1.723-.147-.485-.55-.95-1.21-1.397-.676-.46-1.302-.682-1.874-.663a1.01 1.01 0 0 0-.856.468c-.186.277-.228.59-.13.943.13.45.668 1.193 1.625 2.234.953 1.04 1.604 1.89 1.95 2.547.355.657.516 1.34.482 2.05-.023.706-.284 1.427-.778 2.16a4.11 4.11 0 0 1-1.812 1.493c-.76.33-1.57.412-2.437.24-.86-.177-1.794-.607-2.798-1.29-1.462-.992-2.36-2.093-2.687-3.3-.322-1.213-.125-2.523.6-3.925zm-11.478-7.533l2.472 1.22c-.345.872-.417 1.628-.22 2.26.208.637.672 1.183 1.4 1.635.775.482 1.455.68 2.043.596.6-.086 1.037-.346 1.306-.786a1.25 1.25 0 0 0 .19-.87c-.038-.302-.218-.655-.54-1.058-.22-.272-.75-.84-1.597-1.713-1.087-1.117-1.746-2.07-1.978-2.86-.323-1.11-.194-2.133.385-3.077a3.619 3.619 0 0 1 1.56-1.38c.674-.316 1.42-.413 2.23-.29.818.127 1.685.473 2.595 1.04 1.492.926 2.408 1.952 2.753 3.074.35 1.126.21 2.247-.427 3.365l-2.464-1.385c.275-.676.327-1.252.15-1.728-.168-.482-.59-.93-1.264-1.35-.697-.433-1.33-.628-1.9-.586-.37.025-.647.195-.838.504-.172.282-.204.594-.09.944.145.443.714 1.165 1.71 2.168.994 1 1.68 1.822 2.052 2.465.38.64.568 1.318.563 2.027.007.708-.227 1.437-.69 2.193a4.158 4.158 0 0 1-1.75 1.565c-.746.36-1.556.474-2.427.336-.865-.14-1.815-.536-2.848-1.175-1.498-.933-2.438-1.996-2.815-3.19-.374-1.2-.23-2.514.438-3.943zm-14.206-3.807l7.276-11.966 8.837 5.416-1.23 2.026-6.43-3.942-1.615 2.652 5.983 3.668-1.225 2.015-5.984-3.667-1.977 3.256 6.657 4.08-1.228 2.017-9.063-5.557zm-20.692-16.993l1.08-2.1 5.4 2.796-2.546 4.962c-.79.238-1.78.296-2.982.17a9.355 9.355 0 0 1-3.317-.986c-1.3-.673-2.29-1.528-2.976-2.572a5.911 5.911 0 0 1-.974-3.47 8.61 8.61 0 0 1 .977-3.703c.664-1.298 1.53-2.31 2.59-3.04 1.057-.727 2.25-1.09 3.57-1.09 1.008-.002 2.104.306 3.29.916 1.542.8 2.577 1.747 3.104 2.846.54 1.096.638 2.28.298 3.555l-2.728-.82c.14-.702.057-1.356-.25-1.957-.296-.606-.806-1.095-1.527-1.47-1.097-.567-2.146-.67-3.155-.305-1 .363-1.85 1.23-2.554 2.6-.76 1.48-1.005 2.76-.73 3.842.277 1.073.944 1.886 2.008 2.437.524.27 1.1.44 1.73.507.64.066 1.22.05 1.753-.05l.81-1.582-2.872-1.485zm-90.242-22.379l2.034-13.867 4.172.62 1.123 9.826 3.86-9.093 4.188.618-2.033 13.87-2.59-.382 1.6-10.918-4.343 10.512-2.685-.398-1.134-11.32-1.6 10.915-2.592-.382zm-14.108-1.638l1.305-13.96 10.307.974-.217 2.36-7.503-.706-.29 3.095 6.978.657-.22 2.352-6.98-.658-.353 3.8 7.764.73-.22 2.354-10.572-.998z" fill="#309e3a"/>
+11 |     <g stroke-opacity=".502">
+12 |       <path d="M216.5 191.28c.04-1.43.284-2.62.736-3.58a6.649 6.649 0 0 1 1.346-1.884c.566-.552 1.18-.956 1.844-1.21.88-.347 1.888-.505 3.023-.475 2.056.06 3.682.744 4.877 2.057 1.205 1.315 1.775 3.114 1.714 5.395-.06 2.26-.72 4.017-1.982 5.264-1.26 1.24-2.914 1.834-4.963 1.777-2.077-.056-3.708-.736-4.9-2.037-1.19-1.308-1.755-3.078-1.694-5.307z" fill="#309e3a"/>
+13 |       <path d="M219.414 191.252c-.043 1.586.29 2.8.997 3.643.708.837 1.625 1.27 2.748 1.3 1.122.03 2.055-.35 2.794-1.138.745-.797 1.14-2.007 1.184-3.633.043-1.605-.277-2.813-.96-3.622-.676-.81-1.595-1.23-2.757-1.262-1.162-.03-2.11.345-2.843 1.128-.733.777-1.12 1.972-1.163 3.584z" fill="#f7ffff"/>
+14 |     </g>
+15 |     <g stroke-opacity=".502">
+16 |       <path d="M233.052 198.51l.163-14.017 5.933.07c1.494.018 2.574.157 3.244.42.677.257 1.214.71 1.613 1.36s.593 1.385.584 2.215c-.013 1.052-.332 1.918-.956 2.598-.623.675-1.55 1.095-2.777 1.26.605.363 1.104.76 1.49 1.193.397.43.923 1.195 1.585 2.293l1.673 2.754-3.372-.04-2.002-3.074c-.71-1.098-1.198-1.788-1.46-2.072-.265-.29-.545-.487-.842-.593-.297-.11-.77-.17-1.418-.177l-.57-.008-.068 5.852-2.82-.033z" fill="#309e3a"/>
+17 |       <path d="M235.976 190.455l2.086.024c1.353.016 2.198-.03 2.536-.142.337-.112.603-.305.796-.584s.293-.627.3-1.048c.004-.472-.118-.853-.37-1.142-.243-.296-.594-.486-1.05-.567-.23-.034-.915-.06-2.057-.072l-2.2-.026-.04 3.555z" fill="#fff"/>
+18 |     </g>
+19 |     <g stroke-opacity=".502">
+20 |       <path d="M249.003 185.188l5.147.26c1.16.06 2.04.195 2.64.405a4.68 4.68 0 0 1 2.036 1.396c.553.646.958 1.426 1.218 2.34.26.907.356 2.015.29 3.326-.058 1.153-.252 2.138-.58 2.96-.4 1-.938 1.797-1.618 2.396-.51.453-1.19.79-2.034 1.016-.632.166-1.468.222-2.51.17l-5.295-.27.706-14z" fill="#309e3a"/>
+21 |       <path d="M251.706 187.685l-.468 9.274 2.103.105c.786.042 1.357.025 1.71-.046.46-.093.85-.268 1.16-.526.32-.26.59-.695.81-1.31.223-.62.36-1.47.416-2.553s0-1.918-.16-2.507c-.16-.59-.404-1.053-.73-1.397-.327-.342-.75-.583-1.27-.724-.39-.11-1.157-.193-2.306-.25l-1.264-.067z" fill="#fff"/>
+22 |     </g>
+23 |     <g stroke-opacity=".502">
+24 |       <path d="M317.63 210.22l3.26-13.63 4.4 1.06c1.666.402 2.737.732 3.21.99.73.392 1.274.996 1.634 1.81.36.81.41 1.755.152 2.84-.2.836-.518 1.504-.958 2-.438.5-.932.854-1.48 1.07-.54.212-1.064.31-1.57.3-.685-.028-1.65-.19-2.89-.49l-1.786-.432-1.23 5.142-2.743-.66z" fill="#309e3a"/>
+25 |       <path d="M323.086 199.552l-.926 3.868 1.5.362c1.082.26 1.82.364 2.218.308a1.85 1.85 0 0 0 1.581-1.448c.12-.496.073-.94-.14-1.33a1.94 1.94 0 0 0-.957-.87c-.312-.143-.96-.332-1.95-.57l-1.324-.32z" fill="#fff"/>
+26 |     </g>
+27 |     <g stroke-opacity=".502">
+28 |       <path d="M330.606 214.106l4.64-13.22 5.598 1.98c1.408.498 2.387.98 2.937 1.445.56.463.923 1.064 1.093 1.807s.12 1.505-.156 2.286c-.348.992-.928 1.71-1.736 2.153-.806.438-1.817.537-3.032.298.457.54.802 1.076 1.03 1.61.238.536.49 1.43.765 2.683l.704 3.15-3.18-1.126-.913-3.556c-.322-1.27-.562-2.08-.72-2.435-.158-.36-.36-.638-.607-.834-.246-.202-.673-.41-1.286-.627l-.536-.192-1.938 5.52-2.66-.942z" fill="#309e3a"/>
+29 |       <path d="M335.938 207.426l1.967.695c1.276.452 2.09.68 2.445.683.355.005.67-.093.943-.295.272-.2.478-.5.616-.896.155-.445.162-.845.017-1.2-.135-.36-.408-.65-.813-.876-.206-.106-.847-.35-1.924-.73l-2.075-.736-1.177 3.356z" fill="#fff"/>
+30 |     </g>
+31 |     <g stroke-opacity=".502">
+32 |       <path d="M347.01 213.6c.424-1.363.982-2.444 1.673-3.24a6.58 6.58 0 0 1 1.808-1.45c.696-.377 1.397-.598 2.102-.665.94-.093 1.953.03 3.038.37 1.965.614 3.344 1.717 4.14 3.308.803 1.593.867 3.48.19 5.658-.67 2.162-1.78 3.67-3.33 4.528-1.548.852-3.302.97-5.26.357-1.982-.62-3.37-1.718-4.164-3.294-.793-1.583-.858-3.44-.196-5.57z" fill="#309e3a"/>
+33 |       <path d="M349.826 214.385c-.47 1.514-.48 2.773-.026 3.778.455.996 1.22 1.663 2.293 2 1.073.334 2.07.223 2.996-.336.932-.562 1.64-1.62 2.122-3.172.476-1.535.495-2.783.056-3.75-.432-.962-1.204-1.618-2.313-1.964-1.11-.347-2.123-.243-3.04.312-.915.548-1.61 1.592-2.09 3.133z" fill="#fff"/>
+34 |     </g>
+35 |     <g stroke-opacity=".502">
+36 |       <path d="M374.305 233.12l6.415-12.45 5.27 2.736c1.326.69 2.23 1.3 2.71 1.84.49.532.768 1.18.835 1.94s-.092 1.505-.47 2.242c-.48.934-1.153 1.564-2.017 1.892-.86.322-1.872.28-3.043-.128.378.598.645 1.18.8 1.74.158.564.288 1.484.387 2.763l.262 3.215-2.993-1.555-.415-3.648c-.145-1.304-.27-2.14-.378-2.512-.105-.377-.27-.682-.487-.91-.214-.233-.61-.5-1.186-.798l-.507-.264-2.677 5.197-2.505-1.3z" fill="#309e3a"/>
+37 |       <path d="M380.503 227.226l1.853.962c1.2.625 1.977.962 2.33 1.016.35.054.675 0 .973-.162.296-.16.54-.428.733-.803.216-.42.276-.814.184-1.186-.087-.374-.315-.702-.685-.98-.19-.134-.79-.465-1.808-.993l-1.952-1.013-1.63 3.16z" fill="#fff"/>
+38 |     </g>
+39 |     <g stroke-opacity=".502">
+40 |       <path d="M426.107 258.704c.797-1.183 1.642-2.056 2.536-2.62a6.609 6.609 0 0 1 2.146-.862 5.45 5.45 0 0 1 2.2-.028c.93.184 1.864.596 2.805 1.235 1.704 1.156 2.708 2.612 3.014 4.366.31 1.758-.173 3.58-1.448 5.472-1.263 1.873-2.758 2.998-4.488 3.37-1.728.365-3.44-.028-5.14-1.182-1.718-1.168-2.732-2.622-3.04-4.362-.303-1.746.168-3.543 1.413-5.39z" fill="#309e3a"/>
+41 |       <path d="M428.578 260.254c-.886 1.316-1.256 2.518-1.112 3.61.15 1.087.69 1.945 1.62 2.578.932.632 1.92.815 2.967.55 1.055-.27 2.037-1.077 2.944-2.425.896-1.33 1.273-2.52 1.13-3.572-.138-1.047-.688-1.898-1.65-2.552s-1.962-.85-3-.583c-1.033.26-1.998 1.06-2.9 2.394z" fill="#fff"/>
+42 |     </g>
+43 |     <path d="M301.824 204.523l2.248-9.84 7.268 1.675-.378 1.662-5.287-1.217-.504 2.18 4.926 1.136-.382 1.655-4.918-1.132-.614 2.677 5.475 1.26-.378 1.66-7.456-1.717z" fill="#309e3a"/>
+44 |   </g>
+45 | </svg>
+46 |
+
+
+--------------------------------------------------------------------------------
+/assets/flags/uk2.svg:
+--------------------------------------------------------------------------------
+ 1 | <svg xmlns="http://www.w3.org/2000/svg" height="480" width="640" viewBox="0 0 640 480">
+ 2 |   <defs>
+ 3 |     <clipPath id="a">
+ 4 |       <path fill-opacity=".67" d="M-85.333 0h682.67v512h-682.67z"/>
+ 5 |     </clipPath>
+ 6 |   </defs>
+ 7 |   <g clip-path="url(#a)" transform="translate(80) scale(.94)">
+ 8 |     <g stroke-width="1pt">
+ 9 |       <path fill="#006" d="M-256 0H768.02v512.01H-256z"/>
+10 |       <path d="M-256 0v57.244l909.535 454.768H768.02V454.77L-141.515 0H-256zM768.02 0v57.243L-141.515 512.01H-256v-57.243L653.535 0H768.02z" fill="#fff"/>
+11 |       <path d="M170.675 0v512.01h170.67V0h-170.67zM-256 170.67v170.67H768.02V170.67H-256z" fill="#fff"/>
+12 |       <path d="M-256 204.804v102.402H768.02V204.804H-256zM204.81 0v512.01h102.4V0h-102.4zM-256 512.01L85.34 341.34h76.324l-341.34 170.67H-256zM-256 0L85.34 170.67H9.016L-256 38.164V0zm606.356 170.67L691.696 0h76.324L426.68 170.67h-76.324zM768.02 512.01L426.68 341.34h76.324L768.02 473.848v38.162z" fill="#c00"/>
+13 |     </g>
+14 |   </g>
+15 | </svg>
+16 |
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/blank.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/blank.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/blank2.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/blank2.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/coil.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/coil.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/coil2.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/coil2.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/coil3.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/coil3.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/inf.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/inf.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/inf2.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/inf2.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/imgs/sine.jpeg:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/imgs/sine.jpeg
+
+
+--------------------------------------------------------------------------------
+/assets/loading.gif:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/loading.gif
+
+
+--------------------------------------------------------------------------------
+/assets/text/biblePt.txt:
+--------------------------------------------------------------------------------
+  1 | Quando são muitas as palavras, o pecado está presente, mas quem controla a língua é sensato.
+  2 | Provérbios 10:19
+  3 |
+  4 | o fruto do Espírito é amor, alegria, paz, paciência, amabilidade, bondade, fidelidade, mansidão e domínio próprio. Contra estas coisas não há lei.
+  5 | Gálatas 5: 22-23
+  6 |
+  7 | quem fica observando o vento não plantará, e quem fica olhando para as nuvens não colherá.
+  8 | Eclesiasters, 11:4
+  9 |
+ 10 | quem quiser amar a vida e ver dias felizes, guarde a sua lingua do mal e os seus lábios da falsidade. Afaste-se do mal e faça o bem, busque a paz com perseverança.
+ 11 | 1 Pedro 3:10-11
+ 12 |
+ 13 | o Senhor será a sua segurança e o impedirá de cair em armadilha.
+ 14 | Provérbios 3:26
+ 15 |
+ 16 | pela graça de Deus, sou o que sou, e sua graça para comigo não foi inútil.
+ 17 | 1 Coríntios 15:10
+ 18 |
+ 19 | Eu sei, Senhor, que não está nas mãos do homem o seu futuro; não compete ao homem dirigir os seus passos.
+ 20 | Jeremias 10:23
+ 21 |
+ 22 | Clame a mim e eu responderei e lhe direi coisas grandiosas e insondáveis que você não conhece.
+ 23 | Jeremias 33:3
+ 24 |
+ 25 | Entregue o seu caminho ao Senhor, confie nele, e Ele agirá.
+ 26 | Salmo 37:5
+ 27 |
+ 28 | Confie no Senhor de todo o seu coração, e não se apóie em seu próprio entendimento. Reconheça o Senhor em todos os seus caminhos, e ele endireitará as suas veredas. Não seja sábio aos seus próprios olhos; tema ao Senhor e evite o mal. Isso lhe dará saúde ao corpo e vigor aos ossos.
+ 29 | Provérbios 3:5-8
+ 30 |
+ 31 | Coloca, Senhor, uma guarda à minha boca; vigia a porta de meus lábios.
+ 32 | Salmo 141:3
+ 33 |
+ 34 | A língua tem poder sobre a vida e a morte; os que gostam de usá-la comerão do seu fruto.
+ 35 | Provérbios 18:21
+ 36 |
+ 37 | Teus, ó Senhor, são a grandeza, o poder, a glória, a majestade e o esplendor, pois tudo o que há nos céus e na terra é teu. Teu, ó Senhor, é o reino; tu estás acima de tudo.
+ 38 | 1 Crônicas 29:11
+ 39 |
+ 40 | Que o Deus da esperança os encha de toda alegria e paz, por sua confiança nele, para que vocês transbordem de esperança, pelo poder do Espírito Santo.
+ 41 | Romanos 15:13
+ 42 |
+ 43 | empenhem-se para acrescentar à sua fé a virtude, à virtude o conhecimento, ao conhecimento o domínio próprio, ao domínio próprio a perseverança, à perseverança a piedade, à piedade a fraternidade, e à fraternidade o amor.
+ 44 | 2 Pedro 1:5-7
+ 45 |
+ 46 | Ainda que eu fale as línguas dos homens e dos anjos, se não tiver amor, serei como o sino que ressoa ou como o prato que retine. Ainda que eu tenha o dom de profecia e saiba todos os mistérios e todo o conhecimento, e tenha uma fé capaz de mover montanhas, se não tiver amor, nada serei. Ainda que eu dê aos pobres tudo o que possuo e entregue o meu corpo para ser queimado, se não tiver amor, nada disso me valerá. O amor é paciente, o amor é bondoso. Não inveja, não se vangloria, não se orgulha. Não maltrata, não procura seus interesses, não se ira facilmente, não guarda rancor. O amor não se alegra com a injustiça, mas se alegra com a verdade. Tudo sofre, tudo crê, tudo espera, tudo suporta. O amor nunca perece; mas as profecias desaparecerão, as línguas cessarão, o conhecimento passará. Pois em parte conhecemos e em parte profetizamos; quando, porém, vier o que é perfeito, o que é imperfeito desaparecerá. Quando eu era menino, falava como menino, pensava como menino e raciocinava como menino. Quando me tornei homem, deixei para trás as coisas de menino. Agora, pois, vemos apenas um reflexo obscuro, como em espelho; mas, então, veremos face a face. Agora conheço em parte; então conhecerei plenamente, da mesma forma com que sou plenamente conhecido. Assim, permanecem agora estes três: a fé, a esperança, e o amor. O maior deles, porém, é o amor.
+ 47 | 1 Coríntios 13
+ 48 |
+ 49 | Confie no Senhor e faça o bem; assim você habitará na terra e desfrutará segurança. Deleite-se no Senhor, e ele atenderá aos desejos do seu coração. Entregue o seu caminho ao Senhor; confie nele e ele agirá: ele deixará claro como a alvorada que você é justo, e como o sol do meio dia que você é inocente. Descanse no Senhor e aguarde por ele com paciência; não se aborreça com o sucesso dos outros nem com aqueles que maquinam o mal. Evite a ira e rejeite a fúria; não se irrite: isso só leva ao mal. Pois os maus serão eliminados, mas os que esperam no Senhor receberão a terra por herança. Um pouco de tempo, e os ímpios não mais existirão; por mais que você os procure, não serão encontrados. Mas os humildes receberão a terra por herança e desfrutarão pleno bem-estar.
+ 50 | Salmo 37:3-11
+ 51 |
+ 52 | Tu és bondoso e perdoador, Senhor, rico em graça para com todos os que te invocam.
+ 53 | Salmo 86:5
+ 54 |
+ 55 | É Deus quem me reveste de força e torna perfeito o meu caminho.
+ 56 | 2 Samuel 22:33
+ 57 |
+ 58 | Os teus olhos viram o meu embrião; todos os dias determinados para mim foram escritos no teu livro antes de qualquer deles existir.
+ 59 | Salmo 139:16
+ 60 |
+ 61 | bendito é o homem cuja confiança está no Senhor, cuja confiança nele está.
+ 62 | Jeremias 17:7
+ 63 |
+ 64 | Sabemos que Deus age em todas as coisas para o bem daqueles que o amam, daqueles que foram chamados de acordo com o seu propósito.
+ 65 | Romanos 8:28
+ 66 |
+ 67 | As palavras agradáveis são como um favo de mel, são doces para a alma e trazem cura para os ossos.
+ 68 | Provérbios 16:24
+ 69 |
+ 70 | Sempre tenho o Senhor diante de mim. Com ele à minha direita, não serei abalado.
+ 71 | Salmo 16:8
+ 72 |
+ 73 | o teu amor está sempre diante de mim, e continuamente sigo a tua verdade.
+ 74 | Salmo 26:3
+ 75 |
+ 76 | Vivam pelo Espírito, e de modo nenhum satisfarão os desejos da carne.
+ 77 | Gálatas, 5:16
+ 78 |
+ 79 | A tua palavra é lâmpada que ilumina os meus passos e luz que clareia o meu caminho.
+ 80 | Salmo 119:105
+ 81 |
+ 82 | Uma coisa pedi ao Senhor e a procuro: que eu possa viver na casa do Senhor todos os dias da minha vida, para contemplar a bondade do Senhor e buscar sua orientação no seu templo.
+ 83 | Salmo 27:4
+ 84 |
+ 85 | fixamos os olhos, não naquilo que se vê, mas no que não se vê, pois o que se vê é transitório, mas o que não se vê é eterno.
+ 86 | 2 Coríntios 4:18
+ 87 |
+ 88 | a piedade com contentamento é grande fonte de lucro, pois nada trouxemos para este mundo e dele nada podemos levar; por isso, tendo o que comer e com que vestir-nos, estejamos com isso satisfeitos.
+ 89 | 1 Timóteo 6:6-8
+ 90 |
+ 91 | Alegrem-se sempre. Orem continuamente. Deem graças em todas as circunstâncias, pois esta é a vontade de Deus para vocês em Cristo Jesus. Não apaguem o Espírito.
+ 92 | 1 Tessalonicenses 5:16-19
+ 93 |
+ 94 | Quem relaxa em seu trabalho é irmão do que o destrói.
+ 95 | Provérbios 18:9
+ 96 |
+ 97 | Com sabedoria se constrói a casa, e com discernimento se consolida. Pelo conhecimento os seus cômodos se enchem do que é precioso e agradável.
+ 98 | Provérbios 24:3-4
+ 99 |
+100 | Não permitirás que o teu santo sofra decomposição.
+101 | Atos dos Apóstolos 13:35
+102 |
+103 | não me importo, nem considero a minha vida de valor algum para mim mesmo, se tão-somente puder terminar a corrida e completar o ministério que o Senhor Jesus me confiou
+104 | Atos dos Apóstolos 20:24
+105 |
+106 | O Senhor é bom para todos; a sua compaixão alcança todas as suas criaturas.
+107 | Salmo 145:9
+108 |
+109 | A minha alma descansa somente em Deus; dele vem a minha salvação.
+110 | Salmo 62:1
+111 |
+112 | Nada façam por ambição egoísta ou por vaidade, mas humildemente considerem os outros superiores a si mesmos. Cada um cuide, não somente dos seus interesses, mas também dos interesses dos outros.
+113 | Filipenses 2:3-4
+114 |
+115 | ponham em ação a salvação de vocês com temor e tremor, pois é Deus que efetua em vocês tanto o querer quanto o realizar, de acordo com a boa vontade dele.
+116 | Filipenses 2:12-13
+117 |
+118 | somos criação de Deus realizada em Cristo Jesus para fazermos boas obras, as quais Deus preparou antes para nós as praticarmos.
+119 | Efésios 2:10
+120 |
+121 | Nenhuma palavra torpe saia da boca de vocês, mas apenas a que for útil para edificar os outros, conforme a necessidade, para que conceda graça aos que a ouvem.
+122 | Efésios 4:29
+123 |
+124 | A boca do justo é fonte de vida, mas a boca dos ímpios abriga a violência.
+125 | Provérbios 10:11
+126 |
+127 | Nós, que somos fortes, devemos suportar as fraquezas dos fracos, e não agradar a nós mesmos. Cada um de nós deve agradar ao seu próximo para o bem dele, a fim de edificá-lo.
+128 | Romanos 15:1-2
+129 |
+130 | Pois tudo o que há no mundo - a cobiça da carne, a cobiça dos olhos e a ostentação dos bens - não provém do Pai, mas do mundo.
+131 | 1 João 2:16
+132 |
+
+
+--------------------------------------------------------------------------------
+/assets/you.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.4.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.4.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.5.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.5.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.6.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.6.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.7.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.7.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.8.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.8.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.9.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.9.zip
+
+
+--------------------------------------------------------------------------------
+/assets/you1.9b.zip:
+--------------------------------------------------------------------------------
+https://raw.githubusercontent.com/aeterni/aeterni.github.io/1c0c892f10125e6aca4c57cd1bba721b8cb9f954/assets/you1.9b.zip
+
+
+--------------------------------------------------------------------------------
+/index.html:
+--------------------------------------------------------------------------------
+  1 | <html>
+  2 |   <head>
+  3 |     <title class="notranslate">&#x00C6;terni Anima</title>
+  4 |     <link id="favicon" rel="shortcut icon" type="image/png" href="assets/fav5.png" />
+  5 |
+  6 |     <meta property="og:image:secure_url" content="https://aeterni.github.io/assets/imgs/coil2.jpeg" />
+  7 |     <meta property="og:image:secure_url" content="https://aeterni.github.io/assets/imgs/sine.jpeg" />
+  8 |     <meta property="og:image:secure_url" content="https://aeterni.github.io/assets/imgs/coil.jpeg" />
+  9 |     <meta property="og:image:secure_url" content="https://aeterni.github.io/assets/imgs/blank.jpeg" />
+ 10 |
+ 11 |     <meta property="og:image" content="https://aeterni.github.io/assets/imgs/coil2.jpeg" />
+ 12 |     <meta property="og:image" content="https://aeterni.github.io/assets/imgs/sine.jpeg" />
+ 13 |     <meta property="og:image" content="https://aeterni.github.io/assets/imgs/coil.jpeg" />
+ 14 |     <meta property="og:image" content="https://aeterni.github.io/assets/imgs/blank.jpeg" />
+ 15 |
+ 16 |   </head>
+ 17 | <body style="margin:0;font-family:Helvetica, arial">
+ 18 |     <div id="loading"><br/><br/><div style="padding-top:30%">LOADING...</div></div>
+ 19 | <script type="text/javascript">
+ 20 | function googleTranslateElementInit() {
+ 21 |   // new google.translate.TranslateElement({ pageLanguage: 'en', includedLanguages: 'en,pt,de,zh-CN,ko,it,ja,ru,fr,es', layout: google.translate.TranslateElement.InlineLayout.HORIZONTAL }, 'google_translate_element');
+ 22 |   new google.translate.TranslateElement({ pageLanguage: 'en' }, 'google_translate_element');
+ 23 | }
+ 24 | </script>
+ 25 |   <script type="module" src="scripts/bundle.js"></script>
+ 26 |   <input id="file-input" type="file" name="name" style="display: none;" />
+ 27 |
+ 28 | </body>
+ 29 | <style type="text/css">
+ 30 | #loading {
+ 31 |   display: block;
+ 32 |   position: absolute;
+ 33 |   top: 0;
+ 34 |   left: 0;
+ 35 |   z-index: 100;
+ 36 |   width: 100vw;
+ 37 |   height: 100vh;
+ 38 |   background-color: rgba(192, 192, 192, 0.5);
+ 39 |   background-image: url(assets/loading.gif);
+ 40 |   background-repeat: no-repeat;
+ 41 |   background-position: center;
+ 42 |   text-align: center;
+ 43 |   font-size: 24px;
+ 44 | }
+ 45 |
+ 46 | /* The Modal (background) */
+ 47 | .modal {
+ 48 |   display: none; /* Hidden by default */
+ 49 |   position: fixed; /* Stay in place */
+ 50 |   z-index: 1; /* Sit on top */
+ 51 |   padding-top: 100px; /* Location of the box */
+ 52 |   left: 0;
+ 53 |   top: 0;
+ 54 |   width: 100%; /* Full width */
+ 55 |   /* height: 100%; /* Full height */
+ 56 |   overflow: auto; /* Enable scroll if needed */
+ 57 |   background-color: rgb(0,0,0); /* Fallback color */
+ 58 |   background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+ 59 | }
+ 60 |
+ 61 | /* Modal Content */
+ 62 | .modal-content {
+ 63 |   background-color: #dedede;
+ 64 |   margin: auto;
+ 65 |   padding: 20px;
+ 66 |   border: 1px solid #888;
+ 67 |   width: 80%;
+ 68 |   border-radius: 5%;
+ 69 | }
+ 70 |
+ 71 | /* The Close Button */
+ 72 | .close {
+ 73 |   color: #aaaaaa;
+ 74 |   float: right;
+ 75 |   font-size: 28px;
+ 76 |   font-weight: bold;
+ 77 | }
+ 78 |
+ 79 | .close:hover,
+ 80 | .close:focus {
+ 81 |   color: #000;
+ 82 |   text-decoration: none;
+ 83 |   cursor: pointer;
+ 84 | }
+ 85 |
+ 86 | /* Translate */
+ 87 | #google_translate_element{
+ 88 |   display: none;
+ 89 | }
+ 90 |
+ 91 | .skiptranslate{
+ 92 |   display: none;
+ 93 | }
+ 94 |
+ 95 | body{
+ 96 |   top: 0!important;
+ 97 | }
+ 98 |
+ 99 | /* span {
+100 |   width: 50%;
+101 | } */
+102 |
+103 |
+104 | /* On / Off switch */
+105 | .switch {
+106 |   position: relative;
+107 |   display: inline-block;
+108 |   width: 90px;
+109 |   height: 34px;
+110 | }
+111 |
+112 | .switch input {display:none;}
+113 |
+114 | .slideraa {
+115 |   position: absolute;
+116 |   cursor: pointer;
+117 |   top: 0;
+118 |   left: 0;
+119 |   right: 0;
+120 |   bottom: 0;
+121 |   background-color: #aaaa09;
+122 |   -webkit-transition: .4s;
+123 |   transition: .4s;
+124 |    border-radius: 34px;
+125 | }
+126 |
+127 | .slideraa:before {
+128 |   position: absolute;
+129 |   content: "";
+130 |   height: 26px;
+131 |   width: 26px;
+132 |   left: 4px;
+133 |   bottom: 4px;
+134 |   background-color: white;
+135 |   -webkit-transition: .4s;
+136 |   transition: .4s;
+137 |   border-radius: 50%;
+138 | }
+139 |
+140 | input:checked + .slideraa {
+141 |   background-color: #2ab934;
+142 | }
+143 |
+144 | input:focus + .slideraa {
+145 |   box-shadow: 0 0 1px #2196F3;
+146 | }
+147 |
+148 | input:checked + .slideraa:before {
+149 |   -webkit-transform: translateX(26px);
+150 |   -ms-transform: translateX(26px);
+151 |   transform: translateX(55px);
+152 | }
+153 |
+154 | /*------ ADDED CSS ---------*/
+155 | .slideraa:after
+156 | {
+157 |  content:'OFF';
+158 |  color: white;
+159 |  display: block;
+160 |  position: absolute;
+161 |  transform: translate(-50%,-50%);
+162 |  top: 50%;
+163 |  left: 50%;
+164 |  font-size: 10px;
+165 |  font-family: Verdana, sans-serif;
+166 | }
+167 |
+168 | input:checked + .slideraa:after
+169 | {
+170 |   content:'ON';
+171 | }
+172 |
+173 | /*--------- END --------*/
+174 |
+175 | .tooltip {
+176 |   position: relative;
+177 |   display: inline-block;
+178 |   border-bottom: 1px dotted black;
+179 | }
+180 |
+181 | .tooltip .tooltiptext {
+182 |   visibility: hidden;
+183 |   width: 120px;
+184 |   background-color: rgb(0,0,0,0.5);
+185 |   color: #fff;
+186 |   text-align: center;
+187 |   border-radius: 6px;
+188 |   padding: 5px;
+189 |   position: absolute;
+190 |   z-index: 1;
+191 |   top: 150%;
+192 |   left: 50%;
+193 |   margin-left: -60px;
+194 |   font-size: 150%;
+195 |   transition: opacity 0.8s;
+196 | }
+197 |
+198 | .tooltip .tooltiptext::after {
+199 |   content: "";
+200 |   position: absolute;
+201 |   bottom: 100%;
+202 |   left: 50%;
+203 |   margin-left: -5px;
+204 |   border-width: 5px;
+205 |   border-style: solid;
+206 |   border-color: transparent transparent black transparent;
+207 | }
+208 |
+209 | .tooltip.focus, .tooltip:focus {
+210 |     outline: 0;
+211 |     box-shadow: none!important;
+212 | }
+213 |
+214 | .tooltip:hover .tooltiptext {
+215 |   visibility: visible;
+216 | }
+217 |
+218 | .tooltip .tooltiptext:hover {
+219 |   visibility: hidden;
+220 | }
+221 |
+222 | </style>
+223 | </html>
+224 |
+
+
+--------------------------------------------------------------------------------

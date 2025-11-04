@@ -80,6 +80,13 @@ import {
   signInWithEmail,
   registerWithEmail,
   onAuthChanged,
+  writeUsageEvent,
+  fetchUserEvents,
+  fetchPublicEvents,
+  fetchUserSettings,
+  saveUserSettings,
+  getDefaultPrivacySettings,
+  getCurrentUser,
 } from './src/utils/firebase.js';
 
 // Enviar relatório para Firestore
@@ -105,6 +112,34 @@ await signInWithEmail('user@example.com', 'senhaSecreta');
 const unsubscribe = await onAuthChanged((user) => {
   console.log('Usuário atual:', user);
 });
+
+// Preferências de privacidade e registros de uso
+const user = await getCurrentUser();
+const settings = await fetchUserSettings(user.uid);
+console.log('Preferências atuais:', settings);
+
+await saveUserSettings(user.uid, {
+  ...getDefaultPrivacySettings(),
+  collectData: true,
+  shareAnonymized: true,
+});
+
+await writeUsageEvent({
+  user,
+  sessionId: 'session-123',
+  eventType: 'audio_add',
+  payload: {
+    label: 'Binaural Alpha 10Hz',
+    presetKey: 'binaural',
+    meta: { base: 200, beat: 10 },
+  },
+  settings: settings,
+});
+
+const myEvents = await fetchUserEvents(user.uid);
+const publicEvents = await fetchPublicEvents();
+console.log('Eventos pessoais:', myEvents.length);
+console.log('Eventos públicos:', publicEvents.length);
 ```
 
 ## Estrutura de arquivos

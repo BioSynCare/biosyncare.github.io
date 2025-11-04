@@ -33,6 +33,27 @@ service cloud.firestore {
                          && request.auth.uid == resource.data.userId;
     }
 
+    // Preferências de privacidade por usuário
+    match /user_settings/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Eventos privados de uso - acessíveis apenas pelo próprio usuário
+    match /usage_events/{eventId} {
+      allow create: if request.auth != null
+                     && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null
+                   && request.auth.uid == resource.data.userId;
+    }
+
+    // Feed público anonimizado - leitura aberta, escrita apenas autenticada
+    match /usage_events_public/{eventId} {
+      allow read: if true;
+      allow create: if request.auth != null
+                     && !(request.resource.data.keys().hasAny(['userId', 'userUid']));
+      allow update, delete: if false;
+    }
+
     // Bloquear tudo que não está explicitamente permitido
     match /{document=**} {
       allow read, write: if false;
