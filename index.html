@@ -226,6 +226,67 @@
         color: #f8fafc;
         text-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
       }
+      .stat-card {
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        padding: 1rem 1.25rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+      .stat-label {
+        font-size: 0.65rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin-bottom: 0.35rem;
+        display: block;
+      }
+      .stat-value {
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .stat-panel {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #ffffff;
+        padding: 1.25rem;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+      }
+      .stat-panel h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #94a3b8;
+        margin-bottom: 0.75rem;
+      }
+      .stat-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .stat-list li {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: #475569;
+      }
+      .stat-list span {
+        font-weight: 600;
+        color: #111827;
+      }
+      .profile-summary {
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        background: #f8fafc;
+        padding: 1.25rem;
+        font-size: 0.9rem;
+        color: #475569;
+      }
       @media (prefers-reduced-motion: reduce) {
         .blink-animation,
         .undulate-animation {
@@ -363,6 +424,65 @@
             class="text-xs text-red-500 hidden"
             role="status"
           ></p>
+        </div>
+        <div
+          class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+          id="auth-stat-cards"
+        >
+          <div class="stat-card">
+            <span class="stat-label">Audio initializations</span>
+            <span id="stat-audio-inits" class="stat-value">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Audio tracks added</span>
+            <span id="stat-audio-adds" class="stat-value">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Visual cues added</span>
+            <span id="stat-visual-adds" class="stat-value">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Tracks stopped</span>
+            <span id="stat-track-stops" class="stat-value">0</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Session time</span>
+            <span id="stat-session-time" class="stat-value">00:00:00</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Neurostimulation time</span>
+            <span id="stat-neuro-time" class="stat-value">00:00:00</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">First sign-in</span>
+            <span id="stat-first-signin" class="stat-value text-sm">—</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">Last sign-in</span>
+            <span id="stat-last-signin" class="stat-value text-sm">—</span>
+          </div>
+        </div>
+        <div class="mt-6 grid gap-6 md:grid-cols-2">
+          <div class="stat-panel">
+            <h3>Audio track exposure</h3>
+            <ul id="stat-audio-duration-list" class="stat-list">
+              <li>No audio tracks yet.</li>
+            </ul>
+          </div>
+          <div class="stat-panel">
+            <h3>Visual cue exposure</h3>
+            <ul id="stat-visual-duration-list" class="stat-list">
+              <li>No visual cues yet.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="mt-6">
+          <h3 class="text-xs font-semibold uppercase text-gray-400 mb-2">
+            Self-reported profile
+          </h3>
+          <div id="stat-profile" class="profile-summary">
+            No self-reported profile yet.
+          </div>
         </div>
       </div>
 
@@ -526,6 +646,16 @@
         `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
       let engine = null;
+      const usageStats = {
+        sessionStart: Date.now(),
+        audioInitializations: 0,
+        audioTrackAdds: 0,
+        visualAdds: 0,
+        trackStops: 0,
+        totalNeuroMs: 0,
+        audioDurations: new Map(),
+        visualDurations: new Map(),
+      };
 
       // --- Identity UI ---
       const authStatusEl = document.getElementById('auth-status');
@@ -544,6 +674,24 @@
       const btnEmailRegister = document.getElementById('btn-email-register');
       const btnSignout = document.getElementById('btn-signout');
 
+      const statAudioInitsEl = document.getElementById('stat-audio-inits');
+      const statAudioAddsEl = document.getElementById('stat-audio-adds');
+      const statVisualAddsEl = document.getElementById('stat-visual-adds');
+      const statTrackStopsEl = document.getElementById('stat-track-stops');
+      const statSessionTimeEl = document.getElementById('stat-session-time');
+      const statNeuroTimeEl = document.getElementById('stat-neuro-time');
+      const statFirstSignInEl = document.getElementById('stat-first-signin');
+      const statLastSignInEl = document.getElementById('stat-last-signin');
+      const statAudioDurationList = document.getElementById(
+        'stat-audio-duration-list'
+      );
+      const statVisualDurationList = document.getElementById(
+        'stat-visual-duration-list'
+      );
+      const profileSummaryEl = document.getElementById('stat-profile');
+      const activeAudioTracks = new Map();
+      const activeVisualTracks = new Map();
+
       const authButtons = [
         btnLoginGoogle,
         btnLoginGitHub,
@@ -551,6 +699,119 @@
         btnEmailRegister,
         btnSignout,
       ].filter(Boolean);
+
+      const formatDuration = (ms) => {
+        if (!ms || ms <= 0) return '00:00:00';
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        return [hours, minutes, seconds]
+          .map((value) => String(value).padStart(2, '0'))
+          .join(':');
+      };
+
+      const formatDateTime = (value) => {
+        if (!value) return '—';
+        const date = new Date(value);
+        if (Number.isNaN(date.valueOf())) return '—';
+        return date.toLocaleString();
+      };
+
+      const accumulateDuration = (map, key, delta) => {
+        if (!key || !Number.isFinite(delta) || delta <= 0) return;
+        const previous = map.get(key) || 0;
+        map.set(key, previous + delta);
+      };
+
+      const computeDurationSummary = (baseMap, activeTracks) => {
+        const summary = new Map();
+        baseMap.forEach((value, key) => summary.set(key, value));
+        const now = Date.now();
+        activeTracks.forEach((track) => {
+          if (!track || track.finalized) return;
+          const key = track.label || track.presetKey || 'Unknown';
+          const startedAt = track.startedAt || now;
+          const delta = Math.max(0, now - startedAt);
+          summary.set(key, (summary.get(key) || 0) + delta);
+        });
+        return summary;
+      };
+
+      const updateDurationList = (element, summaryMap, emptyMessage) => {
+        if (!element) return;
+        element.innerHTML = '';
+
+        const entries = Array.from(summaryMap.entries()).sort(
+          (a, b) => b[1] - a[1]
+        );
+
+        if (entries.length === 0) {
+          const li = document.createElement('li');
+          li.textContent = emptyMessage;
+          element.appendChild(li);
+          return;
+        }
+
+        entries.forEach(([label, duration]) => {
+          const li = document.createElement('li');
+          const spanLabel = document.createElement('span');
+          spanLabel.textContent = label;
+          const spanValue = document.createElement('span');
+          spanValue.textContent = formatDuration(duration);
+          li.appendChild(spanLabel);
+          li.appendChild(spanValue);
+          element.appendChild(li);
+        });
+      };
+
+      const loadUserProfile = () => {
+        try {
+          const raw = localStorage.getItem('biosyncare_user_profile');
+          if (!raw) return null;
+          return JSON.parse(raw);
+        } catch (error) {
+          console.warn('[Profile] Failed to parse stored profile', error);
+          return null;
+        }
+      };
+
+      const titleize = (input) => {
+        if (!input) return '';
+        return input
+          .toString()
+          .replace(/[_\-]+/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+          .replace(/\w\S*/g, (word) => word.charAt(0).toUpperCase() + word.slice(1));
+      };
+
+      const formatProfileSummary = (profile) => {
+        if (!profile || typeof profile !== 'object') {
+          return 'No self-reported profile yet.';
+        }
+
+        const entries = Object.entries(profile).filter(
+          ([, value]) =>
+            value !== undefined &&
+            value !== null &&
+            String(value).trim().length > 0
+        );
+
+        if (entries.length === 0) {
+          return 'No self-reported profile yet.';
+        }
+
+        return entries
+          .map(([key, value]) => `${titleize(key)}: ${Array.isArray(value) ? value.join(', ') : value}`)
+          .join(' • ');
+      };
+
+      const updateProfileSummary = () => {
+        if (!profileSummaryEl) return;
+        const profile = loadUserProfile();
+        profileSummaryEl.textContent = formatProfileSummary(profile);
+      };
 
       const AUTH_ERROR_MESSAGES = {
         'auth/invalid-email': 'Invalid email address.',
@@ -576,6 +837,91 @@
         currentUser: null,
         unsubscribe: null,
       };
+
+      const finalizeTrack = (track, type, endedAt = Date.now()) => {
+        if (!track || track.finalized) return 0;
+
+        const startedAt = track.startedAt || endedAt;
+        const duration = Math.max(0, endedAt - startedAt);
+        track.finalized = true;
+
+        const label = track.label || track.presetKey || type;
+        if (type === 'audio') {
+          accumulateDuration(usageStats.audioDurations, label, duration);
+        } else {
+          accumulateDuration(usageStats.visualDurations, label, duration);
+        }
+
+        usageStats.totalNeuroMs += duration;
+        usageStats.trackStops += 1;
+        return duration;
+      };
+
+      const updateUsageView = () => {
+        const now = Date.now();
+
+        if (statAudioInitsEl) {
+          statAudioInitsEl.textContent = usageStats.audioInitializations;
+        }
+        if (statAudioAddsEl) {
+          statAudioAddsEl.textContent = usageStats.audioTrackAdds;
+        }
+        if (statVisualAddsEl) {
+          statVisualAddsEl.textContent = usageStats.visualAdds;
+        }
+        if (statTrackStopsEl) {
+          statTrackStopsEl.textContent = usageStats.trackStops;
+        }
+        if (statSessionTimeEl) {
+          statSessionTimeEl.textContent = formatDuration(
+            now - usageStats.sessionStart
+          );
+        }
+
+        const activeAudio = Array.from(activeAudioTracks.values());
+        const activeVisual = Array.from(activeVisualTracks.values());
+
+        const activeAudioMs = activeAudio.reduce((total, track) => {
+          if (!track || track.finalized) return total;
+          const startedAt = track.startedAt || now;
+          return total + Math.max(0, now - startedAt);
+        }, 0);
+
+        const activeVisualMs = activeVisual.reduce((total, track) => {
+          if (!track || track.finalized) return total;
+          const startedAt = track.startedAt || now;
+          return total + Math.max(0, now - startedAt);
+        }, 0);
+
+        if (statNeuroTimeEl) {
+          statNeuroTimeEl.textContent = formatDuration(
+            usageStats.totalNeuroMs + activeAudioMs + activeVisualMs
+          );
+        }
+
+        const audioSummary = computeDurationSummary(
+          usageStats.audioDurations,
+          activeAudio
+        );
+        updateDurationList(
+          statAudioDurationList,
+          audioSummary,
+          'No audio tracks yet.'
+        );
+
+        const visualSummary = computeDurationSummary(
+          usageStats.visualDurations,
+          activeVisual
+        );
+        updateDurationList(
+          statVisualDurationList,
+          visualSummary,
+          'No visual cues yet.'
+        );
+      };
+
+      updateProfileSummary();
+      updateUsageView();
 
       const toggleElement = (element, show) => {
         if (!element) return;
@@ -616,10 +962,11 @@
 
       const describeUserLabel = (user) => {
         if (!user) return '—';
+        const uidSuffix = user.uid ? user.uid.slice(-6) : '------';
         if (isAnonymousUser(user)) {
-          return `Anonymous #${user.uid.slice(-6)}`;
+          return `Anonymous #${uidSuffix}`;
         }
-        return user.displayName || user.email || `User ${user.uid.slice(-6)}`;
+        return user.displayName || user.email || `User ${uidSuffix}`;
       };
 
       const updateAuthUI = (user) => {
@@ -645,6 +992,20 @@
         toggleElement(authLoginSection, !hasUser || anonymous);
         toggleElement(btnSignout, hasUser && !anonymous);
 
+        if (statFirstSignInEl) {
+          statFirstSignInEl.textContent =
+            !hasUser || anonymous || !user?.metadata?.creationTime
+              ? '—'
+              : formatDateTime(user.metadata.creationTime);
+        }
+
+        if (statLastSignInEl) {
+          statLastSignInEl.textContent =
+            !hasUser || !user?.metadata?.lastSignInTime
+              ? '—'
+              : formatDateTime(user.metadata.lastSignInTime);
+        }
+
         if (hasUser && !anonymous) {
           if (authEmailInput) authEmailInput.value = '';
           if (authPasswordInput) authPasswordInput.value = '';
@@ -655,6 +1016,8 @@
         }
 
         setAuthLoading(false);
+        updateProfileSummary();
+        updateUsageView();
       };
 
       const handleAuthError = (error, fallbackMessage) => {
@@ -698,6 +1061,8 @@
         } catch (error) {
           console.error('[Auth] Failed to fetch current user:', error);
         }
+
+        updateUsageView();
       };
 
       btnLoginGoogle?.addEventListener('click', async () => {
@@ -787,12 +1152,19 @@
         }
       });
 
+      window.addEventListener('storage', (event) => {
+        if (event.key === 'biosyncare_user_profile') {
+          updateProfileSummary();
+        }
+      });
+
       window.addEventListener('beforeunload', () => {
         if (typeof authState.unsubscribe === 'function') {
           authState.unsubscribe();
         }
       });
 
+      setInterval(updateUsageView, 1000);
       initAuthFlow();
 
       const initBtn = document.getElementById('btn-init');
@@ -818,9 +1190,6 @@
       const visualActiveEmpty = document.getElementById('visual-active-empty');
       const visualTrackCount = document.getElementById('visual-track-count');
       const visualStatusText = document.getElementById('visual-status-text');
-
-      const activeAudioTracks = new Map();
-      const activeVisualTracks = new Map();
 
       const audioPresets = {
         sine: {
@@ -1128,6 +1497,8 @@
             count === 1 ? '' : 's'
           } running.`;
         }
+
+        updateUsageView();
       };
 
       const renderVisualTracks = ({ message } = {}) => {
@@ -1179,9 +1550,14 @@
             `Running ${count} visual layer${count === 1 ? '' : 's'}.`;
           visualStatusText.classList.add('active');
         }
+
+        updateUsageView();
       };
 
       const stopAllAudio = ({ message } = {}) => {
+        const now = Date.now();
+        activeAudioTracks.forEach((track) => finalizeTrack(track, 'audio', now));
+
         if (engine) {
           try {
             engine.stopAll();
@@ -1196,7 +1572,9 @@
       };
 
       const stopAllVisual = ({ message } = {}) => {
+        const now = Date.now();
         activeVisualTracks.forEach((track) => {
+          finalizeTrack(track, 'visual', now);
           try {
             track.cleanup();
           } catch (error) {
@@ -1236,7 +1614,9 @@
             detail: result.detail || '',
             nodeId: result.nodeId,
             startedAt: Date.now(),
+            finalized: false,
           });
+          usageStats.audioTrackAdds += 1;
 
           const count = activeAudioTracks.size;
           renderAudioTracks({
@@ -1270,6 +1650,7 @@
           }
         }
 
+        finalizeTrack(track, 'audio');
         activeAudioTracks.delete(trackId);
         const count = activeAudioTracks.size;
         renderAudioTracks({
@@ -1299,8 +1680,11 @@
             presetKey,
             label: preset.label,
             detail: result?.detail || '',
+            startedAt: Date.now(),
+            finalized: false,
             cleanup,
           });
+          usageStats.visualAdds += 1;
 
           const count = activeVisualTracks.size;
           renderVisualTracks({
@@ -1334,6 +1718,7 @@
           console.warn('Failed to cleanup visual track', error);
         }
 
+        finalizeTrack(track, 'visual');
         activeVisualTracks.delete(trackId);
         const count = activeVisualTracks.size;
         renderVisualTracks({
@@ -1358,6 +1743,8 @@
             'Audio engine ready. Layer tracks freely.';
           initBtn.classList.add('hidden');
           stopBtn.classList.remove('hidden');
+          usageStats.audioInitializations += 1;
+          updateUsageView();
         } catch (error) {
           console.error('Failed to initialise audio engine', error);
           statusEl.textContent = 'Audio engine failed to initialise.';
