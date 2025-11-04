@@ -333,3 +333,16 @@ export async function getIdToken(forceRefresh = false) {
   if (!authInstance.currentUser) return null;
   return authModule.getIdToken(authInstance.currentUser, forceRefresh);
 }
+
+/**
+ * Ensure an anonymous session exists (used before prompting user to upgrade)
+ */
+export async function ensureAnonymousUser() {
+  const { auth: authInstance, authModule } = await ensureAuthModule();
+  if (authInstance.currentUser) {
+    return serializeUser(authInstance.currentUser);
+  }
+
+  const credential = await authModule.signInAnonymously(authInstance);
+  return normalizeAuthResult(credential, { providerId: 'anonymous' });
+}

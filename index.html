@@ -265,12 +265,111 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="panel mb-6" id="identity-panel">
+        <div
+          class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+        >
+          <div class="space-y-2">
+            <h2 class="text-2xl font-bold">Session & Identity</h2>
+            <p id="auth-status" class="text-sm text-gray-600">
+              Checking authentication state...
+            </p>
+            <div class="flex flex-wrap items-center gap-2 text-sm">
+              <span class="uppercase tracking-wide text-gray-400 text-xs"
+                >Current identity</span
+              >
+              <span id="auth-identity" class="font-medium text-gray-800"
+                >—</span
+              >
+              <span
+                id="auth-anonymous-badge"
+                class="hidden rounded-full bg-slate-200 px-2 py-1 text-xs font-medium text-slate-600"
+              >
+                Anonymous session
+              </span>
+            </div>
+          </div>
+          <div class="flex items-start justify-end">
+            <button
+              id="btn-signout"
+              class="btn-secondary text-sm hidden"
+              type="button"
+            >
+              ↩ Sign out
+            </button>
+          </div>
+        </div>
+        <div id="auth-login-section" class="mt-5 space-y-4">
+          <div class="space-y-3">
+            <p class="text-xs font-semibold uppercase text-gray-400">
+              Quick login
+            </p>
+            <div class="flex flex-wrap items-center gap-3">
+              <button
+                id="btn-login-google"
+                class="btn-primary text-sm"
+                type="button"
+              >
+                ✨ Continue with Google
+              </button>
+              <button
+                id="btn-login-github"
+                class="btn-secondary text-sm"
+                type="button"
+              >
+                🐙 Continue with GitHub
+              </button>
+            </div>
+          </div>
+          <div class="space-y-3 border-t border-slate-200 pt-4">
+            <p class="text-xs font-semibold uppercase text-gray-400">
+              Email access
+            </p>
+            <div class="grid gap-2 sm:grid-cols-2">
+              <input
+                id="auth-email"
+                type="email"
+                autocomplete="email"
+                placeholder="you@example.com"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+              />
+              <input
+                id="auth-password"
+                type="password"
+                autocomplete="current-password"
+                placeholder="Password"
+                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+              />
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <button
+                id="btn-email-login"
+                class="btn-primary text-sm"
+                type="button"
+              >
+                Login
+              </button>
+              <button
+                id="btn-email-register"
+                class="btn-secondary text-sm"
+                type="button"
+              >
+                Register
+              </button>
+            </div>
+          </div>
+          <p
+            id="auth-feedback"
+            class="text-xs text-red-500 hidden"
+            role="status"
+          ></p>
+        </div>
+      </div>
+
       <div class="grid gap-6 lg:grid-cols-2">
         <div class="panel">
           <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
-          <p id="status" class="text-gray-600 mb-4">
-            Click Initialize to start
-          </p>
+          <p id="status" class="text-gray-600 mb-4">Click Initialize to start</p>
           <div class="space-y-6">
             <div class="space-y-2">
               <div class="flex items-center justify-between gap-2">
@@ -411,11 +510,290 @@
 
     <script type="module">
       import { AudioEngine } from './src/core/audio-engine.js';
+      import {
+        ensureAnonymousUser,
+        onAuthChanged,
+        signInWithGoogle,
+        signInWithGitHub,
+        signInWithEmail,
+        registerWithEmail,
+        signOutUser,
+        getCurrentUser,
+        isAnonymousUser,
+      } from './src/utils/firebase.js';
 
       const generateTrackId = (prefix) =>
         `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
       let engine = null;
+
+      // --- Identity UI ---
+      const authStatusEl = document.getElementById('auth-status');
+      const authIdentityEl = document.getElementById('auth-identity');
+      const authAnonymousBadge = document.getElementById(
+        'auth-anonymous-badge'
+      );
+      const authLoginSection = document.getElementById('auth-login-section');
+      const authFeedbackEl = document.getElementById('auth-feedback');
+      const authEmailInput = document.getElementById('auth-email');
+      const authPasswordInput = document.getElementById('auth-password');
+
+      const btnLoginGoogle = document.getElementById('btn-login-google');
+      const btnLoginGitHub = document.getElementById('btn-login-github');
+      const btnEmailLogin = document.getElementById('btn-email-login');
+      const btnEmailRegister = document.getElementById('btn-email-register');
+      const btnSignout = document.getElementById('btn-signout');
+
+      const authButtons = [
+        btnLoginGoogle,
+        btnLoginGitHub,
+        btnEmailLogin,
+        btnEmailRegister,
+        btnSignout,
+      ].filter(Boolean);
+
+      const AUTH_ERROR_MESSAGES = {
+        'auth/invalid-email': 'Invalid email address.',
+        'auth/user-disabled': 'This account has been disabled.',
+        'auth/user-not-found': 'No account found with that email.',
+        'auth/wrong-password':
+          'Incorrect password. Please double-check and try again.',
+        'auth/email-already-in-use':
+          'This email is already in use. Try logging in instead.',
+        'auth/weak-password':
+          'Password too weak. Use at least 6 characters in length.',
+        'auth/popup-blocked':
+          'Popup was blocked by the browser. Allow popups and retry.',
+        'auth/popup-closed-by-user':
+          'Popup closed before finishing authentication.',
+        'auth/account-exists-with-different-credential':
+          'This email is linked to a different provider. Sign in with that provider first.',
+      };
+
+      const AUTH_INFO_CODES = new Set(['auth/popup-closed-by-user']);
+
+      const authState = {
+        currentUser: null,
+        unsubscribe: null,
+      };
+
+      const toggleElement = (element, show) => {
+        if (!element) return;
+        element.classList.toggle('hidden', !show);
+      };
+
+      const setAuthLoading = (isLoading) => {
+        authButtons.forEach((btn) => {
+          btn.disabled = isLoading;
+          btn.classList.toggle('opacity-60', isLoading);
+          btn.classList.toggle('pointer-events-none', isLoading);
+        });
+      };
+
+      const showAuthFeedback = (message, tone = 'info') => {
+        if (!authFeedbackEl) return;
+        if (!message) {
+          authFeedbackEl.textContent = '';
+          authFeedbackEl.classList.add('hidden');
+          authFeedbackEl.classList.remove(
+            'text-red-500',
+            'text-emerald-500',
+            'text-slate-500'
+          );
+          return;
+        }
+
+        authFeedbackEl.textContent = message;
+        authFeedbackEl.classList.remove('hidden', 'text-red-500', 'text-emerald-500', 'text-slate-500');
+        if (tone === 'success') {
+          authFeedbackEl.classList.add('text-emerald-500');
+        } else if (tone === 'info') {
+          authFeedbackEl.classList.add('text-slate-500');
+        } else {
+          authFeedbackEl.classList.add('text-red-500');
+        }
+      };
+
+      const describeUserLabel = (user) => {
+        if (!user) return '—';
+        if (isAnonymousUser(user)) {
+          return `Anonymous #${user.uid.slice(-6)}`;
+        }
+        return user.displayName || user.email || `User ${user.uid.slice(-6)}`;
+      };
+
+      const updateAuthUI = (user) => {
+        authState.currentUser = user;
+        const hasUser = Boolean(user);
+        const anonymous = hasUser ? isAnonymousUser(user) : true;
+
+        authIdentityEl.textContent = describeUserLabel(user);
+
+        if (!hasUser) {
+          authStatusEl.textContent =
+            'No active session. Establishing secure connection…';
+        } else if (anonymous) {
+          authStatusEl.textContent =
+            'Anonymous session active. Sign in to sync usage across devices.';
+        } else {
+          const name =
+            user.displayName || user.email || `User ${user.uid.slice(-6)}`;
+          authStatusEl.textContent = `Signed in as ${name}. Sessions will sync to your account.`;
+        }
+
+        toggleElement(authAnonymousBadge, hasUser && anonymous);
+        toggleElement(authLoginSection, !hasUser || anonymous);
+        toggleElement(btnSignout, hasUser && !anonymous);
+
+        if (hasUser && !anonymous) {
+          if (authEmailInput) authEmailInput.value = '';
+          if (authPasswordInput) authPasswordInput.value = '';
+        }
+
+        if (hasUser) {
+          showAuthFeedback('');
+        }
+
+        setAuthLoading(false);
+      };
+
+      const handleAuthError = (error, fallbackMessage) => {
+        if (!error) {
+          showAuthFeedback(fallbackMessage || 'Authentication failed.', 'error');
+          return;
+        }
+        const code = error.code;
+        const message =
+          AUTH_ERROR_MESSAGES[code] ||
+          fallbackMessage ||
+          error.message ||
+          'Authentication failed.';
+
+        const tone = AUTH_INFO_CODES.has(code) ? 'info' : 'error';
+        if (tone === 'error') {
+          console.error('[Auth] Error:', error);
+        }
+        showAuthFeedback(message, tone);
+      };
+
+      const initAuthFlow = async () => {
+        try {
+          authState.unsubscribe = await onAuthChanged((user) => {
+            updateAuthUI(user);
+          });
+        } catch (error) {
+          console.error('[Auth] Failed to attach listener:', error);
+        }
+
+        try {
+          await ensureAnonymousUser();
+        } catch (error) {
+          console.error('[Auth] Unable to ensure anonymous user:', error);
+          handleAuthError(error, 'Unable to start anonymous session.');
+        }
+
+        try {
+          const user = await getCurrentUser();
+          updateAuthUI(user);
+        } catch (error) {
+          console.error('[Auth] Failed to fetch current user:', error);
+        }
+      };
+
+      btnLoginGoogle?.addEventListener('click', async () => {
+        showAuthFeedback('');
+        setAuthLoading(true);
+        try {
+          await signInWithGoogle();
+          showAuthFeedback('Google sign-in successful.', 'success');
+        } catch (error) {
+          handleAuthError(error, 'Google sign-in failed.');
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      btnLoginGitHub?.addEventListener('click', async () => {
+        showAuthFeedback('');
+        setAuthLoading(true);
+        try {
+          await signInWithGitHub();
+          showAuthFeedback('GitHub sign-in successful.', 'success');
+        } catch (error) {
+          handleAuthError(error, 'GitHub sign-in failed.');
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      btnEmailLogin?.addEventListener('click', async () => {
+        const email = authEmailInput?.value.trim();
+        const password = authPasswordInput?.value || '';
+
+        if (!email || !password) {
+          showAuthFeedback('Enter both email and password to login.', 'error');
+          return;
+        }
+
+        showAuthFeedback('');
+        setAuthLoading(true);
+
+        try {
+          await signInWithEmail(email, password);
+          showAuthFeedback('Signed in with email.', 'success');
+        } catch (error) {
+          handleAuthError(error, 'Email sign-in failed.');
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      btnEmailRegister?.addEventListener('click', async () => {
+        const email = authEmailInput?.value.trim();
+        const password = authPasswordInput?.value || '';
+
+        if (!email || !password) {
+          showAuthFeedback(
+            'Provide email and password to create an account.',
+            'error'
+          );
+          return;
+        }
+
+        showAuthFeedback('');
+        setAuthLoading(true);
+
+        try {
+          await registerWithEmail(email, password);
+          showAuthFeedback('Account created and signed in.', 'success');
+        } catch (error) {
+          handleAuthError(error, 'Registration failed.');
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      btnSignout?.addEventListener('click', async () => {
+        showAuthFeedback('');
+        setAuthLoading(true);
+        try {
+          await signOutUser();
+          await ensureAnonymousUser();
+          showAuthFeedback('Signed out successfully.', 'success');
+        } catch (error) {
+          handleAuthError(error, 'Failed to sign out.');
+        } finally {
+          setAuthLoading(false);
+        }
+      });
+
+      window.addEventListener('beforeunload', () => {
+        if (typeof authState.unsubscribe === 'function') {
+          authState.unsubscribe();
+        }
+      });
+
+      initAuthFlow();
 
       const initBtn = document.getElementById('btn-init');
       const stopBtn = document.getElementById('btn-stop');
