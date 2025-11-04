@@ -1,0 +1,36 @@
+# macOS artifacts
+.DS_Store
+
+# Node / frontend dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Firebase CLI local artifacts
+.firebase/
+firebase-debug.log
+
+# Environment / local configuration
+.env
+.env.local
+.env.*
+*.local
+
+# Temporary / backup files
+index_backup_*.html
+*.swp
+*.swo
+*~
+
+# Large local data dumps
+aux/
+
+# Misc tooling caches
+.DS_Store?
+Thumbs.db
