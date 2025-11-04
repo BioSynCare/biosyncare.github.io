@@ -73,7 +73,14 @@ a.click();
 ### 3. Firebase (opcional)
 
 ```javascript
-import { sendReport } from './src/utils/firebase.js';
+import {
+  sendReport,
+  signInWithGoogle,
+  signInWithGitHub,
+  signInWithEmail,
+  registerWithEmail,
+  onAuthChanged,
+} from './src/utils/firebase.js';
 
 // Enviar relatório para Firestore
 const result = await sendReport(
@@ -88,6 +95,16 @@ if (result.success) {
   // Fallback: salvar localmente
   localStorage.setItem('pending_report', JSON.stringify(diagnostics));
 }
+
+// Autenticação (Google, GitHub ou email/senha)
+await signInWithGoogle(); // popup
+await signInWithGitHub(); // popup
+await registerWithEmail('user@example.com', 'senhaSecreta', 'BioSync User');
+await signInWithEmail('user@example.com', 'senhaSecreta');
+
+const unsubscribe = await onAuthChanged((user) => {
+  console.log('Usuário atual:', user);
+});
 ```
 
 ## Estrutura de arquivos
