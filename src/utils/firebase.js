@@ -105,12 +105,8 @@ async function ensureAuthModule() {
   }
 
   authModule = await import(FIREBASE_AUTH_URL);
-  const {
-    getAuth,
-    GoogleAuthProvider,
-    GithubAuthProvider,
-    EmailAuthProvider,
-  } = authModule;
+  const { getAuth, GoogleAuthProvider, GithubAuthProvider, EmailAuthProvider } =
+    authModule;
 
   auth = getAuth(firebaseApp);
   if (typeof auth.useDeviceLanguage === 'function') {
@@ -149,8 +145,7 @@ function serializeUser(user) {
 
 function normalizeAuthResult(userCredential, override = {}) {
   if (!userCredential) return null;
-  const { additionalUserInfo, credential, operationType, user } =
-    userCredential;
+  const { additionalUserInfo, credential, operationType, user } = userCredential;
 
   return {
     user: serializeUser(user),
@@ -183,10 +178,7 @@ export async function sendReport(diagnostics, message = '') {
       version: '1.0.0',
     };
 
-    const docRef = await addDoc(
-      collection(db, 'diagnostic_reports'),
-      reportData
-    );
+    const docRef = await addDoc(collection(db, 'diagnostic_reports'), reportData);
     console.log('[Firebase] Report sent:', docRef.id);
     return { success: true, id: docRef.id };
   } catch (error) {
@@ -248,8 +240,7 @@ export async function getCurrentUser() {
 }
 
 async function authenticateWithProvider(providerKey, { link = false } = {}) {
-  const { auth: authInstance, authModule, providers } =
-    await ensureAuthModule();
+  const { auth: authInstance, authModule, providers } = await ensureAuthModule();
 
   const provider = providers[providerKey];
   if (!provider) {
@@ -326,8 +317,7 @@ export async function registerWithEmail(email, password, displayName) {
  * Link current (possibly anonymous) user with an email credential
  */
 export async function linkEmailCredential(email, password) {
-  const { auth: authInstance, authModule, providers } =
-    await ensureAuthModule();
+  const { auth: authInstance, authModule, providers } = await ensureAuthModule();
 
   if (!authInstance.currentUser) {
     throw new Error('No active Firebase user to link credentials with.');
@@ -401,13 +391,7 @@ function cloneSettings(settings = {}) {
   };
 }
 
-const PUBLIC_PAYLOAD_FIELDS = [
-  'label',
-  'presetKey',
-  'category',
-  'durationMs',
-  'count',
-];
+const PUBLIC_PAYLOAD_FIELDS = ['label', 'presetKey', 'category', 'durationMs', 'count'];
 
 function summarizeMeta(meta = {}) {
   if (!meta || typeof meta !== 'object') return undefined;
@@ -545,8 +529,7 @@ export async function writeUsageEvent({
 
   const createdAt = serverTimestamp();
   const visibility = effectiveSettings.shareAnonymized ? 'anonymized' : 'private';
-  const includeInCommunity =
-    effectiveSettings.includeInCommunity !== false;
+  const includeInCommunity = effectiveSettings.includeInCommunity !== false;
   const isAnonymous = Boolean(user.isAnonymous);
 
   const eventDoc = {
@@ -568,9 +551,7 @@ export async function writeUsageEvent({
     if (effectiveSettings.shareAnonymized) {
       const publicLabel =
         effectiveSettings.anonymizedLabel ||
-        (user.displayName
-          ? 'Member'
-          : `Anonymous #${user.uid.slice(-6)}`);
+        (user.displayName ? 'Member' : `Anonymous #${user.uid.slice(-6)}`);
 
       publicEntry = {
         userLabel: publicLabel,
@@ -613,14 +594,8 @@ export async function fetchUserEvents(userId, { pageSize = 100 } = {}) {
   if (!userId) return [];
 
   const db = await initFirebase();
-  const {
-    collection,
-    query,
-    where,
-    orderBy,
-    limit,
-    getDocs,
-  } = await getFirestoreHelpers();
+  const { collection, query, where, orderBy, limit, getDocs } =
+    await getFirestoreHelpers();
 
   try {
     const eventsQuery = query(
@@ -640,9 +615,7 @@ export async function fetchUserEvents(userId, { pageSize = 100 } = {}) {
         timestamp: normalizeTimestamp(data.createdAt) || Date.now(),
         visibility: data.visibility || 'private',
         includeInCommunity:
-          data.includeInCommunity !== undefined
-            ? Boolean(data.includeInCommunity)
-            : true,
+          data.includeInCommunity !== undefined ? Boolean(data.includeInCommunity) : true,
       };
     });
   } catch (error) {
@@ -653,8 +626,7 @@ export async function fetchUserEvents(userId, { pageSize = 100 } = {}) {
 
 export async function fetchPublicEvents({ pageSize = 50 } = {}) {
   const db = await initFirebase();
-  const { collection, query, orderBy, limit, getDocs } =
-    await getFirestoreHelpers();
+  const { collection, query, orderBy, limit, getDocs } = await getFirestoreHelpers();
 
   try {
     const publicQuery = query(
@@ -673,9 +645,7 @@ export async function fetchPublicEvents({ pageSize = 50 } = {}) {
         userLabel: data.userLabel || 'Anonymous member',
         timestamp: normalizeTimestamp(data.createdAt) || Date.now(),
         includeInCommunity:
-          data.includeInCommunity !== undefined
-            ? Boolean(data.includeInCommunity)
-            : true,
+          data.includeInCommunity !== undefined ? Boolean(data.includeInCommunity) : true,
       };
     });
   } catch (error) {

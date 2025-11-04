@@ -9,7 +9,7 @@
 
 ## Phase 2 – Tooling & Quality
 
-- [ ] Add ESLint + Prettier configuration
+- [x] Add ESLint + Prettier configuration ✓ COMPLETED (2025-11-04)
 - [ ] (Optional) Set up Husky + lint-staged for pre-commit checks
 
 ## Phase 3 – State Management Stores
@@ -42,6 +42,9 @@ simple commands start and control/substitute the neurosensory stimulation tracks
 
 use UI libs:
 bootstrap? preact, react?
+
+testing modules and deploy procedure:
+we should test BSCLab and update firebase if rules changed
 
 ## Urgent
 

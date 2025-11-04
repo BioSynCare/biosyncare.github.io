@@ -1,0 +1,35 @@
+{
+  "name": "biosyncare-lab",
+  "version": "1.0.0",
+  "description": "BioSynCare Lab - Neurosensory consciousness stimulation platform",
+  "type": "module",
+  "scripts": {
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "format": "prettier --write \"src/**/*.js\" \"*.html\"",
+    "format:check": "prettier --check \"src/**/*.js\" \"*.html\"",
+    "dev": "python3 -m http.server 3000",
+    "serve": "npx serve .",
+    "check": "npm run lint && npm run format:check"
+  },
+  "keywords": [
+    "neuroscience",
+    "audio",
+    "binaural",
+    "isochronic",
+    "meditation",
+    "web-audio"
+  ],
+  "author": "BioSynCare Team",
+  "license": "MIT",
+  "devDependencies": {
+    "@eslint/js": "^9.17.0",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.13.0",
+    "prettier": "^3.4.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

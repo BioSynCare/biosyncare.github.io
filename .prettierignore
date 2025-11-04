@@ -1,0 +1,26 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Backups and auxiliary files
+aux/
+index_backup_*.html
+docs_landing.html
+
+# RDF/Ontology files
+rdf/
+
+# Minified files
+*.min.js
+*.min.css
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db

@@ -121,10 +121,7 @@ export class UsageTracker {
     }
 
     const completed = sessions.filter((s) => s.completed);
-    const totalDuration = sessions.reduce(
-      (sum, s) => sum + (s.actualDuration || 0),
-      0
-    );
+    const totalDuration = sessions.reduce((sum, s) => sum + (s.actualDuration || 0), 0);
 
     // Protocol breakdown
     const protocolBreakdown = {};
@@ -156,9 +153,7 @@ export class UsageTracker {
   getSessionsByDateRange(startDate, endDate) {
     const sessions = this.getAllSessions();
     return sessions.filter((s) => {
-      return (
-        s.startTime >= startDate.getTime() && s.startTime <= endDate.getTime()
-      );
+      return s.startTime >= startDate.getTime() && s.startTime <= endDate.getTime();
     });
   }
 

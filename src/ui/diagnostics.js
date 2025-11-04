@@ -49,18 +49,9 @@ export async function hasGoodGPU() {
 
     const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
     if (debugInfo) {
-      const renderer = gl
-        .getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
-        .toLowerCase();
+      const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL).toLowerCase();
 
-      const lowEndGPUs = [
-        'intel',
-        'mali',
-        'adreno 3',
-        'adreno 4',
-        'powervr',
-        'vivante',
-      ];
+      const lowEndGPUs = ['intel', 'mali', 'adreno 3', 'adreno 4', 'powervr', 'vivante'];
       const isLowEnd = lowEndGPUs.some((gpu) => renderer.includes(gpu));
       if (isLowEnd) return false;
     }
@@ -155,9 +146,7 @@ export async function getGPUScore() {
 
     return {
       score: Math.min(100, Math.max(0, finalScore)),
-      details: `Render: ${renderTime.toFixed(
-        1
-      )}ms, Texture: ${textureTime.toFixed(1)}ms`,
+      details: `Render: ${renderTime.toFixed(1)}ms, Texture: ${textureTime.toFixed(1)}ms`,
     };
   } catch (e) {
     return { score: 0, details: 'Erro na detecção' };
@@ -190,9 +179,7 @@ export function getRAMInfo() {
 
       return {
         ...estimatedRAM,
-        availablePercent: Math.round(
-          (estimatedRAM.available / estimatedRAM.limit) * 100
-        ),
+        availablePercent: Math.round((estimatedRAM.available / estimatedRAM.limit) * 100),
         details: `~${estimatedRAM.available} MB (estimado)`,
       };
     }
@@ -203,7 +190,7 @@ export function getRAMInfo() {
 
 export async function getRefreshRate() {
   return new Promise((resolve) => {
-    let startTime = performance.now();
+    const startTime = performance.now();
     let frameCount = 0;
 
     function countFrames() {
@@ -262,7 +249,7 @@ export function getBrowserInfo() {
     deviceModel = 'Mac';
     const macMatch = ua.match(/Mac OS X ([0-9_]+)/);
     if (macMatch) {
-      deviceModel += ' (macOS ' + macMatch[1].replace(/_/g, '.') + ')';
+      deviceModel += ` (macOS ${macMatch[1].replace(/_/g, '.')})`;
     }
   } else if (ua.includes('Windows NT')) {
     deviceModel = 'Windows PC';
@@ -275,14 +262,14 @@ export function getBrowserInfo() {
           6.2: '8',
           6.1: '7',
         }[winMatch[1]] || winMatch[1];
-      deviceModel += ' (Windows ' + winVersion + ')';
+      deviceModel += ` (Windows ${winVersion})`;
     }
   } else if (ua.includes('Android')) {
     const androidMatch = ua.match(/Android ([0-9.]+)/);
     const modelMatch = ua.match(/;\s*([^;)]+)\s+Build/);
     deviceModel = modelMatch?.[1] || 'Android Device';
     if (androidMatch) {
-      deviceModel += ' (Android ' + androidMatch[1] + ')';
+      deviceModel += ` (Android ${androidMatch[1]})`;
     }
   } else if (ua.includes('Linux')) {
     deviceModel = 'Linux PC';
@@ -353,12 +340,8 @@ export async function getAudioInfo() {
       sampleRate: ctx.sampleRate,
       maxChannels: ctx.destination.maxChannelCount,
       state: ctx.state,
-      baseLatency: ctx.baseLatency
-        ? (ctx.baseLatency * 1000).toFixed(2)
-        : 'N/A',
-      outputLatency: ctx.outputLatency
-        ? (ctx.outputLatency * 1000).toFixed(2)
-        : 'N/A',
+      baseLatency: ctx.baseLatency ? (ctx.baseLatency * 1000).toFixed(2) : 'N/A',
+      outputLatency: ctx.outputLatency ? (ctx.outputLatency * 1000).toFixed(2) : 'N/A',
     };
 
     info.headphonesLikely =
@@ -428,9 +411,7 @@ export function getSystemInfo() {
   info.viewportRatio = (window.innerWidth / window.innerHeight).toFixed(2);
   info.possibleMultiMonitor =
     screen.availWidth < screen.width ? 'Possível' : 'Improvável';
-  info.hdrSupport = window.matchMedia('(dynamic-range: high)').matches
-    ? 'Sim'
-    : 'Não';
+  info.hdrSupport = window.matchMedia('(dynamic-range: high)').matches ? 'Sim' : 'Não';
 
   const dpi = window.devicePixelRatio * 96;
   info.dpi = Math.round(dpi);
@@ -450,6 +431,7 @@ export function detectEngines() {
   };
 
   // Check for Tone.js
+  /* global Tone */
   if (typeof Tone !== 'undefined') {
     engines.audio.name = 'Tone.js';
     engines.audio.status = 'Carregado ✓';
@@ -460,6 +442,7 @@ export function detectEngines() {
   }
 
   // Check for Three.js
+  /* global THREE, PIXI, p5 */
   if (typeof THREE !== 'undefined') {
     engines.visual.name = 'Three.js';
     engines.visual.status = 'Carregado ✓';
@@ -498,12 +481,9 @@ export async function getBatteryInfo() {
         supported: true,
         charging: battery.charging,
         level: Math.round(battery.level * 100),
-        chargingTime:
-          battery.chargingTime === Infinity ? 'N/A' : battery.chargingTime,
+        chargingTime: battery.chargingTime === Infinity ? 'N/A' : battery.chargingTime,
         dischargingTime:
-          battery.dischargingTime === Infinity
-            ? 'N/A'
-            : battery.dischargingTime,
+          battery.dischargingTime === Infinity ? 'N/A' : battery.dischargingTime,
       };
     }
   } catch (e) {
@@ -554,7 +534,9 @@ export function getPerformanceMetrics() {
  */
 export function getActiveTracksInfo() {
   const audioTracks = document.querySelectorAll('#audio-active-list .track-item');
-  const visualTracks = document.querySelectorAll('#visual-active-list .visual-track-item');
+  const visualTracks = document.querySelectorAll(
+    '#visual-active-list .visual-track-item'
+  );
 
   return {
     audioTracksCount: audioTracks.length,
@@ -578,7 +560,7 @@ export async function assessSystemHealth() {
 
   // ===== HEALTH ASSESSMENT =====
   let healthScore = 100;
-  let healthIssues = [];
+  const healthIssues = [];
 
   // Audio health (30 points)
   if (!audio.supported) {
@@ -788,26 +770,20 @@ export async function gatherDiagnostics() {
   const time = new Date();
 
   // GPU details
-  let gpuDetails = {};
+  const gpuDetails = {};
   try {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
     if (gl) {
       const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
       if (debugInfo) {
-        gpuDetails.renderer = gl.getParameter(
-          debugInfo.UNMASKED_RENDERER_WEBGL
-        );
+        gpuDetails.renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
         gpuDetails.vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
       }
       gpuDetails.version = gl.getParameter(gl.VERSION);
-      gpuDetails.shadingLanguageVersion = gl.getParameter(
-        gl.SHADING_LANGUAGE_VERSION
-      );
+      gpuDetails.shadingLanguageVersion = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
       gpuDetails.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-      gpuDetails.maxRenderbufferSize = gl.getParameter(
-        gl.MAX_RENDERBUFFER_SIZE
-      );
+      gpuDetails.maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
       gpuDetails.maxVertexAttribs = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
     }
   } catch (e) {

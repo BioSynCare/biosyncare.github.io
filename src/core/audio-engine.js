@@ -164,14 +164,8 @@ export class AudioEngine {
 
     if (duration > 0) {
       // Fade out
-      masterOut.gain.setValueAtTime(
-        gain,
-        this.ctx.currentTime + duration - 0.1
-      );
-      masterOut.gain.linearRampToValueAtTime(
-        0,
-        this.ctx.currentTime + duration
-      );
+      masterOut.gain.setValueAtTime(gain, this.ctx.currentTime + duration - 0.1);
+      masterOut.gain.linearRampToValueAtTime(0, this.ctx.currentTime + duration);
 
       oscLeft.stop(this.ctx.currentTime + duration);
       oscRight.stop(this.ctx.currentTime + duration);
@@ -242,9 +236,12 @@ export class AudioEngine {
       oscLow.stop(stopTime);
       oscHigh.stop(stopTime);
 
-      setTimeout(() => {
-        this.nodes.delete(id);
-      }, duration * 1000 + 100);
+      setTimeout(
+        () => {
+          this.nodes.delete(id);
+        },
+        duration * 1000 + 100
+      );
     }
 
     console.log('[AudioEngine] Monaural', {
@@ -407,9 +404,7 @@ export class AudioEngine {
 
     osc.start(now);
 
-    const nodeId = `waveform_${Date.now()}_${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
+    const nodeId = `waveform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     this.nodes.set(nodeId, { osc, gainNode, panner });
 
     if (duration !== null) {
@@ -418,9 +413,12 @@ export class AudioEngine {
       gainNode.gain.linearRampToValueAtTime(0, stopTime);
       osc.stop(stopTime);
 
-      setTimeout(() => {
-        this.nodes.delete(nodeId);
-      }, duration * 1000 + 100);
+      setTimeout(
+        () => {
+          this.nodes.delete(nodeId);
+        },
+        duration * 1000 + 100
+      );
     }
 
     return nodeId;
@@ -551,9 +549,12 @@ export class AudioEngine {
       gainNode.gain.linearRampToValueAtTime(0, stopTime);
       source.stop(stopTime);
 
-      setTimeout(() => {
-        this.nodes.delete(nodeId);
-      }, duration * 1000 + 100);
+      setTimeout(
+        () => {
+          this.nodes.delete(nodeId);
+        },
+        duration * 1000 + 100
+      );
     }
 
     return nodeId;
@@ -613,9 +614,12 @@ export class AudioEngine {
       masterGainNode.gain.linearRampToValueAtTime(0, stopTime);
       oscillators.forEach((osc) => osc.stop(stopTime));
 
-      setTimeout(() => {
-        this.nodes.delete(nodeId);
-      }, duration * 1000 + 100);
+      setTimeout(
+        () => {
+          this.nodes.delete(nodeId);
+        },
+        duration * 1000 + 100
+      );
     }
 
     return nodeId;
@@ -643,11 +647,12 @@ export class AudioEngine {
       case 'fibonacci':
         ratios = [1, 2, 3, 5, 8, 13, 21];
         break;
-      case 'golden':
+      case 'golden': {
         // Golden ratio series: 1, φ, φ², φ³, ...
         const phi = (1 + Math.sqrt(5)) / 2;
         ratios = [1, phi, phi * phi, phi * phi * phi];
         break;
+      }
       case 'prime':
         ratios = [1, 2, 3, 5, 7, 11, 13];
         break;
@@ -717,9 +722,12 @@ export class AudioEngine {
       osc.stop(stopTime);
       lfo.stop(stopTime);
 
-      setTimeout(() => {
-        this.nodes.delete(nodeId);
-      }, duration * 1000 + 100);
+      setTimeout(
+        () => {
+          this.nodes.delete(nodeId);
+        },
+        duration * 1000 + 100
+      );
     }
 
     return nodeId;

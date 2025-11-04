@@ -45,22 +45,19 @@ const visualEngines = {
     id: 'pixi',
     name: 'PixiJS',
     description: 'GPU accelerated 2D rendering',
-    available: () =>
-      typeof window !== 'undefined' && !!window.PIXI,
+    available: () => typeof window !== 'undefined' && !!window.PIXI,
   },
   three: {
     id: 'three',
     name: 'Three.js',
     description: '3D WebGL rendering',
-    available: () =>
-      typeof window !== 'undefined' && !!window.THREE,
+    available: () => typeof window !== 'undefined' && !!window.THREE,
   },
   p5: {
     id: 'p5',
     name: 'p5.js',
     description: 'Creative coding toolkit',
-    available: () =>
-      typeof window !== 'undefined' && !!window.p5,
+    available: () => typeof window !== 'undefined' && !!window.p5,
   },
 };
 
@@ -113,7 +110,6 @@ function persistSelection(selection) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(cachedSelection));
   }
   return cachedSelection;
-
 }
 
 export function getEngineSelection() {
@@ -158,9 +154,7 @@ export async function createAudioEngine(selection = getEngineSelection()) {
   const provider = audioEngines[key] || audioEngines.webaudio;
   if (!provider.available()) {
     if (provider === audioEngines.tone) {
-      throw new Error(
-        'Tone.js engine selected but Tone.js is not loaded.'
-      );
+      throw new Error('Tone.js engine selected but Tone.js is not loaded.');
     }
     return audioEngines.webaudio.create();
   }

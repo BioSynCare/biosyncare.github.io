@@ -53,8 +53,8 @@ export class ONCParser {
    */
   _parse() {
     const lines = this.raw.split('\n');
-    let currentSubject = null;
-    let currentPredicate = null;
+    const currentSubject = null;
+    const currentPredicate = null;
 
     for (let line of lines) {
       line = line.trim();
@@ -152,9 +152,7 @@ export class ONCParser {
       const types =
         entity.properties.get('rdf:type') ||
         entity.properties.get('a') ||
-        entity.properties.get(
-          'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
-        ) ||
+        entity.properties.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type') ||
         [];
 
       if (types.some((t) => t.includes(type))) {
