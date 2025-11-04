@@ -53,6 +53,7 @@ we should test BSCLab and update firebase if rules changed
 ## Urgent
 
 - [ ] mobile iphone safari not working
+- [ ] "Initialize" button starts fine, but fails to stop on second click.
 
 ## Done
 
