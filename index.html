@@ -293,6 +293,30 @@
         color: #64748b;
         margin-top: 0.1rem;
       }
+      .usage-scope-tabs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+      }
+      .usage-scope-tab {
+        padding: 0.35rem 0.9rem;
+        border-radius: 9999px;
+        border: 1px solid #cbd5f5;
+        background: #f8fafc;
+        color: #1f2937;
+        font-size: 0.75rem;
+        font-weight: 600;
+        transition: all 0.2s;
+      }
+      .usage-scope-tab:hover {
+        background: #e0e7ff;
+      }
+      .usage-scope-tab-active {
+        background: #2563eb;
+        border-color: #2563eb;
+        color: #ffffff;
+      }
       .activity-panel {
         display: flex;
         flex-direction: column;
@@ -467,6 +491,42 @@
             </div>
           </div>
           <p id="auth-feedback" class="text-xs text-red-500 hidden" role="status"></p>
+        </div>
+        <div class="mt-6">
+          <div
+            class="usage-scope-tabs"
+            role="tablist"
+            aria-label="Usage metrics scope selection"
+            id="usage-scope-tabs"
+          >
+            <button
+              type="button"
+              class="usage-scope-tab"
+              data-usage-scope="session"
+              id="usage-scope-tab-session"
+            >
+              This session
+            </button>
+            <button
+              type="button"
+              class="usage-scope-tab usage-scope-tab-active"
+              data-usage-scope="user"
+              id="usage-scope-tab-user"
+            >
+              This user
+            </button>
+            <button
+              type="button"
+              class="usage-scope-tab"
+              data-usage-scope="global"
+              id="usage-scope-tab-global"
+            >
+              All users
+            </button>
+          </div>
+          <p id="usage-scope-description" class="mt-2 text-xs text-gray-500">
+            Showing lifetime activity for this user across recorded sessions.
+          </p>
         </div>
         <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4" id="auth-stat-cards">
           <div class="stat-card">

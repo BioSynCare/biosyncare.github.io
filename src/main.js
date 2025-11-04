@@ -121,6 +121,19 @@ const statLastSignInEl = document.getElementById('stat-last-signin');
 const statAudioDurationList = document.getElementById('stat-audio-duration-list');
 const statVisualDurationList = document.getElementById('stat-visual-duration-list');
 const profileSummaryEl = document.getElementById('stat-profile');
+const usageScopeTabsEl = document.getElementById('usage-scope-tabs');
+const usageScopeDescriptionEl = document.getElementById('usage-scope-description');
+const usageScopeButtons = usageScopeTabsEl
+  ? Array.from(usageScopeTabsEl.querySelectorAll('[data-usage-scope]'))
+  : [];
+const VALID_USAGE_SCOPES = new Set(['session', 'user', 'global']);
+const USAGE_SCOPE_DESCRIPTIONS = {
+  session: 'Showing metrics collected in the current neurosensory session only.',
+  user: 'Showing lifetime activity for this BioSynCare Lab identity.',
+  global: 'Showing community-wide activity across all public sessions.',
+};
+let activeUsageScope = 'user';
+let communityTotalsCache = { eventsRef: null, totals: null };
 const collectDataToggle = document.getElementById('toggle-collect-data');
 const shareAnonymizedToggle = document.getElementById('toggle-share-anonymized');
 const includeCommunityToggle = document.getElementById('toggle-include-community');
@@ -449,6 +462,34 @@ const computeTotalsFromEvents = (events = []) => {
   return totals;
 };
 
+const invalidateCommunityTotals = () => {
+  communityTotalsCache = { eventsRef: null, totals: null };
+};
+
+const getCommunityTotals = () => {
+  const events = activityState.publicEvents || [];
+  if (communityTotalsCache.eventsRef === events && communityTotalsCache.totals) {
+    return communityTotalsCache.totals;
+  }
+  const totals = computeTotalsFromEvents(events);
+  communityTotalsCache = { eventsRef: events, totals };
+  return totals;
+};
+
+const updateUsageScopeDescription = () => {
+  if (!usageScopeDescriptionEl) return;
+  usageScopeDescriptionEl.textContent =
+    USAGE_SCOPE_DESCRIPTIONS[activeUsageScope] ||
+    'Showing lifetime activity for this BioSynCare Lab identity.';
+};
+
+const updateUsageScopeTabs = () => {
+  usageScopeButtons.forEach((btn) => {
+    const buttonScope = btn.dataset.usageScope;
+    btn.classList.toggle('usage-scope-tab-active', buttonScope === activeUsageScope);
+  });
+};
+
 const SETTINGS_SYNC_DEBOUNCE_MS = 1000;
 let settingsSyncTimeout = null;
 let settingsSyncInFlight = null;
@@ -541,33 +582,8 @@ const finalizeTrack = (track, type, endedAt = Date.now()) => {
   return duration;
 };
 
-const updateUsageView = () => {
+const getActiveTrackSnapshot = () => {
   const now = Date.now();
-
-  const baseline = usageStats.baseline || {};
-  const totalAudioInits =
-    (baseline.audioInitializations || 0) + usageStats.audioInitializations;
-  const totalAudioAdds = (baseline.audioTrackAdds || 0) + usageStats.audioTrackAdds;
-  const totalVisualAdds = (baseline.visualAdds || 0) + usageStats.visualAdds;
-  const totalStops = (baseline.trackStops || 0) + usageStats.trackStops;
-  const baselineNeuro = baseline.totalNeuroMs || 0;
-
-  if (statAudioInitsEl) {
-    statAudioInitsEl.textContent = totalAudioInits;
-  }
-  if (statAudioAddsEl) {
-    statAudioAddsEl.textContent = totalAudioAdds;
-  }
-  if (statVisualAddsEl) {
-    statVisualAddsEl.textContent = totalVisualAdds;
-  }
-  if (statTrackStopsEl) {
-    statTrackStopsEl.textContent = totalStops;
-  }
-  if (statSessionTimeEl) {
-    statSessionTimeEl.textContent = formatDuration(now - usageStats.sessionStart);
-  }
-
   const activeAudio = getAllAudioTracks().map(([, track]) => track);
   const activeVisual = getAllVisualTracks().map(([, track]) => track);
 
@@ -583,25 +599,119 @@ const updateUsageView = () => {
     return total + Math.max(0, now - startedAt);
   }, 0);
 
-  if (statNeuroTimeEl) {
-    statNeuroTimeEl.textContent = formatDuration(
-      baselineNeuro + usageStats.totalNeuroMs + activeAudioMs + activeVisualMs
-    );
+  return {
+    now,
+    activeAudio,
+    activeVisual,
+    activeAudioMs,
+    activeVisualMs,
+    sessionTimeMs: Math.max(0, now - usageStats.sessionStart),
+  };
+};
+
+const getUsageTotalsForScope = (scope, snapshot) => {
+  if (scope === 'session') {
+    return {
+      audioInitializations: usageStats.audioInitializations,
+      audioTrackAdds: usageStats.audioTrackAdds,
+      visualAdds: usageStats.visualAdds,
+      trackStops: usageStats.trackStops,
+      totalNeuroMs:
+        usageStats.totalNeuroMs + snapshot.activeAudioMs + snapshot.activeVisualMs,
+      sessionTimeMs: snapshot.sessionTimeMs,
+      audioDurations: mergeDurationMaps({}, usageStats.audioDurations, snapshot.activeAudio),
+      visualDurations: mergeDurationMaps({}, usageStats.visualDurations, snapshot.activeVisual),
+    };
   }
 
-  const audioSummary = mergeDurationMaps(
-    baseline.audioDurations || {},
-    usageStats.audioDurations,
-    activeAudio
-  );
-  updateDurationList(statAudioDurationList, audioSummary, 'No audio tracks yet.');
+  if (scope === 'global') {
+    const communityTotals = getCommunityTotals();
+    return {
+      audioInitializations: communityTotals.audioInitializations || 0,
+      audioTrackAdds: communityTotals.audioTrackAdds || 0,
+      visualAdds: communityTotals.visualAdds || 0,
+      trackStops: communityTotals.trackStops || 0,
+      totalNeuroMs: communityTotals.totalNeuroMs || 0,
+      sessionTimeMs: null,
+      audioDurations: cloneBaselineDurations(communityTotals.audioDurations),
+      visualDurations: cloneBaselineDurations(communityTotals.visualDurations),
+    };
+  }
 
-  const visualSummary = mergeDurationMaps(
-    baseline.visualDurations || {},
-    usageStats.visualDurations,
-    activeVisual
-  );
-  updateDurationList(statVisualDurationList, visualSummary, 'No visual cues yet.');
+  const baseline = usageStats.baseline || {};
+  return {
+    audioInitializations:
+      (baseline.audioInitializations || 0) + usageStats.audioInitializations,
+    audioTrackAdds: (baseline.audioTrackAdds || 0) + usageStats.audioTrackAdds,
+    visualAdds: (baseline.visualAdds || 0) + usageStats.visualAdds,
+    trackStops: (baseline.trackStops || 0) + usageStats.trackStops,
+    totalNeuroMs:
+      (baseline.totalNeuroMs || 0) +
+      usageStats.totalNeuroMs +
+      snapshot.activeAudioMs +
+      snapshot.activeVisualMs,
+    sessionTimeMs: snapshot.sessionTimeMs,
+    audioDurations: mergeDurationMaps(
+      baseline.audioDurations || {},
+      usageStats.audioDurations,
+      snapshot.activeAudio
+    ),
+    visualDurations: mergeDurationMaps(
+      baseline.visualDurations || {},
+      usageStats.visualDurations,
+      snapshot.activeVisual
+    ),
+  };
+};
+
+const updateUsageView = () => {
+  const snapshot = getActiveTrackSnapshot();
+  const totals = getUsageTotalsForScope(activeUsageScope, snapshot);
+
+  if (statAudioInitsEl) {
+    statAudioInitsEl.textContent = totals.audioInitializations ?? 0;
+  }
+  if (statAudioAddsEl) {
+    statAudioAddsEl.textContent = totals.audioTrackAdds ?? 0;
+  }
+  if (statVisualAddsEl) {
+    statVisualAddsEl.textContent = totals.visualAdds ?? 0;
+  }
+  if (statTrackStopsEl) {
+    statTrackStopsEl.textContent = totals.trackStops ?? 0;
+  }
+  if (statSessionTimeEl) {
+    statSessionTimeEl.textContent =
+      typeof totals.sessionTimeMs === 'number'
+        ? formatDuration(totals.sessionTimeMs)
+        : '—';
+  }
+
+  if (statNeuroTimeEl) {
+    const neuroMs = Math.max(0, totals.totalNeuroMs || 0);
+    statNeuroTimeEl.textContent = formatDuration(neuroMs);
+  }
+
+  const audioEmptyMessage =
+    activeUsageScope === 'global' ? 'No public audio activity yet.' : 'No audio tracks yet.';
+  const visualEmptyMessage =
+    activeUsageScope === 'global' ? 'No public visual activity yet.' : 'No visual cues yet.';
+
+  updateDurationList(statAudioDurationList, totals.audioDurations, audioEmptyMessage);
+  updateDurationList(statVisualDurationList, totals.visualDurations, visualEmptyMessage);
+};
+
+const setUsageScope = (scope) => {
+  if (!VALID_USAGE_SCOPES.has(scope)) return;
+  if (activeUsageScope === scope) {
+    updateUsageScopeTabs();
+    updateUsageScopeDescription();
+    return;
+  }
+  activeUsageScope = scope;
+  updateUsageScopeTabs();
+  updateUsageScopeDescription();
+  updateUsageView();
 };
 
 const toggleElement = (element, show) => {
@@ -878,6 +988,10 @@ const refreshPublicEvents = async ({ force = false } = {}) => {
   try {
     const events = await fetchPublicEvents({ pageSize: 100 });
     activityState.publicEvents = events;
+    invalidateCommunityTotals();
+    if (activeUsageScope === 'global') {
+      updateUsageView();
+    }
     activityState.lastPublicFetch = Date.now();
   } catch (error) {
     console.error('[Usage] Failed to fetch public events:', error);
@@ -1113,6 +1227,21 @@ btnSignout?.addEventListener('click', async () => {
     setAuthLoading(false);
   }
 });
+
+usageScopeButtons.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const scope = btn.dataset.usageScope;
+    if (scope) {
+      setUsageScope(scope);
+    }
+  });
+});
+
+if (usageScopeButtons.length > 0) {
+  setUsageScope(activeUsageScope);
+} else {
+  updateUsageScopeDescription();
+}
 
 collectDataToggle?.addEventListener('change', (event) => {
   handleSettingsChange({ collectData: Boolean(event.target.checked) });
