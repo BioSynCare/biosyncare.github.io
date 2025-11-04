@@ -14,19 +14,29 @@
  */
 
 // Firebase config - OK to be public (protected by Security Rules)
+// const firebaseConfig = {
+//   // Replace with your Firebase project config
+//   apiKey: 'AIza...YOUR_KEY_HERE',
+//   authDomain: 'biosyncare.firebaseapp.com',
+//   projectId: 'biosyncare',
+//   storageBucket: 'biosyncare.appspot.com',
+//   messagingSenderId: '123456789',
+//   appId: '1:123456789:web:abc123',
+// };
 const firebaseConfig = {
-  // Replace with your Firebase project config
-  apiKey: 'AIza...YOUR_KEY_HERE',
-  authDomain: 'biosyncare.firebaseapp.com',
-  projectId: 'biosyncare',
-  storageBucket: 'biosyncare.appspot.com',
-  messagingSenderId: '123456789',
-  appId: '1:123456789:web:abc123',
+  apiKey: 'AIzaSyAWcLkLlzmwlGJAb-CSkue78rnTUEhfAo8',
+  authDomain: 'biosyncarelab.firebaseapp.com',
+  projectId: 'biosyncarelab',
+  storageBucket: 'biosyncarelab.firebasestorage.app',
+  messagingSenderId: '831255166249',
+  appId: '1:831255166249:web:708133d374e80af9d48b38',
+  measurementId: 'G-K4X7HXKQ2C',
 };
 
 // Lazy load Firebase only when needed
 let firebaseApp = null;
 let firestore = null;
+let analytics = null;
 
 async function initFirebase() {
   if (firebaseApp) return firestore;
@@ -35,12 +45,16 @@ async function initFirebase() {
   const { initializeApp } = await import(
     'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js'
   );
+  const { getAnalytics } = await import(
+    'https://www.gstatic.com/firebasejs/10.7.0/firebase-analytics.js'
+  );
   const { getFirestore, collection, addDoc, serverTimestamp } = await import(
     'https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js'
   );
 
   firebaseApp = initializeApp(firebaseConfig);
   firestore = getFirestore(firebaseApp);
+  analytics = getAnalytics(firebaseApp);
 
   console.log('[Firebase] Initialized');
   return firestore;
