@@ -70,9 +70,10 @@ import {
   recordAudioDuration,
   recordVisualDuration,
   getUsageStatsSnapshot,
-  generateId,
 } from './state/usage-state.js';
 import {
+  activeAudioTracks,
+  activeVisualTracks,
   addAudioTrack,
   removeAudioTrack,
   getAudioTrack,
@@ -84,9 +85,6 @@ import {
   getAllAudioTracks,
   getAllVisualTracks,
 } from './state/track-state.js';
-
-// Maintain backward compatibility with legacy helpers
-const generateTrackId = (prefix) => generateId(prefix);
 
 // Audio engine instance
 let audioEngine = null;
@@ -170,6 +168,12 @@ const formatDateTime = (value) => {
   const date = new Date(value);
   if (Number.isNaN(date.valueOf())) return '—';
   return date.toLocaleString();
+};
+
+const accumulateDuration = (map, key, delta) => {
+  if (!key || !Number.isFinite(delta) || delta <= 0) return;
+  const previous = map.get(key) || 0;
+  map.set(key, previous + delta);
 };
 
 const updateDurationList = (element, summaryMap, emptyMessage) => {
@@ -520,13 +524,13 @@ const finalizeTrack = (track, type, endedAt = Date.now()) => {
 
   const label = track.label || track.presetKey || type;
   if (type === 'audio') {
-    recordAudioDuration(label, duration);
+    accumulateDuration(usageStats.audioDurations, label, duration);
   } else {
-    recordVisualDuration(label, duration);
+    accumulateDuration(usageStats.visualDurations, label, duration);
   }
 
-  addNeuroTime(duration);
-  incrementTrackStops();
+  usageStats.totalNeuroMs += duration;
+  usageStats.trackStops += 1;
   if (duration > 0) {
     recordUsageEvent('track_stop', {
       label,
@@ -568,8 +572,8 @@ const updateUsageView = () => {
     statSessionTimeEl.textContent = formatDuration(now - usageStats.sessionStart);
   }
 
-  const activeAudio = getAllAudioTracks().map(([, track]) => track);
-  const activeVisual = getAllVisualTracks().map(([, track]) => track);
+  const activeAudio = Array.from(activeAudioTracks.values());
+  const activeVisual = Array.from(activeVisualTracks.values());
 
   const activeAudioMs = activeAudio.reduce((total, track) => {
     if (!track || track.finalized) return total;
@@ -883,7 +887,7 @@ const refreshPublicEvents = async ({ force = false } = {}) => {
     console.error('[Usage] Failed to fetch public events:', error);
   } finally {
     activityState.fetchingPublic = false;
-    if (getPendingPublicEventsRefresh()) {
+    if (pendingPublicEventsRefresh) {
       setPendingPublicEventsRefresh(false);
       refreshPublicEvents({ force: true });
     }
@@ -1130,7 +1134,7 @@ includeCommunityToggle?.addEventListener('change', (event) => {
 
 audioEngineSelect?.addEventListener('change', (event) => {
   const value = event.target.value;
-  setEngineSelection({ audio: value });
+  const selection = setEngineSelection({ audio: value });
   populateEngineSelects();
   recordUsageEvent('engine_change', { type: 'audio', value });
   if (audioEngine) {
@@ -1145,23 +1149,23 @@ audioEngineSelect?.addEventListener('change', (event) => {
     stopBtn.classList.add('hidden');
     statusEl.textContent = 'Audio engine selection updated. Click Initialize to start.';
   }
-  updateFloatingWidgetUI();
+  updateEngineStatus(selection);
 });
 
 visualEngineSelect?.addEventListener('change', (event) => {
   const value = event.target.value;
-  setEngineSelection({ visual: value });
+  const selection = setEngineSelection({ visual: value });
   populateEngineSelects();
   recordUsageEvent('engine_change', { type: 'visual', value });
-  updateFloatingWidgetUI();
+  updateEngineStatus(selection);
 });
 
 hapticEngineSelect?.addEventListener('change', (event) => {
   const value = event.target.value;
-  setEngineSelection({ haptics: value });
+  const selection = setEngineSelection({ haptics: value });
   populateEngineSelects();
   recordUsageEvent('engine_change', { type: 'haptics', value });
-  updateFloatingWidgetUI();
+  updateEngineStatus(selection);
 });
 
 myActivityTab?.addEventListener('click', () => setActiveActivityTab('mine'));
@@ -1548,7 +1552,7 @@ const updateVisualDescription = () => {
 
 const renderAudioTracks = ({ message } = {}) => {
   audioActiveList.innerHTML = '';
-  const entries = getAllAudioTracks();
+  const entries = Array.from(activeAudioTracks.entries());
   const count = entries.length;
 
   audioTrackCount.textContent = `${count} layer${count === 1 ? '' : 's'}`;
@@ -1557,7 +1561,7 @@ const renderAudioTracks = ({ message } = {}) => {
 
   entries.forEach(([id, track]) => {
     const item = document.createElement('div');
-    item.className = 'track-item audio-track-item';
+    item.className = 'track-item';
 
     const info = document.createElement('div');
     info.className = 'flex-1 pr-4';
@@ -1583,10 +1587,10 @@ const renderAudioTracks = ({ message } = {}) => {
     audioActiveList.appendChild(item);
   });
 
+  if (!audioEngine) return;
+
   if (message) {
     statusEl.textContent = message;
-  } else if (!audioEngine) {
-    statusEl.textContent = 'Select an audio engine and click Initialize to start.';
   } else if (count === 0) {
     statusEl.textContent = 'Audio engine ready. No active layers.';
   } else {
@@ -1598,7 +1602,7 @@ const renderAudioTracks = ({ message } = {}) => {
 
 const renderVisualTracks = ({ message } = {}) => {
   visualActiveList.innerHTML = '';
-  const entries = getAllVisualTracks();
+  const entries = Array.from(activeVisualTracks.entries());
   const count = entries.length;
 
   visualTrackCount.textContent = `${count} layer${count === 1 ? '' : 's'}`;
@@ -1607,7 +1611,7 @@ const renderVisualTracks = ({ message } = {}) => {
 
   entries.forEach(([id, track]) => {
     const item = document.createElement('div');
-    item.className = 'track-item visual-track-item';
+    item.className = 'track-item';
 
     const info = document.createElement('div');
     info.className = 'flex-1 pr-4';
@@ -1647,7 +1651,7 @@ const renderVisualTracks = ({ message } = {}) => {
 
 const stopAllAudio = ({ message } = {}) => {
   const now = Date.now();
-  getAllAudioTracks().forEach(([, track]) => finalizeTrack(track, 'audio', now));
+  activeAudioTracks.forEach((track) => finalizeTrack(track, 'audio', now));
 
   if (audioEngine) {
     try {
@@ -1656,7 +1660,7 @@ const stopAllAudio = ({ message } = {}) => {
       console.warn('Failed to stop audio nodes', error);
     }
   }
-  clearAudioTracks();
+  activeAudioTracks.clear();
   renderAudioTracks({
     message: message ?? 'All audio layers stopped.',
   });
@@ -1664,7 +1668,7 @@ const stopAllAudio = ({ message } = {}) => {
 
 const stopAllVisual = ({ message } = {}) => {
   const now = Date.now();
-  getAllVisualTracks().forEach(([, track]) => {
+  activeVisualTracks.forEach((track) => {
     finalizeTrack(track, 'visual', now);
     try {
       track.cleanup();
@@ -1672,7 +1676,7 @@ const stopAllVisual = ({ message } = {}) => {
       console.warn('Failed to stop visual layer', error);
     }
   });
-  clearVisualTracks();
+  activeVisualTracks.clear();
   renderVisualTracks({
     message: message ?? 'Visual layers cleared.',
   });
@@ -1700,7 +1704,7 @@ addAudioBtn.addEventListener('click', async () => {
 
     const trackId = generateTrackId('audio');
     const trackMeta = result.meta || { type: presetKey };
-    addAudioTrack(trackId, {
+    activeAudioTracks.set(trackId, {
       presetKey,
       label: preset.label,
       detail: result.detail || '',
@@ -1709,7 +1713,7 @@ addAudioBtn.addEventListener('click', async () => {
       finalized: false,
       meta: trackMeta,
     });
-    incrementAudioAdds();
+    usageStats.audioTrackAdds += 1;
     recordUsageEvent('audio_add', {
       label: preset.label,
       presetKey,
@@ -1718,7 +1722,7 @@ addAudioBtn.addEventListener('click', async () => {
       meta: trackMeta,
     });
 
-    const count = getAllAudioTracks().length;
+    const count = activeAudioTracks.size;
     renderAudioTracks({
       message: `Started ${preset.label}. ${count} audio layer${
         count === 1 ? '' : 's'
@@ -1739,7 +1743,7 @@ audioActiveList.addEventListener('click', (event) => {
   if (!button) return;
 
   const trackId = button.dataset.trackId;
-  const track = getAudioTrack(trackId);
+  const track = activeAudioTracks.get(trackId);
   if (!track) return;
 
   if (audioEngine && track.nodeId) {
@@ -1751,8 +1755,8 @@ audioActiveList.addEventListener('click', (event) => {
   }
 
   finalizeTrack(track, 'audio');
-  removeAudioTrack(trackId);
-  const count = getAllAudioTracks().length;
+  activeAudioTracks.delete(trackId);
+  const count = activeAudioTracks.size;
   renderAudioTracks({
     message:
       count === 0
@@ -1772,7 +1776,7 @@ addVisualBtn.addEventListener('click', () => {
 
     const trackId = generateTrackId('visual');
     const trackMeta = result?.meta || { type: presetKey };
-    addVisualTrack(trackId, {
+    activeVisualTracks.set(trackId, {
       presetKey,
       label: preset.label,
       detail: result?.detail || '',
@@ -1781,7 +1785,7 @@ addVisualBtn.addEventListener('click', () => {
       meta: trackMeta,
       cleanup,
     });
-    incrementVisualAdds();
+    usageStats.visualAdds += 1;
     recordUsageEvent('visual_add', {
       label: preset.label,
       presetKey,
@@ -1790,7 +1794,7 @@ addVisualBtn.addEventListener('click', () => {
       meta: trackMeta,
     });
 
-    const count = getAllVisualTracks().length;
+    const count = activeVisualTracks.size;
     renderVisualTracks({
       message: `Started ${preset.label}. ${count} visual layer${
         count === 1 ? '' : 's'
@@ -1813,7 +1817,7 @@ visualActiveList.addEventListener('click', (event) => {
   if (!button) return;
 
   const trackId = button.dataset.trackId;
-  const track = getVisualTrack(trackId);
+  const track = activeVisualTracks.get(trackId);
   if (!track) return;
 
   try {
@@ -1823,8 +1827,8 @@ visualActiveList.addEventListener('click', (event) => {
   }
 
   finalizeTrack(track, 'visual');
-  removeVisualTrack(trackId);
-  const count = getAllVisualTracks().length;
+  activeVisualTracks.delete(trackId);
+  const count = activeVisualTracks.size;
   renderVisualTracks({
     message:
       count === 0
@@ -1852,7 +1856,7 @@ initBtn.addEventListener('click', async () => {
     statusEl.textContent = 'Audio engine ready. Layer tracks freely.';
     initBtn.classList.add('hidden');
     stopBtn.classList.remove('hidden');
-    incrementAudioInits();
+    usageStats.audioInitializations += 1;
     recordUsageEvent('audio_init', { count: 1 });
     updateUsageView();
   } catch (error) {
@@ -1890,7 +1894,6 @@ async function updateFloatingWidgetUI() {
     const sys = getSystemInfo();
     const caps = window.deviceCapabilities || {};
     const engines = detectEngines();
-    const selected = describeEngines(getEngineSelection());
 
     // ===== SYSTEM HEALTH ASSESSMENT =====
     const healthData = await assessSystemHealth();
@@ -1932,37 +1935,34 @@ async function updateFloatingWidgetUI() {
     }
 
     // Engines BSCLab with status indicators
-    $('engine-audio-name').textContent = selected.audio.name;
+    $('engine-audio-name').textContent = engines.audio.name;
 
     const audioStatusEl = $('engine-audio-status');
-    audioStatusEl.textContent = selected.audio.available
-      ? `${selected.audio.description} (disponível)`
-      : `${selected.audio.description} (carregar biblioteca)`;
-    audioStatusEl.className = selected.audio.available
-      ? 'font-mono text-green-600 font-semibold'
-      : 'font-mono text-yellow-600';
+    audioStatusEl.textContent = engines.audio.status;
+    audioStatusEl.className =
+      engines.audio.status === 'ready' || engines.audio.status === 'active'
+        ? 'font-mono text-green-600 font-semibold'
+        : engines.audio.status === 'initializing'
+          ? 'font-mono text-yellow-600'
+          : engines.audio.status === 'error'
+            ? 'font-mono text-red-600 font-semibold'
+            : 'font-mono';
 
     $('engine-audio-version').textContent = engines.audio.version || 'N/A';
-    $('engine-visual-name').textContent = selected.visual.name;
+    $('engine-visual-name').textContent = engines.visual.name;
 
     const visualStatusEl = $('engine-visual-status');
-    visualStatusEl.textContent = selected.visual.available
-      ? `${selected.visual.description} (disponível)`
-      : `${selected.visual.description} (carregar biblioteca)`;
-    visualStatusEl.className = selected.visual.available
-      ? 'font-mono text-green-600 font-semibold'
-      : 'font-mono text-yellow-600';
+    visualStatusEl.textContent = engines.visual.status;
+    visualStatusEl.className =
+      engines.visual.status === 'ready' || engines.visual.status === 'active'
+        ? 'font-mono text-green-600 font-semibold'
+        : engines.visual.status === 'initializing'
+          ? 'font-mono text-yellow-600'
+          : engines.visual.status === 'error'
+            ? 'font-mono text-red-600 font-semibold'
+            : 'font-mono';
 
     $('engine-visual-version').textContent = engines.visual.version || 'N/A';
-
-    const hapticStatusEl = $('engine-haptic-status');
-    $('engine-haptic-name').textContent = selected.haptics.name;
-    hapticStatusEl.textContent = selected.haptics.available
-      ? `${selected.haptics.description} (disponível)`
-      : `${selected.haptics.description} (não suportado)`;
-    hapticStatusEl.className = selected.haptics.available
-      ? 'font-mono text-green-600 font-semibold'
-      : 'font-mono text-yellow-600';
 
     // Performance & Active Tracks
     const tracksInfo = getActiveTracksInfo();

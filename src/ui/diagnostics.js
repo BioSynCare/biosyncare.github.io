@@ -1,3 +1,5 @@
+import { getAllAudioTracks, getAllVisualTracks } from '../state/track-state.js';
+
 /**
  * BioSynCare Lab - System Diagnostics Widget
  *
@@ -428,6 +430,7 @@ export function detectEngines() {
     audio: { name: 'Nenhum', status: 'Não carregado', version: null },
     visual: { name: 'Nenhum', status: 'Não carregado', version: null },
     webAudio: { supported: false, version: null },
+    haptics: { name: 'Desconhecido', status: 'Indisponível' },
   };
 
   // Check for Tone.js
@@ -468,6 +471,14 @@ export function detectEngines() {
   if (AudioContext) {
     engines.webAudio.supported = true;
     engines.webAudio.version = 'Standard API';
+  }
+
+  if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
+    engines.haptics.name = 'Vibration API';
+    engines.haptics.status = 'Disponível';
+  } else {
+    engines.haptics.name = 'Vibration API';
+    engines.haptics.status = 'Não suportado';
   }
 
   return engines;
@@ -533,15 +544,24 @@ export function getPerformanceMetrics() {
  * Get active track information
  */
 export function getActiveTracksInfo() {
-  const audioTracks = document.querySelectorAll('#audio-active-list .track-item');
-  const visualTracks = document.querySelectorAll(
-    '#visual-active-list .visual-track-item'
-  );
+  const audioEntries = getAllAudioTracks();
+  const visualEntries = getAllVisualTracks();
+
+  const serializeTrack = ([id, track = {}]) => ({
+    id,
+    label: track.label || track.presetKey || 'Unknown',
+    detail: track.detail || '',
+    startedAt: track.startedAt || null,
+    finalized: Boolean(track.finalized),
+    meta: track.meta || {},
+  });
 
   return {
-    audioTracksCount: audioTracks.length,
-    visualTracksCount: visualTracks.length,
-    totalTracks: audioTracks.length + visualTracks.length,
+    audioTracksCount: audioEntries.length,
+    visualTracksCount: visualEntries.length,
+    totalTracks: audioEntries.length + visualEntries.length,
+    audioTracks: audioEntries.map(serializeTrack),
+    visualTracks: visualEntries.map(serializeTrack),
   };
 }
 
@@ -801,6 +821,7 @@ export async function gatherDiagnostics() {
     audio,
     battery,
     engines,
+    selectedEngines: selectedEnginesSnapshot,
     gpuDetails,
   };
 }

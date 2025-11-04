@@ -2,10 +2,14 @@
 
 ## Phase 1 – Module Extraction & Engine Switches
 
-- [ ] Move inline script from `index.html` into `src/main.js`
-- [ ] Introduce `src/state`, `src/ui/vanilla`, `src/services` folders
-- [ ] Add pluggable sensory engine registry (Web Audio vs Tone.js, Canvas vs Pixi.js/Three.js/p5.js, haptics)
-- [ ] Surface currently selected engines in the diagnostics widget
+- [x] Move inline script from `index.html` into `src/main.js` ✓ COMPLETED (already done)
+- [x] Introduce `src/state` folder with modular state management ✓ COMPLETED (2025-11-04)
+  - ✅ auth-state.js - Authentication state
+  - ✅ activity-state.js - Activity feed state
+  - ✅ usage-state.js - Usage statistics tracking
+  - ✅ track-state.js - Active audio/visual tracks
+- [x] Add pluggable sensory engine registry ✓ COMPLETED (already exists in src/services/engine-registry.js)
+- [x] Surface currently selected engines in the diagnostics widget ✓ COMPLETED (detectEngines in diagnostics widget)
 
 ## Phase 2 – Tooling & Quality
 

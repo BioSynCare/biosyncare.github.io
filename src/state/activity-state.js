@@ -13,8 +13,17 @@ export const activityState = {
   lastPublicFetch: 0,
 };
 
-export let pendingUserEventsRefresh = false;
-export let pendingPublicEventsRefresh = false;
+// Note: These are internal flags, use getter/setter functions
+let _pendingUserEventsRefresh = false;
+let _pendingPublicEventsRefresh = false;
+
+export function getPendingUserEventsRefresh() {
+  return _pendingUserEventsRefresh;
+}
+
+export function getPendingPublicEventsRefresh() {
+  return _pendingPublicEventsRefresh;
+}
 
 /**
  * Set user events
@@ -66,9 +75,9 @@ export function setLastPublicFetch(timestamp) {
  * Set pending refresh flags
  */
 export function setPendingUserEventsRefresh(pending) {
-  pendingUserEventsRefresh = pending;
+  _pendingUserEventsRefresh = pending;
 }
 
 export function setPendingPublicEventsRefresh(pending) {
-  pendingPublicEventsRefresh = pending;
+  _pendingPublicEventsRefresh = pending;
 }

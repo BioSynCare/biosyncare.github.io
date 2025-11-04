@@ -3,10 +3,10 @@
  * Tracks user activity and neurosensory stimulation usage
  */
 
-const generateTrackId = (prefix) =>
+export const generateId = (prefix) =>
   `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
 
-export const sessionId = generateTrackId('session');
+export const sessionId = generateId('session');
 
 export const usageStats = {
   sessionStart: Date.now(),
