@@ -39,14 +39,25 @@ biosyncare/
 ### Local development
 
 ```bash
-# Start server
-python3 -m http.server 3000
-
-# Or with Node.js
-npx serve .
+# Start server (make uses python by default)
+make serve PORT=3000
 
 # Open http://localhost:3000
 ```
+
+### Automation helpers
+
+A convenient `Makefile` is included:
+
+```bash
+make help                         # list available commands
+make deploy-rules PROJECT=biosyncarelab   # deploy Firestore security rules
+make serve PORT=5173              # serve the site locally
+make git-sync MSG="update ui"     # commit current changes and push
+```
+
+> First time using Firebase CLI here?  
+> `firebase login` and `firebase use biosyncarelab` (or rely on the included `.firebaserc`) before running `make deploy-rules`.
 
 ### Using modules
 
