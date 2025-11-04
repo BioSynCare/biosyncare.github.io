@@ -1,83 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BioSynCare Lab - Neurosensory Stimulation Dashboard</title>
-  <meta name="description" content="Neurosensory stimulation dashboard with binaural beats, isochronic tones, noise generators, and ONC ontology browser.">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    .panel { background: white; border-radius: 0.75rem; box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); border: 1px solid #e5e7eb; padding: 1.5rem; }
-    .btn-primary { padding: 0.5rem 1rem; background-color: #2563eb; color: white; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; }
-    .btn-primary:hover { background-color: #1d4ed8; }
-    .btn-secondary { padding: 0.5rem 1rem; background-color: #f3f4f6; color: #374151; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; }
-    .btn-secondary:hover { background-color: #e5e7eb; }
-    .btn-danger { padding: 0.5rem 1rem; background-color: #dc2626; color: white; border-radius: 0.5rem; font-weight: 500; transition: all 0.2s; }
-    .btn-danger:hover { background-color: #b91c1c; }
-    .tab { padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 500; border-radius: 0.5rem; transition: all 0.2s; cursor: pointer; }
-    .tab-active { background-color: #2563eb; color: white; }
-    .tab-inactive { color: #4b5563; }
-    .tab-inactive:hover { background-color: #f3f4f6; }
-  </style>
-</head>
-<body class="bg-gray-50 min-h-screen">
-  
-  <header class="bg-white border-b sticky top-0 z-50 shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 py-4">
-      <div class="flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow">B</div>
-          <div>
-            <h1 class="text-xl font-bold">BioSynCare Lab</h1>
-            <p class="text-xs text-gray-500">Neurosensory Stimulation Dashboard</p>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BioSynCare Lab - Neurosensory Stimulation Dashboard</title>
+    <meta
+      name="description"
+      content="Neurosensory stimulation dashboard with binaural beats, isochronic tones, noise generators, and ONC ontology browser."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .panel {
+        background: white;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        border: 1px solid #e5e7eb;
+        padding: 1.5rem;
+      }
+      .btn-primary {
+        padding: 0.5rem 1rem;
+        background-color: #2563eb;
+        color: white;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-primary:hover {
+        background-color: #1d4ed8;
+      }
+      .btn-secondary {
+        padding: 0.5rem 1rem;
+        background-color: #f3f4f6;
+        color: #374151;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-secondary:hover {
+        background-color: #e5e7eb;
+      }
+      .btn-danger {
+        padding: 0.5rem 1rem;
+        background-color: #dc2626;
+        color: white;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        transition: all 0.2s;
+      }
+      .btn-danger:hover {
+        background-color: #b91c1c;
+      }
+      .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: 0.5rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .tab-active {
+        background-color: #2563eb;
+        color: white;
+      }
+      .tab-inactive {
+        color: #4b5563;
+      }
+      .tab-inactive:hover {
+        background-color: #f3f4f6;
+      }
+    </style>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <header class="bg-white border-b sticky top-0 z-50 shadow-sm">
+      <div class="max-w-7xl mx-auto px-4 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow"
+            >
+              B
+            </div>
+            <div>
+              <h1 class="text-xl font-bold">BioSynCare Lab</h1>
+              <p class="text-xs text-gray-500">
+                Neurosensory Stimulation Dashboard
+              </p>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button id="btn-init" class="btn-primary text-sm">
+              🎧 Initialize
+            </button>
+            <button id="btn-stop" class="btn-danger text-sm hidden">
+              ⏹ Stop
+            </button>
           </div>
         </div>
-        <div class="flex gap-2">
-          <button id="btn-init" class="btn-primary text-sm">🎧 Initialize</button>
-          <button id="btn-stop" class="btn-danger text-sm hidden">⏹ Stop</button>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-8">
+      <div class="panel">
+        <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
+        <p id="status" class="text-gray-600 mb-4">Click Initialize to start</p>
+        <div class="flex gap-4">
+          <button id="btn-sine" class="btn-secondary">Play Sine (440Hz)</button>
+          <button id="btn-binaural" class="btn-secondary">
+            Play Binaural (Alpha 10Hz)
+          </button>
         </div>
       </div>
-    </div>
-  </header>
+    </main>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <div class="panel">
-      <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
-      <p id="status" class="text-gray-600 mb-4">Click Initialize to start</p>
-      <div class="flex gap-4">
-        <button id="btn-sine" class="btn-secondary">Play Sine (440Hz)</button>
-        <button id="btn-binaural" class="btn-secondary">Play Binaural (Alpha 10Hz)</button>
-      </div>
-    </div>
-  </main>
+    <script type="module">
+      import { AudioEngine } from './src/core/audio-engine.js';
 
-  <script type="module">
-    import { AudioEngine } from './src/core/audio-engine.js';
-    
-    let engine = null;
-    
-    document.getElementById('btn-init').addEventListener('click', async () => {
-      engine = new AudioEngine();
-      await engine.init();
-      document.getElementById('status').textContent = 'Audio initialized!';
-      document.getElementById('btn-init').classList.add('hidden');
-      document.getElementById('btn-stop').classList.remove('hidden');
-    });
-    
-    document.getElementById('btn-stop').addEventListener('click', () => {
-      if (engine) engine.stopAll();
-    });
-    
-    document.getElementById('btn-sine').addEventListener('click', () => {
-      if (!engine) { alert('Initialize first!'); return; }
-      engine.playWaveform({ type: 'sine', freq: 440, duration: 3 });
-    });
-    
-    document.getElementById('btn-binaural').addEventListener('click', () => {
-      if (!engine) { alert('Initialize first!'); return; }
-      engine.playBinaural({ base: 200, beat: 10, duration: 10 });
-    });
-  </script>
+      let engine = null;
 
-</body>
+      document
+        .getElementById('btn-init')
+        .addEventListener('click', async () => {
+          engine = new AudioEngine();
+          await engine.init();
+          document.getElementById('status').textContent = 'Audio initialized!';
+          document.getElementById('btn-init').classList.add('hidden');
+          document.getElementById('btn-stop').classList.remove('hidden');
+        });
+
+      document.getElementById('btn-stop').addEventListener('click', () => {
+        if (engine) engine.stopAll();
+      });
+
+      document.getElementById('btn-sine').addEventListener('click', () => {
+        if (!engine) {
+          alert('Initialize first!');
+          return;
+        }
+        engine.playWaveform({ type: 'sine', freq: 440, duration: 3 });
+      });
+
+      document.getElementById('btn-binaural').addEventListener('click', () => {
+        if (!engine) {
+          alert('Initialize first!');
+          return;
+        }
+        engine.playBinaural({ base: 200, beat: 10, duration: 10 });
+      });
+    </script>
+  </body>
 </html>
