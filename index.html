@@ -826,7 +826,9 @@ assets/             // favicon, og, logos
         role="dialog"
         aria-label="Diagnóstico do sistema"
       >
-        <div class="sticky top-0 bg-white p-3 border-b flex items-center gap-2 z-10">
+        <div
+          class="sticky top-0 bg-white p-3 border-b flex items-center gap-2 z-10"
+        >
           <div class="flex-1">
             <div class="text-sm font-semibold">Diagnóstico do Sistema</div>
             <div id="diag-mini-summary" class="text-[11px] text-neutral-500">
@@ -843,10 +845,11 @@ assets/             // favicon, og, logos
         </div>
 
         <div class="p-3 space-y-3 text-xs text-neutral-700">
-          
           <!-- Engines BSCLab -->
           <details class="border rounded-lg" open>
-            <summary class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
               🎵🎨 Engines BSCLab
             </summary>
             <div class="p-2 space-y-2 text-[11px]">
@@ -880,7 +883,9 @@ assets/             // favicon, og, logos
 
           <!-- Audio Detalhado -->
           <details class="border rounded-lg" open>
-            <summary class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
               🔊 Áudio Detalhado
             </summary>
             <div class="p-2 space-y-2 text-[11px]">
@@ -937,7 +942,9 @@ assets/             // favicon, og, logos
 
           <!-- Display & Visual -->
           <details class="border rounded-lg" open>
-            <summary class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
               🖥️ Display & Visual
             </summary>
             <div class="p-2 space-y-2 text-[11px]">
@@ -990,13 +997,17 @@ assets/             // favicon, og, logos
 
           <!-- Hardware & Sistema -->
           <details class="border rounded-lg">
-            <summary class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
               💻 Hardware & Sistema
             </summary>
             <div class="p-2 space-y-2 text-[11px]">
               <div class="flex justify-between">
                 <span>Dispositivo:</span>
-                <span id="detailed-device-model" class="font-mono text-[10px]">--</span>
+                <span id="detailed-device-model" class="font-mono text-[10px]"
+                  >--</span
+                >
               </div>
               <div class="flex justify-between">
                 <span>Sistema Operacional:</span>
@@ -1020,7 +1031,9 @@ assets/             // favicon, og, logos
               </div>
               <div class="flex justify-between">
                 <span>GPU:</span>
-                <span id="detailed-gpu-model" class="font-mono text-[10px]">--</span>
+                <span id="detailed-gpu-model" class="font-mono text-[10px]"
+                  >--</span
+                >
               </div>
               <div class="flex justify-between">
                 <span>GPU Score:</span>
@@ -1048,7 +1061,9 @@ assets/             // favicon, og, logos
 
           <!-- Browser Info -->
           <details class="border rounded-lg">
-            <summary class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100">
+            <summary
+              class="cursor-pointer p-2 bg-neutral-50 font-semibold text-xs hover:bg-neutral-100"
+            >
               🌐 Navegador
             </summary>
             <div class="p-2 space-y-2 text-[11px]">
@@ -1525,12 +1540,13 @@ assets/             // favicon, og, logos
           deviceModel = 'Windows PC';
           const winMatch = ua.match(/Windows NT ([0-9.]+)/);
           if (winMatch) {
-            const winVersion = {
-              '10.0': '10/11',
-              '6.3': '8.1',
-              '6.2': '8',
-              '6.1': '7'
-            }[winMatch[1]] || winMatch[1];
+            const winVersion =
+              {
+                '10.0': '10/11',
+                6.3: '8.1',
+                6.2: '8',
+                6.1: '7',
+              }[winMatch[1]] || winMatch[1];
             deviceModel += ' (Windows ' + winVersion + ')';
           }
         } else if (ua.includes('Android')) {
@@ -1582,7 +1598,11 @@ assets/             // favicon, og, logos
 
         // Architecture detection
         let arch = 'Unknown';
-        if (platform.includes('Win64') || platform.includes('x86_64') || platform.includes('x64')) {
+        if (
+          platform.includes('Win64') ||
+          platform.includes('x86_64') ||
+          platform.includes('x64')
+        ) {
           arch = 'x64';
         } else if (platform.includes('Win32') || platform.includes('x86')) {
           arch = 'x86';
@@ -1654,8 +1674,14 @@ assets/             // favicon, og, logos
               supported: true,
               charging: battery.charging,
               level: Math.round(battery.level * 100),
-              chargingTime: battery.chargingTime === Infinity ? 'N/A' : battery.chargingTime,
-              dischargingTime: battery.dischargingTime === Infinity ? 'N/A' : battery.dischargingTime,
+              chargingTime:
+                battery.chargingTime === Infinity
+                  ? 'N/A'
+                  : battery.chargingTime,
+              dischargingTime:
+                battery.dischargingTime === Infinity
+                  ? 'N/A'
+                  : battery.dischargingTime,
             };
           }
         } catch (e) {
@@ -1691,10 +1717,10 @@ assets/             // favicon, og, logos
 
           // Bit depth estimation (most browsers use 32-bit float internally)
           info.bitDepth = '32-bit float (estimado)';
-          
+
           // Check if audio is currently playing by checking if context is running
           info.isPlaying = ctx.state === 'running' ? 'Sim' : 'Não';
-          
+
           // Get detailed latency info
           if (ctx.baseLatency !== undefined) {
             info.baseLatencyMs = (ctx.baseLatency * 1000).toFixed(2);
@@ -1702,21 +1728,30 @@ assets/             // favicon, og, logos
           if (ctx.outputLatency !== undefined) {
             info.outputLatencyMs = (ctx.outputLatency * 1000).toFixed(2);
           }
-          
+
           // Calculate buffer size estimation
-          info.bufferSize = ctx.sampleRate ? Math.floor(ctx.sampleRate / 60) : 'N/A';
-          
+          info.bufferSize = ctx.sampleRate
+            ? Math.floor(ctx.sampleRate / 60)
+            : 'N/A';
+
           // Try to enumerate audio devices
           try {
-            if (navigator.mediaDevices && navigator.mediaDevices.enumerateDevices) {
+            if (
+              navigator.mediaDevices &&
+              navigator.mediaDevices.enumerateDevices
+            ) {
               const devices = await navigator.mediaDevices.enumerateDevices();
-              const audioInputs = devices.filter(d => d.kind === 'audioinput');
-              const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+              const audioInputs = devices.filter(
+                (d) => d.kind === 'audioinput'
+              );
+              const audioOutputs = devices.filter(
+                (d) => d.kind === 'audiooutput'
+              );
               info.inputDevices = audioInputs.length;
               info.outputDevices = audioOutputs.length;
               info.deviceList = {
-                inputs: audioInputs.map(d => d.label || 'Unnamed input'),
-                outputs: audioOutputs.map(d => d.label || 'Unnamed output')
+                inputs: audioInputs.map((d) => d.label || 'Unnamed input'),
+                outputs: audioOutputs.map((d) => d.label || 'Unnamed output'),
               };
             }
           } catch (e) {
@@ -1744,7 +1779,7 @@ assets/             // favicon, og, logos
           cookiesEnabled: navigator.cookieEnabled ? 'Sim' : 'Não',
           storageEnabled: typeof Storage !== 'undefined' ? 'Sim' : 'Não',
         };
-        
+
         // Multi-monitor detection
         if (window.screen) {
           info.screenWidth = screen.width;
@@ -1755,29 +1790,34 @@ assets/             // favicon, og, logos
           info.pixelDepth = screen.pixelDepth || 'Unknown';
           info.orientation = screen.orientation?.type || 'Unknown';
         }
-        
+
         // Viewport info
         info.viewportWidth = window.innerWidth;
         info.viewportHeight = window.innerHeight;
-        info.viewportRatio = (window.innerWidth / window.innerHeight).toFixed(2);
-        
+        info.viewportRatio = (window.innerWidth / window.innerHeight).toFixed(
+          2
+        );
+
         // Check for multiple monitors (heuristic)
-        info.possibleMultiMonitor = screen.availWidth < screen.width ? 'Possível' : 'Improvável';
-        
+        info.possibleMultiMonitor =
+          screen.availWidth < screen.width ? 'Possível' : 'Improvável';
+
         // HDR support
-        info.hdrSupport = window.matchMedia('(dynamic-range: high)').matches ? 'Sim' : 'Não';
-        
+        info.hdrSupport = window.matchMedia('(dynamic-range: high)').matches
+          ? 'Sim'
+          : 'Não';
+
         // DPI calculation
         const dpi = window.devicePixelRatio * 96;
         info.dpi = Math.round(dpi);
-        
+
         // Memory info (if available)
         if (navigator.deviceMemory) {
           info.deviceMemoryGB = navigator.deviceMemory;
         }
-        
+
         // Battery info will be fetched separately due to async nature
-        
+
         return info;
       }
 
@@ -2248,7 +2288,7 @@ Use your browser's translation feature to view this page in another language.`;
         const battery = await getBatteryInfo();
         const engines = detectEngines();
         const time = new Date();
-        
+
         // Get GPU details
         let gpuDetails = {};
         try {
@@ -2257,19 +2297,29 @@ Use your browser's translation feature to view this page in another language.`;
           if (gl) {
             const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
             if (debugInfo) {
-              gpuDetails.renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-              gpuDetails.vendor = gl.getParameter(debugInfo.UNMASKED_VENDOR_WEBGL);
+              gpuDetails.renderer = gl.getParameter(
+                debugInfo.UNMASKED_RENDERER_WEBGL
+              );
+              gpuDetails.vendor = gl.getParameter(
+                debugInfo.UNMASKED_VENDOR_WEBGL
+              );
             }
             gpuDetails.version = gl.getParameter(gl.VERSION);
-            gpuDetails.shadingLanguageVersion = gl.getParameter(gl.SHADING_LANGUAGE_VERSION);
+            gpuDetails.shadingLanguageVersion = gl.getParameter(
+              gl.SHADING_LANGUAGE_VERSION
+            );
             gpuDetails.maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE);
-            gpuDetails.maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
-            gpuDetails.maxVertexAttribs = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+            gpuDetails.maxRenderbufferSize = gl.getParameter(
+              gl.MAX_RENDERBUFFER_SIZE
+            );
+            gpuDetails.maxVertexAttribs = gl.getParameter(
+              gl.MAX_VERTEX_ATTRIBS
+            );
           }
         } catch (e) {
           gpuDetails.error = e.message;
         }
-        
+
         return {
           timestamp: time.toISOString(),
           locale: navigator.language,
@@ -2399,39 +2449,61 @@ Use your browser's translation feature to view this page in another language.`;
           // Engines BSCLab
           $('engine-audio-name').textContent = engines.audio.name;
           $('engine-audio-status').textContent = engines.audio.status;
-          $('engine-audio-version').textContent = engines.audio.version || 'N/A';
+          $('engine-audio-version').textContent =
+            engines.audio.version || 'N/A';
           $('engine-visual-name').textContent = engines.visual.name;
           $('engine-visual-status').textContent = engines.visual.status;
-          $('engine-visual-version').textContent = engines.visual.version || 'N/A';
+          $('engine-visual-version').textContent =
+            engines.visual.version || 'N/A';
 
           // Audio detalhado (will be filled asynchronously)
-          getAudioInfo().then(audio => {
-            $('detailed-audio-api').textContent = audio.supported ? 'Suportado ✓' : 'Não Suportado ✗';
-            $('detailed-sample-rate').textContent = audio.sampleRate ? audio.sampleRate + ' Hz' : '--';
+          getAudioInfo().then((audio) => {
+            $('detailed-audio-api').textContent = audio.supported
+              ? 'Suportado ✓'
+              : 'Não Suportado ✗';
+            $('detailed-sample-rate').textContent = audio.sampleRate
+              ? audio.sampleRate + ' Hz'
+              : '--';
             $('detailed-bit-depth').textContent = audio.bitDepth || '--';
             $('detailed-channels').textContent = audio.maxChannels || '--';
             $('detailed-audio-state').textContent = audio.state || '--';
             $('detailed-audio-playing').textContent = audio.isPlaying || '--';
-            $('detailed-base-latency').textContent = audio.baseLatencyMs ? audio.baseLatencyMs + ' ms' : '--';
-            $('detailed-output-latency').textContent = audio.outputLatencyMs ? audio.outputLatencyMs + ' ms' : '--';
+            $('detailed-base-latency').textContent = audio.baseLatencyMs
+              ? audio.baseLatencyMs + ' ms'
+              : '--';
+            $('detailed-output-latency').textContent = audio.outputLatencyMs
+              ? audio.outputLatencyMs + ' ms'
+              : '--';
             $('detailed-buffer-size').textContent = audio.bufferSize || '--';
-            $('detailed-headphones').textContent = audio.headphonesLikely || '--';
-            $('detailed-input-devices').textContent = audio.inputDevices !== undefined ? audio.inputDevices : '--';
-            $('detailed-output-devices').textContent = audio.outputDevices !== undefined ? audio.outputDevices : '--';
+            $('detailed-headphones').textContent =
+              audio.headphonesLikely || '--';
+            $('detailed-input-devices').textContent =
+              audio.inputDevices !== undefined ? audio.inputDevices : '--';
+            $('detailed-output-devices').textContent =
+              audio.outputDevices !== undefined ? audio.outputDevices : '--';
           });
 
           // Display & Visual
           const hz = caps.performance?.refresh?.fps;
-          $('detailed-screen-res').textContent = `${sys.screenWidth}x${sys.screenHeight}`;
-          $('detailed-avail-res').textContent = `${sys.availWidth}x${sys.availHeight}`;
-          $('detailed-viewport').textContent = `${sys.viewportWidth}x${sys.viewportHeight}`;
+          $(
+            'detailed-screen-res'
+          ).textContent = `${sys.screenWidth}x${sys.screenHeight}`;
+          $(
+            'detailed-avail-res'
+          ).textContent = `${sys.availWidth}x${sys.availHeight}`;
+          $(
+            'detailed-viewport'
+          ).textContent = `${sys.viewportWidth}x${sys.viewportHeight}`;
           $('detailed-aspect-ratio').textContent = sys.viewportRatio || '--';
           $('detailed-pixel-ratio').textContent = sys.pixelRatio || '--';
           $('detailed-dpi').textContent = sys.dpi || '--';
-          $('detailed-color-depth').textContent = sys.colorDepth ? sys.colorDepth + '-bit' : '--';
+          $('detailed-color-depth').textContent = sys.colorDepth
+            ? sys.colorDepth + '-bit'
+            : '--';
           $('detailed-hdr').textContent = sys.hdrSupport || '--';
           $('detailed-orientation').textContent = sys.orientation || '--';
-          $('detailed-multi-monitor').textContent = sys.possibleMultiMonitor || '--';
+          $('detailed-multi-monitor').textContent =
+            sys.possibleMultiMonitor || '--';
           $('detailed-refresh-rate').textContent = hz ? hz + ' Hz' : '--';
 
           // Hardware & Sistema
@@ -2440,16 +2512,21 @@ Use your browser's translation feature to view this page in another language.`;
           $('detailed-arch').textContent = os.architecture || '--';
           $('detailed-platform').textContent = os.platform || '--';
           $('detailed-cores').textContent = sys.cores || '--';
-          $('detailed-device-memory').textContent = sys.deviceMemoryGB ? sys.deviceMemoryGB + ' GB' : '--';
-          
+          $('detailed-device-memory').textContent = sys.deviceMemoryGB
+            ? sys.deviceMemoryGB + ' GB'
+            : '--';
+
           // GPU info
           try {
             const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+            const gl =
+              canvas.getContext('webgl2') || canvas.getContext('webgl');
             if (gl) {
               const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
               if (debugInfo) {
-                const renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                const renderer = gl.getParameter(
+                  debugInfo.UNMASKED_RENDERER_WEBGL
+                );
                 $('detailed-gpu-model').textContent = renderer || '--';
               }
               const version = gl.getParameter(gl.VERSION);
@@ -2461,13 +2538,20 @@ Use your browser's translation feature to view this page in another language.`;
           }
 
           const gpuScore = caps.performance?.gpu?.score;
-          $('detailed-gpu-score').textContent = typeof gpuScore === 'number' ? gpuScore + '/100' : '--';
+          $('detailed-gpu-score').textContent =
+            typeof gpuScore === 'number' ? gpuScore + '/100' : '--';
           $('detailed-touch').textContent = sys.touchSupport || '--';
 
           // Battery (async)
-          getBatteryInfo().then(battery => {
-            $('detailed-battery-level').textContent = battery.supported ? battery.level + '%' : 'N/A';
-            $('detailed-battery-charging').textContent = battery.supported ? (battery.charging ? 'Sim' : 'Não') : 'N/A';
+          getBatteryInfo().then((battery) => {
+            $('detailed-battery-level').textContent = battery.supported
+              ? battery.level + '%'
+              : 'N/A';
+            $('detailed-battery-charging').textContent = battery.supported
+              ? battery.charging
+                ? 'Sim'
+                : 'Não'
+              : 'N/A';
           });
 
           // Browser

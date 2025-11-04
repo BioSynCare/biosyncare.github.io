@@ -2,6 +2,79 @@
 
 This repo holds a client-side webpage for neurosensory stimulation.
 
+## Architecture
+
+**100% client-side** - No backend needed!
+
+- Deploy: GitHub Pages (free, automatic)
+- Audio: Web Audio API (low latency, privacy-first)
+- Database: Firebase (optional, for reports/analytics)
+- Build: None (ES6 modules natively)
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed decisions.
+
+## Project structure
+
+```
+biosyncare/
+├── index.html              # Landing page
+├── ARCHITECTURE.md         # Architecture decisions
+├── firestore.rules         # Firebase security (if used)
+│
+├── src/
+│   ├── core/
+│   │   └── audio-engine.js    # Web Audio wrapper
+│   ├── ui/
+│   │   └── diagnostics.js     # System detection
+│   ├── utils/
+│   │   └── firebase.js        # Cloud storage (optional)
+│   └── README.md              # Module usage examples
+│
+└── assets/
+    └── ...
+```
+
+## Quick start
+
+### Local development
+
+```bash
+# Start server
+python3 -m http.server 3000
+
+# Or with Node.js
+npx serve .
+
+# Open http://localhost:3000
+```
+
+### Using modules
+
+```javascript
+// In your HTML
+<script type="module">
+  import { AudioEngine } from './src/core/audio-engine.js';
+  import { gatherDiagnostics } from './src/ui/diagnostics.js';
+
+  const engine = new AudioEngine();
+  await engine.init();
+
+  engine.playBinaural({ base: 300, beat: 8 });
+</script>
+```
+
+See [src/README.md](./src/README.md) for detailed examples.
+
+## Deploy
+
+```bash
+git add .
+git commit -m "your changes"
+git push origin main
+```
+
+GitHub Pages updates automatically in ~30 seconds.
+
 ## System diagnostics widget
 
 A collapsible floating widget (bottom-left) lets users view comprehensive system state and send detailed reports.
@@ -9,11 +82,13 @@ A collapsible floating widget (bottom-left) lets users view comprehensive system
 ### Informações capturadas
 
 #### 🎵🎨 Engines BSCLab
+
 - **Engine de Áudio**: Detecta Tone.js ou Web Audio API nativo
 - **Engine Visual**: Detecta Three.js, Pixi.js, p5.js ou Canvas 2D nativo
 - **Status e Versões**: Mostra se as engines estão carregadas e suas versões
 
 #### 🔊 Áudio Detalhado
+
 - Web Audio API suporte e estado
 - Taxa de amostragem (sample rate)
 - Bit depth (32-bit float estimado)
@@ -27,6 +102,7 @@ A collapsible floating widget (bottom-left) lets users view comprehensive system
 - Lista de dispositivos (quando permissões são concedidas)
 
 #### 🖥️ Display & Visual
+
 - Resolução da tela completa
 - Área disponível (sem barras do sistema)
 - Viewport (janela do navegador)
@@ -40,6 +116,7 @@ A collapsible floating widget (bottom-left) lets users view comprehensive system
 - Taxa de atualização (refresh rate) medida
 
 #### 💻 Hardware & Sistema
+
 - Modelo do dispositivo detectado
 - Sistema operacional e versão
 - Arquitetura (x64, ARM, ARM64, etc.)
@@ -54,6 +131,7 @@ A collapsible floating widget (bottom-left) lets users view comprehensive system
 - Tempo de carga/descarga estimado
 
 #### 🌐 Navegador
+
 - Nome e versão do navegador
 - Engine de renderização (Chromium, Gecko, WebKit)
 - Vendor
@@ -72,16 +150,18 @@ A collapsible floating widget (bottom-left) lets users view comprehensive system
 
 ### Configuração de endpoint (opcional)
 
-1) Via meta tag no `<head>` de `index.html`:
+1. Via meta tag no `<head>` de `index.html`:
 
 ```html
 <meta name="report-endpoint" content="https://example.org/api/report" />
 ```
 
-2) Ou via variável global (antes do script do módulo):
+2. Ou via variável global (antes do script do módulo):
 
 ```html
-<script>window.BioSynCareReportEndpoint = 'https://example.org/api/report';</script>
+<script>
+  window.BioSynCareReportEndpoint = 'https://example.org/api/report';
+</script>
 ```
 
 O widget primeiro tenta `navigator.sendBeacon`; se indisponível ou falhar, usa `fetch`. Se nenhum endpoint estiver configurado ou a requisição falhar, o relatório permanece local e o JSON é baixado para compartilhamento manual (ex: via email ou GitHub issues).
