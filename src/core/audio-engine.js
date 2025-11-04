@@ -294,7 +294,9 @@ export class AudioEngine {
 
     osc.start(now);
 
-    const nodeId = `waveform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const nodeId = `waveform_${Date.now()}_${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     this.nodes.set(nodeId, { osc, gainNode, panner });
 
     if (duration !== null) {
@@ -319,7 +321,14 @@ export class AudioEngine {
   playNoise(opts = {}) {
     this._ensureInit();
 
-    const { type = 'white', duration = null, gain = 0.15, pan = 0, fadeIn = 0.1, fadeOut = 0.1 } = opts;
+    const {
+      type = 'white',
+      duration = null,
+      gain = 0.15,
+      pan = 0,
+      fadeIn = 0.1,
+      fadeOut = 0.1,
+    } = opts;
 
     const bufferSize = this.ctx.sampleRate * 2;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
@@ -332,34 +341,40 @@ export class AudioEngine {
           data[i] = Math.random() * 2 - 1;
         }
         break;
-      
+
       case 'pink': {
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        let b0 = 0,
+          b1 = 0,
+          b2 = 0,
+          b3 = 0,
+          b4 = 0,
+          b5 = 0,
+          b6 = 0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + white * 0.0555179;
           b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
+          b2 = 0.969 * b2 + white * 0.153852;
+          b3 = 0.8665 * b3 + white * 0.3104856;
+          b4 = 0.55 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.016898;
           data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
           b6 = white * 0.115926;
         }
         break;
       }
-      
+
       case 'brown': {
         let lastOut = 0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
-          data[i] = (lastOut + (0.02 * white)) / 1.02;
+          data[i] = (lastOut + 0.02 * white) / 1.02;
           lastOut = data[i];
           data[i] *= 3.5; // Compensate volume
         }
         break;
       }
-      
+
       case 'blue': {
         let lastOut = 0;
         for (let i = 0; i < bufferSize; i++) {
@@ -369,7 +384,7 @@ export class AudioEngine {
         }
         break;
       }
-      
+
       case 'violet': {
         let prev = 0;
         for (let i = 0; i < bufferSize; i++) {
@@ -379,14 +394,14 @@ export class AudioEngine {
         }
         break;
       }
-      
+
       case 'black':
         // Black noise = silence or near silence
         for (let i = 0; i < bufferSize; i++) {
           data[i] = (Math.random() - 0.5) * 0.001;
         }
         break;
-      
+
       default:
         // Default to white
         for (let i = 0; i < bufferSize; i++) {
@@ -450,7 +465,7 @@ export class AudioEngine {
 
     const oscillators = [];
     const gainNodes = [];
-    
+
     const masterGainNode = this.ctx.createGain();
     masterGainNode.gain.value = 0;
     masterGainNode.connect(this.masterGain);
@@ -474,7 +489,7 @@ export class AudioEngine {
     masterGainNode.gain.setValueAtTime(0, now);
     masterGainNode.gain.linearRampToValueAtTime(gain, now + fadeIn);
 
-    oscillators.forEach(osc => osc.start(now));
+    oscillators.forEach((osc) => osc.start(now));
 
     const nodeId = `martigli_${Date.now()}`;
     this.nodes.set(nodeId, { oscillators, gainNodes, masterGainNode });
@@ -483,7 +498,7 @@ export class AudioEngine {
       const stopTime = now + duration;
       masterGainNode.gain.setValueAtTime(gain, stopTime - fadeOut);
       masterGainNode.gain.linearRampToValueAtTime(0, stopTime);
-      oscillators.forEach(osc => osc.stop(stopTime));
+      oscillators.forEach((osc) => osc.stop(stopTime));
 
       setTimeout(() => {
         this.nodes.delete(nodeId);
@@ -510,7 +525,7 @@ export class AudioEngine {
     } = opts;
 
     let ratios = [];
-    
+
     switch (pattern) {
       case 'fibonacci':
         ratios = [1, 2, 3, 5, 8, 13, 21];

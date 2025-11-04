@@ -1,9 +1,9 @@
 /**
  * ONC Ontology Parser
- * 
+ *
  * Parses and queries the ONC (Ontology for Neurosensory Consciousness) vocabulary
  * Loads Turtle (.ttl) RDF format and provides search/browse capabilities
- * 
+ *
  * Usage:
  *   import { ONCParser } from './src/utils/onc-parser.js';
  *   const onc = new ONCParser();
@@ -29,17 +29,17 @@ export class ONCParser {
       if (!response.ok) {
         throw new Error(`Failed to load ONC: ${response.status}`);
       }
-      
+
       this.raw = await response.text();
       this._parse();
       this.loaded = true;
-      
+
       console.log('[ONCParser] Loaded', {
         size: this.raw.length,
         triples: this.triples.length,
         entities: this.entities.size,
       });
-      
+
       return true;
     } catch (error) {
       console.error('[ONCParser] Load failed:', error);
@@ -58,10 +58,10 @@ export class ONCParser {
 
     for (let line of lines) {
       line = line.trim();
-      
+
       // Skip comments and empty lines
       if (!line || line.startsWith('#')) continue;
-      
+
       // Skip prefixes for now (simple parser)
       if (line.startsWith('@prefix') || line.startsWith('@base')) continue;
 
@@ -70,9 +70,9 @@ export class ONCParser {
       const tripleMatch = line.match(/<([^>]+)>\s+<([^>]+)>\s+(.+?)\s*[;.]$/);
       if (tripleMatch) {
         const [, subject, predicate, object] = tripleMatch;
-        
+
         this.triples.push({ subject, predicate, object });
-        
+
         // Index entities
         if (!this.entities.has(subject)) {
           this.entities.set(subject, {
@@ -80,7 +80,7 @@ export class ONCParser {
             properties: new Map(),
           });
         }
-        
+
         const entity = this.entities.get(subject);
         if (!entity.properties.has(predicate)) {
           entity.properties.set(predicate, []);
@@ -97,7 +97,7 @@ export class ONCParser {
    */
   search(query) {
     if (!this.loaded) return [];
-    
+
     const lowerQuery = query.toLowerCase();
     const results = [];
 
@@ -114,7 +114,7 @@ export class ONCParser {
           results.push(entity);
           break;
         }
-        
+
         for (const val of values) {
           if (String(val).toLowerCase().includes(lowerQuery)) {
             results.push(entity);
@@ -147,18 +147,21 @@ export class ONCParser {
    */
   getByType(type) {
     const results = [];
-    
+
     for (const entity of this.entities.values()) {
-      const types = entity.properties.get('rdf:type') || 
-                    entity.properties.get('a') ||
-                    entity.properties.get('http://www.w3.org/1999/02/22-rdf-syntax-ns#type') || 
-                    [];
-      
-      if (types.some(t => t.includes(type))) {
+      const types =
+        entity.properties.get('rdf:type') ||
+        entity.properties.get('a') ||
+        entity.properties.get(
+          'http://www.w3.org/1999/02/22-rdf-syntax-ns#type'
+        ) ||
+        [];
+
+      if (types.some((t) => t.includes(type))) {
         results.push(entity);
       }
     }
-    
+
     return results;
   }
 

@@ -1,9 +1,9 @@
 /**
  * Usage Analytics Module
- * 
+ *
  * Tracks user sessions, protocol usage, and generates statistics
  * Stores data locally (localStorage) and optionally syncs to Firebase
- * 
+ *
  * Usage:
  *   import { UsageTracker } from './src/utils/usage-tracker.js';
  *   const tracker = new UsageTracker();
@@ -36,7 +36,7 @@ export class UsageTracker {
 
     this.currentSession = session;
     this._saveSession(session);
-    
+
     console.log('[UsageTracker] Session started:', session.id);
     return session.id;
   }
@@ -52,11 +52,13 @@ export class UsageTracker {
 
     const now = Date.now();
     this.currentSession.endTime = now;
-    this.currentSession.actualDuration = Math.round((now - this.currentSession.startTime) / 1000);
+    this.currentSession.actualDuration = Math.round(
+      (now - this.currentSession.startTime) / 1000
+    );
     this.currentSession.completed = completed;
 
     this._saveSession(this.currentSession);
-    
+
     const sessionId = this.currentSession.id;
     this.currentSession = null;
 
@@ -106,7 +108,7 @@ export class UsageTracker {
    */
   getStats() {
     const sessions = this.getAllSessions();
-    
+
     if (sessions.length === 0) {
       return {
         totalSessions: 0,
@@ -118,12 +120,15 @@ export class UsageTracker {
       };
     }
 
-    const completed = sessions.filter(s => s.completed);
-    const totalDuration = sessions.reduce((sum, s) => sum + (s.actualDuration || 0), 0);
-    
+    const completed = sessions.filter((s) => s.completed);
+    const totalDuration = sessions.reduce(
+      (sum, s) => sum + (s.actualDuration || 0),
+      0
+    );
+
     // Protocol breakdown
     const protocolBreakdown = {};
-    sessions.forEach(s => {
+    sessions.forEach((s) => {
       if (!protocolBreakdown[s.protocol]) {
         protocolBreakdown[s.protocol] = {
           count: 0,
@@ -150,8 +155,10 @@ export class UsageTracker {
    */
   getSessionsByDateRange(startDate, endDate) {
     const sessions = this.getAllSessions();
-    return sessions.filter(s => {
-      return s.startTime >= startDate.getTime() && s.startTime <= endDate.getTime();
+    return sessions.filter((s) => {
+      return (
+        s.startTime >= startDate.getTime() && s.startTime <= endDate.getTime()
+      );
     });
   }
 
@@ -170,7 +177,7 @@ export class UsageTracker {
   exportData() {
     const sessions = this.getAllSessions();
     const stats = this.getStats();
-    
+
     return {
       exportDate: new Date().toISOString(),
       stats,
@@ -183,8 +190,8 @@ export class UsageTracker {
   _saveSession(session) {
     try {
       const sessions = this.getAllSessions();
-      const index = sessions.findIndex(s => s.id === session.id);
-      
+      const index = sessions.findIndex((s) => s.id === session.id);
+
       if (index >= 0) {
         sessions[index] = session;
       } else {
