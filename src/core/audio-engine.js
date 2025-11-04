@@ -193,25 +193,138 @@ export class AudioEngine {
   }
 
   /**
+   * Play monaural beat (two carriers summed into both ears)
+   * @param {Object} params
+   * @param {number} params.base - Carrier frequency (Hz)
+   * @param {number} params.beat - Beat frequency (Hz, typically 1-40)
+   * @param {number} params.duration - Duration (seconds, 0 = infinite)
+   * @param {number} params.gain - Volume 0-1
+   */
+  playMonaural({ base = 300, beat = 8, duration = 0, gain = 0.35 } = {}) {
+    this._ensureInit();
+
+    const lowFreq = Math.max(20, base - beat / 2);
+    const highFreq = base + beat / 2;
+
+    const oscLow = this.ctx.createOscillator();
+    const oscHigh = this.ctx.createOscillator();
+    oscLow.type = oscHigh.type = 'sine';
+    oscLow.frequency.value = lowFreq;
+    oscHigh.frequency.value = highFreq;
+
+    const mixGain = this.ctx.createGain();
+    mixGain.gain.value = 0.5; // balance summed amplitude
+
+    const masterOut = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+    masterOut.gain.setValueAtTime(0, now);
+    masterOut.gain.linearRampToValueAtTime(gain, now + 0.1);
+
+    oscLow.connect(mixGain);
+    oscHigh.connect(mixGain);
+    mixGain.connect(masterOut);
+    masterOut.connect(this.masterGain);
+
+    const id = `monaural-${Date.now()}`;
+    this.nodes.set(id, {
+      oscillators: [oscLow, oscHigh],
+      mixGain,
+      masterOut,
+    });
+
+    oscLow.start(now);
+    oscHigh.start(now);
+
+    if (duration > 0) {
+      const stopTime = now + duration;
+      masterOut.gain.setValueAtTime(gain, stopTime - 0.1);
+      masterOut.gain.linearRampToValueAtTime(0, stopTime);
+      oscLow.stop(stopTime);
+      oscHigh.stop(stopTime);
+
+      setTimeout(() => {
+        this.nodes.delete(id);
+      }, duration * 1000 + 100);
+    }
+
+    console.log('[AudioEngine] Monaural', {
+      base,
+      beat,
+      lowFreq,
+      highFreq,
+      duration,
+    });
+
+    return id;
+  }
+
+  /**
    * Stop specific sound by ID
    */
   stop(id) {
     const node = this.nodes.get(id);
     if (!node) return;
 
+    const safeStop = (osc) => {
+      if (!osc) return;
+      try {
+        if (typeof osc.stop === 'function') {
+          osc.stop();
+        }
+      } catch (e) {
+        // noop - oscillator might already be stopped
+      }
+      try {
+        if (typeof osc.disconnect === 'function') {
+          osc.disconnect();
+        }
+      } catch (e) {
+        // noop - node might already be disconnected
+      }
+    };
+
+    const safeDisconnect = (audioNode) => {
+      if (!audioNode) return;
+      try {
+        if (typeof audioNode.disconnect === 'function') {
+          audioNode.disconnect();
+        }
+      } catch (e) {
+        // noop
+      }
+    };
+
     try {
-      if (node.osc) {
-        node.osc.stop();
-        node.osc.disconnect();
+      safeStop(node.osc);
+      safeStop(node.oscLeft);
+      safeStop(node.oscRight);
+      safeStop(node.lfo);
+      safeStop(node.source);
+      safeStop(node.osc1);
+      safeStop(node.osc2);
+
+      if (Array.isArray(node.oscillators)) {
+        node.oscillators.forEach(safeStop);
       }
-      if (node.oscLeft) {
-        node.oscLeft.stop();
-        node.oscRight.stop();
-        node.oscLeft.disconnect();
-        node.oscRight.disconnect();
+      if (Array.isArray(node.sources)) {
+        node.sources.forEach(safeStop);
       }
-      if (node.gain) node.gain.disconnect();
-      if (node.masterOut) node.masterOut.disconnect();
+
+      safeDisconnect(node.gain);
+      safeDisconnect(node.gainLeft);
+      safeDisconnect(node.gainRight);
+      safeDisconnect(node.gainNode);
+      safeDisconnect(node.carrierGain);
+      safeDisconnect(node.lfoGain);
+      safeDisconnect(node.masterOut);
+      safeDisconnect(node.masterGainNode);
+      safeDisconnect(node.merger);
+      safeDisconnect(node.panner);
+      safeDisconnect(node.mixGain);
+
+      if (Array.isArray(node.gainNodes)) {
+        node.gainNodes.forEach(safeDisconnect);
+      }
     } catch (e) {
       // Already stopped
     }

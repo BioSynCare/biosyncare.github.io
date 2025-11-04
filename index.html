@@ -68,6 +68,99 @@
       .tab-inactive:hover {
         background-color: #f3f4f6;
       }
+      .visual-display {
+        border-radius: 0.75rem;
+        border: 1px solid #e5e7eb;
+        background: radial-gradient(
+          circle at center,
+          #f8fafc 0%,
+          #e2e8f0 75%
+        );
+        transition: background 0.6s ease, transform 0.6s ease;
+        min-height: 12rem;
+      }
+      .visual-display.bright-text {
+        color: #f8fafc;
+        text-shadow: 0 4px 12px rgba(15, 23, 42, 0.45);
+      }
+      @keyframes blinkPalette {
+        0%,
+        100% {
+          background: radial-gradient(
+            circle at center,
+            #1d4ed8 0%,
+            #1e293b 75%
+          );
+          transform: scale(1);
+        }
+        25% {
+          background: radial-gradient(
+            circle at center,
+            #0ea5e9 0%,
+            #0369a1 80%
+          );
+          transform: scale(1.03);
+        }
+        50% {
+          background: radial-gradient(
+            circle at center,
+            #22d3ee 0%,
+            #14b8a6 80%
+          );
+          transform: scale(0.98);
+        }
+        75% {
+          background: radial-gradient(
+            circle at center,
+            #f97316 0%,
+            #c2410c 80%
+          );
+          transform: scale(1.04);
+        }
+      }
+      .blink-animation {
+        animation: blinkPalette 1.4s infinite;
+      }
+      @keyframes undulatePalette {
+        0% {
+          background: radial-gradient(
+            circle at 20% 20%,
+            #4338ca 0%,
+            #2563eb 70%
+          );
+        }
+        33% {
+          background: radial-gradient(
+            circle at 80% 30%,
+            #0891b2 0%,
+            #0ea5e9 70%
+          );
+        }
+        66% {
+          background: radial-gradient(
+            circle at 30% 80%,
+            #a855f7 0%,
+            #7c3aed 70%
+          );
+        }
+        100% {
+          background: radial-gradient(
+            circle at 70% 80%,
+            #f59e0b 0%,
+            #ef4444 70%
+          );
+        }
+      }
+      .undulate-animation {
+        animation: undulatePalette 10s infinite alternate;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .blink-animation,
+        .undulate-animation {
+          animation-duration: 0s;
+          animation-iteration-count: 1;
+        }
+      }
     </style>
   </head>
   <body class="bg-gray-50 min-h-screen">
@@ -100,14 +193,94 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-      <div class="panel">
-        <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
-        <p id="status" class="text-gray-600 mb-4">Click Initialize to start</p>
-        <div class="flex gap-4">
-          <button id="btn-sine" class="btn-secondary">Play Sine (440Hz)</button>
-          <button id="btn-binaural" class="btn-secondary">
-            Play Binaural (Alpha 10Hz)
-          </button>
+      <div class="grid gap-6 lg:grid-cols-2">
+        <div class="panel">
+          <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
+          <p id="status" class="text-gray-600 mb-4">
+            Click Initialize to start
+          </p>
+          <div class="space-y-4">
+            <div>
+              <label
+                for="audio-menu"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Audio feature</label
+              >
+              <select
+                id="audio-menu"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+              >
+                <option value="sine">Pure sine • 440Hz</option>
+                <option value="binaural">Binaural beat • Alpha 10Hz</option>
+                <option value="monaural">Monaural beat • Theta 6Hz</option>
+              </select>
+              <p
+                id="audio-description"
+                class="mt-2 text-xs text-gray-500 leading-relaxed"
+              >
+                Pure sine tone at 440Hz for quick calibration and reference.
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+            >
+              <button id="btn-play-audio" class="btn-primary md:flex-1">
+                ▶ Start audio
+              </button>
+              <button id="btn-stop-audio" class="btn-secondary md:flex-none">
+                ⏹ Stop audio
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="panel">
+          <h2 class="text-2xl font-bold mb-4">Visual Controls</h2>
+          <p class="text-gray-600 mb-4">
+            Pair color entrainment with audio sessions or run standalone.
+          </p>
+          <div class="space-y-4">
+            <div>
+              <label
+                for="visual-menu"
+                class="block text-sm font-medium text-gray-700 mb-1"
+                >Visual feature</label
+              >
+              <select
+                id="visual-menu"
+                class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+              >
+                <option value="blink">Blinking colors</option>
+                <option value="undulate">Undulating colors</option>
+              </select>
+              <p
+                id="visual-description"
+                class="mt-2 text-xs text-gray-500 leading-relaxed"
+              >
+                High-contrast blinking palette for alert focus and breathing
+                cadence.
+              </p>
+            </div>
+            <div
+              class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+            >
+              <button id="btn-start-visual" class="btn-primary md:flex-1">
+                🌈 Start visual
+              </button>
+              <button id="btn-stop-visual" class="btn-secondary md:flex-none">
+                ⏹ Stop visual
+              </button>
+            </div>
+          </div>
+          <div
+            id="visual-display"
+            class="visual-display mt-6 flex h-48 items-center justify-center px-4 text-center text-sm font-medium text-gray-600 transition-colors"
+          >
+            <span
+              id="visual-status-text"
+              class="transition-colors duration-300 text-gray-600"
+              >Visual output appears here once started.</span
+            >
+          </div>
         </div>
       </div>
     </main>
@@ -116,35 +289,200 @@
       import { AudioEngine } from './src/core/audio-engine.js';
 
       let engine = null;
+      let activeAudioId = null;
+      let activeVisualCleanup = null;
+
+      const statusEl = document.getElementById('status');
+      const audioMenu = document.getElementById('audio-menu');
+      const audioDescriptionEl = document.getElementById('audio-description');
+      const playAudioBtn = document.getElementById('btn-play-audio');
+      const stopAudioBtn = document.getElementById('btn-stop-audio');
+
+      const visualMenu = document.getElementById('visual-menu');
+      const visualDescriptionEl = document.getElementById('visual-description');
+      const startVisualBtn = document.getElementById('btn-start-visual');
+      const stopVisualBtn = document.getElementById('btn-stop-visual');
+      const visualDisplay = document.getElementById('visual-display');
+      const visualStatusText = document.getElementById('visual-status-text');
+
+      const setVisualTextBase = () => {
+        visualStatusText.classList.remove('text-white');
+        visualStatusText.classList.add('text-gray-600');
+      };
+
+      const setVisualTextBright = () => {
+        visualStatusText.classList.add('text-white');
+        visualStatusText.classList.remove('text-gray-600');
+      };
+
+      const resetVisualDisplay = () => {
+        if (typeof activeVisualCleanup === 'function') {
+          activeVisualCleanup();
+        }
+        activeVisualCleanup = null;
+        visualDisplay.classList.remove(
+          'blink-animation',
+          'undulate-animation',
+          'bright-text'
+        );
+        visualDisplay.style.background = '';
+        visualStatusText.textContent =
+          'Visual output appears here once started.';
+        setVisualTextBase();
+      };
+
+      const audioPresets = {
+        sine: {
+          label: 'Pure sine • 440Hz',
+          description:
+            'Pure sine tone at 440Hz for quick calibration and reference.',
+          play: () =>
+            engine.playWaveform({
+              type: 'sine',
+              freq: 440,
+              gain: 0.2,
+            }),
+        },
+        binaural: {
+          label: 'Binaural beat • Alpha 10Hz',
+          description:
+            'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
+          play: () =>
+            engine.playBinaural({
+              base: 200,
+              beat: 10,
+              duration: 0,
+              gain: 0.25,
+            }),
+        },
+        monaural: {
+          label: 'Monaural beat • Theta 6Hz',
+          description:
+            'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
+          play: () =>
+            engine.playMonaural({
+              base: 210,
+              beat: 6,
+              duration: 0,
+              gain: 0.3,
+            }),
+        },
+      };
+
+      const visualPresets = {
+        blink: {
+          label: 'Blinking colors',
+          description:
+            'High-contrast blinking palette to energize focus and breathing cadence.',
+          activate: () => {
+            visualDisplay.classList.add('blink-animation', 'bright-text');
+            setVisualTextBright();
+            return () => {
+              visualDisplay.classList.remove('blink-animation', 'bright-text');
+            };
+          },
+        },
+        undulate: {
+          label: 'Undulating colors',
+          description:
+            'Slow undulating gradients for ambient relaxation and coherence.',
+          activate: () => {
+            visualDisplay.classList.add('undulate-animation', 'bright-text');
+            setVisualTextBright();
+            return () => {
+              visualDisplay.classList.remove(
+                'undulate-animation',
+                'bright-text'
+              );
+            };
+          },
+        },
+      };
+
+      const updateAudioDescription = () => {
+        const preset = audioPresets[audioMenu.value];
+        audioDescriptionEl.textContent = preset
+          ? preset.description
+          : 'Select an audio feature to play.';
+      };
+
+      const updateVisualDescription = () => {
+        const preset = visualPresets[visualMenu.value];
+        visualDescriptionEl.textContent = preset
+          ? preset.description
+          : 'Select a visual feature to display.';
+      };
+
+      audioMenu.addEventListener('change', updateAudioDescription);
+      visualMenu.addEventListener('change', updateVisualDescription);
+
+      updateAudioDescription();
+      updateVisualDescription();
 
       document
         .getElementById('btn-init')
         .addEventListener('click', async () => {
           engine = new AudioEngine();
           await engine.init();
-          document.getElementById('status').textContent = 'Audio initialized!';
+          statusEl.textContent = 'Audio engine ready. Select a feature to play.';
           document.getElementById('btn-init').classList.add('hidden');
           document.getElementById('btn-stop').classList.remove('hidden');
         });
 
       document.getElementById('btn-stop').addEventListener('click', () => {
-        if (engine) engine.stopAll();
+        if (engine) {
+          engine.stopAll();
+          activeAudioId = null;
+          statusEl.textContent = 'Audio stopped.';
+        }
+        resetVisualDisplay();
       });
 
-      document.getElementById('btn-sine').addEventListener('click', () => {
+      playAudioBtn.addEventListener('click', async () => {
         if (!engine) {
           alert('Initialize first!');
           return;
         }
-        engine.playWaveform({ type: 'sine', freq: 440, duration: 3 });
+
+        const preset = audioPresets[audioMenu.value];
+        if (!preset) return;
+
+        if (activeAudioId) {
+          engine.stop(activeAudioId);
+          activeAudioId = null;
+        }
+
+        await engine.resume();
+
+        try {
+          activeAudioId = preset.play();
+          statusEl.textContent = `Now playing: ${preset.label}`;
+        } catch (error) {
+          console.error('Failed to start audio preset', error);
+          statusEl.textContent = 'Unable to start audio preset.';
+        }
       });
 
-      document.getElementById('btn-binaural').addEventListener('click', () => {
-        if (!engine) {
-          alert('Initialize first!');
-          return;
-        }
-        engine.playBinaural({ base: 200, beat: 10, duration: 10 });
+      stopAudioBtn.addEventListener('click', () => {
+        if (!engine) return;
+        engine.stopAll();
+        activeAudioId = null;
+        statusEl.textContent = 'Audio stopped.';
+      });
+
+      startVisualBtn.addEventListener('click', () => {
+        const preset = visualPresets[visualMenu.value];
+        if (!preset) return;
+
+        resetVisualDisplay();
+        const cleanup = preset.activate();
+        activeVisualCleanup =
+          typeof cleanup === 'function' ? cleanup : null;
+        visualStatusText.textContent = `Now showing: ${preset.label}`;
+      });
+
+      stopVisualBtn.addEventListener('click', () => {
+        resetVisualDisplay();
       });
     </script>
   </body>
