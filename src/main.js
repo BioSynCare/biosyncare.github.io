@@ -165,48 +165,65 @@ const martigliController = {
     }
 
     const period = this.getCurrentPeriod(elapsedSec);
-    const cyclePosition = (elapsedSec % period) / period; // 0 to 1
+    const cyclePosition = (elapsedSec % period) / period; // 0 to 1 over the full period
 
-    // Apply inhale/exhale ratio
+    // Apply waveform to the full cycle position
+    return this.applyWaveform(cyclePosition);
+  },
+
+  // Apply selected waveform to cycle position
+  applyWaveform(cyclePosition) {
+    // cyclePosition goes from 0 to 1 over the full breathing cycle
+    // We need to split this into inhale and exhale phases based on inhaleRatio
+    // Output: -1 (full exhale) to +1 (full inhale)
+
     let value;
+
     if (cyclePosition < this.inhaleRatio) {
-      // Inhale phase (0 to 1)
-      const inhaleProgress = cyclePosition / this.inhaleRatio;
-      value = this.applyWaveform(inhaleProgress, true);
+      // Inhale phase: go from -1 to +1
+      const inhaleProgress = cyclePosition / this.inhaleRatio; // 0 to 1
+
+      switch (this.waveform) {
+        case 'sine':
+          // Map 0→1 to -1→1 using half sine wave
+          value = Math.sin(inhaleProgress * Math.PI - Math.PI / 2);
+          break;
+        case 'triangle':
+          value = 2 * inhaleProgress - 1;
+          break;
+        case 'sawtooth':
+          value = 2 * inhaleProgress - 1;
+          break;
+        case 'square':
+          value = inhaleProgress < 0.5 ? -1 : 1;
+          break;
+        default:
+          value = Math.sin(inhaleProgress * Math.PI - Math.PI / 2);
+      }
     } else {
-      // Exhale phase (1 to 0)
-      const exhaleProgress = (cyclePosition - this.inhaleRatio) / (1 - this.inhaleRatio);
-      value = this.applyWaveform(exhaleProgress, false);
+      // Exhale phase: go from +1 to -1
+      const exhaleProgress = (cyclePosition - this.inhaleRatio) / (1 - this.inhaleRatio); // 0 to 1
+
+      switch (this.waveform) {
+        case 'sine':
+          // Map 0→1 to +1→-1 using half sine wave (reversed)
+          value = Math.sin((1 - exhaleProgress) * Math.PI - Math.PI / 2);
+          break;
+        case 'triangle':
+          value = 1 - 2 * exhaleProgress;
+          break;
+        case 'sawtooth':
+          value = 1 - 2 * exhaleProgress;
+          break;
+        case 'square':
+          value = exhaleProgress < 0.5 ? 1 : -1;
+          break;
+        default:
+          value = Math.sin((1 - exhaleProgress) * Math.PI - Math.PI / 2);
+      }
     }
 
     return value;
-  },
-
-  // Apply selected waveform to progress value
-  applyWaveform(progress, isInhale) {
-    // progress goes from 0 to 1
-    // For inhale: map to -1 to 1
-    // For exhale: map to 1 to -1
-    let rawValue;
-
-    switch (this.waveform) {
-      case 'sine':
-        rawValue = Math.sin(progress * Math.PI - Math.PI / 2);
-        break;
-      case 'triangle':
-        rawValue = 2 * progress - 1;
-        break;
-      case 'sawtooth':
-        rawValue = progress * 2 - 1;
-        break;
-      case 'square':
-        rawValue = progress < 0.5 ? -1 : 1;
-        break;
-      default:
-        rawValue = Math.sin(progress * Math.PI - Math.PI / 2);
-    }
-
-    return isInhale ? rawValue : -rawValue;
   },
 
   // Start breathing pattern
@@ -836,20 +853,11 @@ const renderMartigliVisualization = () => {
   ctx.beginPath();
 
   for (let i = 0; i <= points; i++) {
-    const progress = i / points;
-    const x = progress * width;
+    const cyclePosition = i / points; // 0 to 1 over full cycle
+    const x = cyclePosition * width;
 
-    // Simulate waveform through one cycle
-    let yValue;
-    if (progress < martigliController.inhaleRatio) {
-      // Inhale phase
-      const inhaleProgress = progress / martigliController.inhaleRatio;
-      yValue = martigliController.applyWaveform(inhaleProgress, true);
-    } else {
-      // Exhale phase
-      const exhaleProgress = (progress - martigliController.inhaleRatio) / (1 - martigliController.inhaleRatio);
-      yValue = martigliController.applyWaveform(exhaleProgress, false);
-    }
+    // Get waveform value using the cycle position
+    const yValue = martigliController.applyWaveform(cyclePosition);
 
     const y = centerY - yValue * (height * 0.4);
 
