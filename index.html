@@ -317,6 +317,24 @@
         border-color: #2563eb;
         color: #ffffff;
       }
+      .start-audio-btn {
+        position: relative;
+        animation: pulseStart 1.8s ease-in-out infinite;
+      }
+      .start-audio-btn:disabled {
+        animation: none;
+      }
+      @keyframes pulseStart {
+        0% {
+          box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45);
+        }
+        70% {
+          box-shadow: 0 0 0 0.75rem rgba(37, 99, 235, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+        }
+      }
       .activity-panel {
         display: flex;
         flex-direction: column;
@@ -417,8 +435,10 @@
             </div>
           </div>
           <div class="flex gap-2">
-            <button id="btn-init" class="btn-primary text-sm">🎧 Initialize</button>
-            <button id="btn-stop" class="btn-danger text-sm hidden">⏹ Stop</button>
+            <button id="btn-init" class="btn-primary text-sm start-audio-btn">
+              ▶ Start audio
+            </button>
+            <button id="btn-stop" class="btn-danger text-sm hidden">⏹ Stop audio</button>
           </div>
         </div>
       </div>
@@ -692,7 +712,9 @@
       <div class="grid gap-6 lg:grid-cols-2">
         <div class="panel">
           <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
-          <p id="status" class="text-gray-600 mb-4">Click Initialize to start</p>
+            <p id="status" class="text-gray-600 mb-4">
+              Audio engine idle. Start audio to play tracks.
+            </p>
           <div class="space-y-6">
             <div class="space-y-2">
               <div class="flex items-center justify-between gap-2">

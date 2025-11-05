@@ -90,6 +90,7 @@ const generateTrackId = (prefix) => generateId(prefix);
 
 // Audio engine instance
 let audioEngine = null;
+let audioEngineInitPromise = null;
 
 // User settings
 const userSettings = getDefaultPrivacySettings();
@@ -1257,23 +1258,16 @@ includeCommunityToggle?.addEventListener('change', (event) => {
   });
 });
 
-audioEngineSelect?.addEventListener('change', (event) => {
+audioEngineSelect?.addEventListener('change', async (event) => {
   const value = event.target.value;
   setEngineSelection({ audio: value });
   populateEngineSelects();
   recordUsageEvent('engine_change', { type: 'audio', value });
   if (audioEngine) {
-    try {
-      audioEngine.stopAll?.();
-    } catch (error) {
-      console.warn('Failed to stop previous audio engine:', error);
-    }
-    audioEngine = null;
     stopAllAudio({ message: 'Audio engine disabled until reinitialized.' });
-    initBtn.classList.remove('hidden');
-    stopBtn.classList.add('hidden');
-    statusEl.textContent = 'Audio engine selection updated. Click Initialize to start.';
+    await disposeAudioEngine();
   }
+  setAudioControlsIdle('Audio engine selection updated. Start audio to apply changes.');
   updateFloatingWidgetUI();
 });
 
@@ -1354,6 +1348,121 @@ const visualActiveList = document.getElementById('visual-active-list');
 const visualActiveEmpty = document.getElementById('visual-active-empty');
 const visualTrackCount = document.getElementById('visual-track-count');
 const visualStatusText = document.getElementById('visual-status-text');
+
+const isAudioContextRunning = () =>
+  Boolean(audioEngine?.ctx && audioEngine.ctx.state === 'running');
+
+const setAudioControlsIdle = (message) => {
+  if (initBtn) {
+    initBtn.classList.remove('hidden');
+    initBtn.classList.add('start-audio-btn');
+    initBtn.disabled = false;
+  }
+  if (stopBtn) {
+    stopBtn.classList.add('hidden');
+  }
+  if (message && statusEl) {
+    statusEl.textContent = message;
+  }
+};
+
+const setAudioControlsRunning = (message) => {
+  if (initBtn) {
+    initBtn.classList.add('hidden');
+    initBtn.classList.remove('start-audio-btn');
+    initBtn.disabled = false;
+  }
+  if (stopBtn) {
+    stopBtn.classList.remove('hidden');
+  }
+  if (message && statusEl) {
+    statusEl.textContent = message;
+  }
+};
+
+const markAudioStarting = (message) => {
+  if (initBtn) {
+    initBtn.disabled = true;
+    initBtn.classList.remove('start-audio-btn');
+  }
+  if (stopBtn) {
+    stopBtn.classList.add('hidden');
+  }
+  if (message && statusEl) {
+    statusEl.textContent = message;
+  }
+};
+
+const disposeAudioEngine = async () => {
+  if (!audioEngine) return;
+  try {
+    audioEngine.stopAll?.();
+  } catch (error) {
+    console.warn('[Audio] Failed to stop audio engine cleanly.', error);
+  }
+  const ctx = audioEngine.ctx;
+  if (ctx) {
+    try {
+      if (ctx.state !== 'closed' && typeof ctx.close === 'function') {
+        await ctx.close();
+      } else if (typeof ctx.suspend === 'function') {
+        await ctx.suspend();
+      }
+    } catch (error) {
+      console.warn('[Audio] Failed to close audio context.', error);
+    }
+  }
+  audioEngine = null;
+};
+
+const ensureAudioEngine = async ({ userInitiated = false } = {}) => {
+  if (audioEngine) {
+    try {
+      await audioEngine.resume?.();
+    } catch (error) {
+      console.warn('[Audio] Failed to resume audio context.', error);
+    }
+    setAudioControlsRunning();
+    return audioEngine;
+  }
+
+  if (audioEngineInitPromise) {
+    return audioEngineInitPromise;
+  }
+
+  const startingMessage = userInitiated
+    ? 'Starting audio engine…'
+    : 'Preparing audio engine for playback…';
+  markAudioStarting(startingMessage);
+
+  const initialization = (async () => {
+    try {
+      const engine = await createAudioEngine(getEngineSelection());
+      await engine.init?.();
+      audioEngine = engine;
+      setAudioControlsRunning('Audio engine ready. Layer tracks freely.');
+      incrementAudioInits();
+      recordUsageEvent('audio_init', { count: 1 });
+      updateUsageView();
+      return audioEngine;
+    } catch (error) {
+      console.error('Failed to initialise audio engine', error);
+      setAudioControlsIdle('Audio engine failed to initialise.');
+      return null;
+    } finally {
+      audioEngineInitPromise = null;
+      if (initBtn) {
+        initBtn.disabled = false;
+        if (!audioEngine) {
+          initBtn.classList.add('start-audio-btn');
+        }
+      }
+    }
+  })();
+
+  audioEngineInitPromise = initialization;
+  return initialization;
+};
 
 const audioPresets = {
   sine: {
@@ -1712,14 +1821,18 @@ const renderAudioTracks = ({ message } = {}) => {
     audioActiveList.appendChild(item);
   });
 
-  if (message) {
-    statusEl.textContent = message;
-  } else if (!audioEngine) {
-    statusEl.textContent = 'Select an audio engine and click Initialize to start.';
-  } else if (count === 0) {
-    statusEl.textContent = 'Audio engine ready. No active layers.';
-  } else {
-    statusEl.textContent = `${count} audio layer${count === 1 ? '' : 's'} running.`;
+  if (statusEl) {
+    if (message) {
+      statusEl.textContent = message;
+    } else if (!audioEngineInitPromise) {
+      if (!audioEngine) {
+        statusEl.textContent = 'Audio engine idle. Start audio to play tracks.';
+      } else if (count === 0) {
+        statusEl.textContent = 'Audio engine running. No active layers.';
+      } else {
+        statusEl.textContent = `${count} audio layer${count === 1 ? '' : 's'} running.`;
+      }
+    }
   }
 
   updateUsageView();
@@ -1807,21 +1920,29 @@ const stopAllVisual = ({ message } = {}) => {
   });
 };
 
+const shutdownAudioSession = async ({ message } = {}) => {
+  const finalMessage = message || 'Audio engine stopped. Start audio to resume playback.';
+  stopAllAudio({ message: finalMessage });
+  stopAllVisual({ message: 'Visual layers cleared.' });
+  await disposeAudioEngine();
+  setAudioControlsIdle(finalMessage);
+  updateUsageView();
+};
+
 audioMenu.addEventListener('change', updateAudioDescription);
 visualMenu.addEventListener('change', updateVisualDescription);
 
 addAudioBtn.addEventListener('click', async () => {
-  if (!audioEngine) {
-    alert('Initialize first!');
-    return;
-  }
-
   const presetKey = audioMenu.value;
   const preset = audioPresets[presetKey];
   if (!preset) return;
 
   try {
-    await audioEngine.resume();
+    const engine = await ensureAudioEngine({ userInitiated: false });
+    if (!engine) {
+      return;
+    }
+    await engine.resume?.();
     const result = preset.start();
     if (!result || !result.nodeId) {
       throw new Error('Preset did not return a node id');
@@ -1885,7 +2006,7 @@ audioActiveList.addEventListener('click', (event) => {
   renderAudioTracks({
     message:
       count === 0
-        ? 'Audio engine ready. No active layers.'
+        ? 'Audio engine running. No active layers.'
         : `Stopped ${track.label}. ${count} audio layer${count === 1 ? '' : 's'} active.`,
   });
 });
@@ -1964,38 +2085,15 @@ visualActiveList.addEventListener('click', (event) => {
   });
 });
 
-initBtn.addEventListener('click', async () => {
-  initBtn.disabled = true;
-  try {
-    if (audioEngine) {
-      try {
-        audioEngine.stopAll?.();
-      } catch (stopError) {
-        console.warn('Failed to stop previous engine:', stopError);
-      }
-    }
-
-    audioEngine = await createAudioEngine(getEngineSelection());
-    await audioEngine.init?.();
-
-    statusEl.textContent = 'Audio engine ready. Layer tracks freely.';
-    initBtn.classList.add('hidden');
-    stopBtn.classList.remove('hidden');
-    incrementAudioInits();
-    recordUsageEvent('audio_init', { count: 1 });
-    updateUsageView();
-  } catch (error) {
-    console.error('Failed to initialise audio engine', error);
-    statusEl.textContent = 'Audio engine failed to initialise.';
-  } finally {
-    initBtn.disabled = false;
-  }
+initBtn.addEventListener('click', () => {
+  ensureAudioEngine({ userInitiated: true });
 });
 
-stopBtn.addEventListener('click', () => {
-  stopAllAudio({ message: 'All audio layers stopped.' });
-  stopAllVisual({ message: 'Visual layers cleared.' });
+stopBtn.addEventListener('click', async () => {
   recordUsageEvent('session_stop', { reason: 'manual_stop' });
+  await shutdownAudioSession({
+    message: 'Audio engine stopped. Start audio to resume playback.',
+  });
 });
 
 updateAudioDescription();

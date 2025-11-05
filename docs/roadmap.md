@@ -50,6 +50,9 @@ bootstrap? preact, react?
 testing modules and deploy procedure:
 we should test BSCLab and update firebase if rules changed
 
+record ambience, analyse it to describe the sonic treatment received by the environment.
+and to propose complements.
+
 ## Urgent
 
 - [ ] mobile iphone safari not working
