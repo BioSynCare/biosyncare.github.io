@@ -1,0 +1,70 @@
+@prefix bsc:   <https://biosyncare.github.io/ont#> .
+@prefix id:    <https://biosyncare.github.io/id/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix schema:<http://schema.org/> .
+
+<> a owl:Ontology ;
+  dct:title "BioSynCare Core Ontology (minimal)" ;
+  dct:creator "BioSynCare Lab" ;
+  dct:description "Minimal OWL classes and properties for BioSynCare sessions, protocols, techniques, outcomes and reports." ;
+  dct:created "2025-11-05"^^xsd:date ;
+  owl:versionInfo "0.1.0" .
+
+# Core classes
+bsc:Project           a owl:Class ; rdfs:label "Project" .
+bsc:Protocol          a owl:Class ; rdfs:label "Protocol" .
+bsc:Technique         a owl:Class ; rdfs:label "Technique" .
+bsc:Session           a owl:Class ; rdfs:label "Session" .
+bsc:Outcome           a owl:Class ; rdfs:label "Outcome" .
+bsc:Report            a owl:Class ; rdfs:label "Report" .
+bsc:ParticipantGroup  a owl:Class ; rdfs:label "Participant Group" .
+
+# Object properties
+bsc:usesTechnique     a owl:ObjectProperty ;
+  rdfs:label "uses technique" ;
+  rdfs:domain bsc:Protocol ; rdfs:range bsc:Technique .
+
+bsc:appliesTechnique  a owl:ObjectProperty ;
+  rdfs:label "applies technique" ;
+  rdfs:domain bsc:Session ; rdfs:range bsc:Technique .
+
+bsc:hasOutcome        a owl:ObjectProperty ;
+  rdfs:label "has outcome" ;
+  rdfs:domain bsc:Session ; rdfs:range bsc:Outcome .
+
+bsc:partOfProject     a owl:ObjectProperty ;
+  rdfs:label "part of project" ;
+  rdfs:range bsc:Project .
+
+bsc:documents         a owl:ObjectProperty ;
+  rdfs:label "documents" ;
+  rdfs:domain bsc:Report .
+
+bsc:occurredDuring    a owl:ObjectProperty ;
+  rdfs:label "occurred during" ;
+  rdfs:domain bsc:Session ; rdfs:range time:TemporalEntity .
+
+# Datatype properties
+bsc:participantCount  a owl:DatatypeProperty ;
+  rdfs:label "participant count" ; rdfs:domain bsc:Session ; rdfs:range xsd:integer .
+
+bsc:durationMinutes   a owl:DatatypeProperty ;
+  rdfs:label "duration (minutes)" ; rdfs:domain bsc:Session ; rdfs:range xsd:decimal .
+
+bsc:minLatencyDays    a owl:DatatypeProperty ;
+  rdfs:label "minimum latency (days)" ; rdfs:domain bsc:Outcome ; rdfs:range xsd:decimal .
+
+bsc:maxLatencyDays    a owl:DatatypeProperty ;
+  rdfs:label "maximum latency (days)" ; rdfs:domain bsc:Outcome ; rdfs:range xsd:decimal .
+
+bsc:notes             a owl:DatatypeProperty ;
+  rdfs:label "notes" ; rdfs:range xsd:string .
+
+# One canonical project resource
+id:BioSynCareLab a bsc:Project ;
+  rdfs:label "BioSynCare Lab" ;
+  dct:description "Open, client-side neurosensory stimulation lab and transparency hub." .

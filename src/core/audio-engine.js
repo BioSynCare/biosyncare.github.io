@@ -1150,6 +1150,124 @@ export class AudioEngine {
     return true;
   }
 
+  /**
+   * Play Martigli oscillation - a tone that follows the global Martigli breathing controller
+   * @param {Object} opts - { baseFrequency: 200, amplitude: 100, gain: 0.2, pan: 0 }
+   * @returns {string} nodeId
+   */
+  playMartigliOscillation(opts = {}) {
+    this._ensureInit();
+
+    const {
+      baseFrequency = 200,
+      amplitude = 100,
+      gain = 0.2,
+      pan = 0,
+      fadeIn = 0.05,
+    } = opts;
+
+    const osc = this.ctx.createOscillator();
+    osc.type = 'sine';
+    osc.frequency.value = baseFrequency;
+
+    const gainNode = this.ctx.createGain();
+    gainNode.gain.value = 0;
+
+    const panner = this.ctx.createStereoPanner();
+    panner.pan.value = Math.max(-1, Math.min(1, pan));
+
+    osc.connect(gainNode);
+    gainNode.connect(panner);
+    panner.connect(this.masterGain);
+
+    const now = this.ctx.currentTime;
+    gainNode.gain.setValueAtTime(0, now);
+    gainNode.gain.linearRampToValueAtTime(gain, now + fadeIn);
+
+    osc.start(now);
+
+    const nodeId = `martigliOsc_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Update frequency based on Martigli controller value
+    const updateFrequency = () => {
+      if (!this.nodes.has(nodeId)) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      const node = this.nodes.get(nodeId);
+      if (!node || !node.osc) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      // Get current Martigli value [-1, 1]
+      let martigliValue = 0;
+      if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+        martigliValue = window.martigliController.getValue();
+      }
+
+      // Calculate target frequency: base ± (amplitude * martigliValue)
+      const targetFreq = node._baseFrequency + (node._amplitude * martigliValue);
+      const clampedFreq = clamp(targetFreq, 20, 20000);
+
+      // Smoothly update frequency
+      const now = this.ctx.currentTime;
+      node.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+    };
+
+    // Store node with its parameters and start update interval
+    const intervalId = setInterval(updateFrequency, 50); // Update every 50ms
+
+    this.nodes.set(nodeId, {
+      osc,
+      gainNode,
+      panner,
+      _baseFrequency: baseFrequency,
+      _amplitude: amplitude,
+      _gain: gain,
+      _pan: pan,
+      _martigliInterval: intervalId,
+    });
+
+    return nodeId;
+  }
+
+  /**
+   * Update Martigli oscillation parameters
+   * @param {string} nodeId
+   * @param {Object} params - { baseFrequency, amplitude, gain, pan }
+   * @returns {boolean} success
+   */
+  updateMartigliOscillation(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+
+    const now = this.ctx.currentTime;
+
+    if (params.baseFrequency !== undefined) {
+      node._baseFrequency = clamp(params.baseFrequency, 20, 20000);
+    }
+
+    if (params.amplitude !== undefined) {
+      node._amplitude = clamp(params.amplitude, 0, 1000);
+    }
+
+    if (params.gain !== undefined && node.gainNode?.gain) {
+      const gain = clamp(params.gain, 0, 1);
+      node.gainNode.gain.setTargetAtTime(gain, now, 0.05);
+      node._gain = gain;
+    }
+
+    if (params.pan !== undefined && node.panner?.pan) {
+      const pan = clamp(params.pan, -1, 1);
+      node.panner.pan.setTargetAtTime(pan, now, 0.05);
+      node._pan = pan;
+    }
+
+    return true;
+  }
+
   _ensureInit() {
     if (!this.initialized) {
       throw new Error('AudioEngine not initialized. Call engine.init() first.');

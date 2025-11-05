@@ -1,0 +1,115 @@
+@prefix bsc:   <https://biosyncare.github.io/ont#> .
+@prefix id:    <https://biosyncare.github.io/id/> .
+@prefix owl:   <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix schema:<http://schema.org/> .
+@prefix prov:  <http://www.w3.org/ns/prov#> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix time:  <http://www.w3.org/2006/time#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+# Graph / dataset metadata
+id:HistoryGraph_20251105 a prov:Entity ;
+  dct:title "BioSynCare History (triplified)"@en ;
+  dct:description "Key claims and structures from docs/history.md represented as RDF instances."@en ;
+  dct:created "2025-11-05"^^xsd:date ;
+  prov:wasDerivedFrom <../docs/history.md> .
+
+# Source document as an artifact
+id:HistoryDoc a schema:CreativeWork, bsc:Report ;
+  dct:title "History – key events and outcomes"@en ;
+  dct:source <../docs/history.md> ;
+  prov:wasAttributedTo id:BioSynCareLab ;
+  prov:generatedAtTime "2025-11-05"^^xsd:date .
+
+# Time spans mentioned in the document (examples)
+id:Period_2020_Q4 a time:Interval ;
+  rdfs:label "Oct–Dec 2020"@en ;
+  time:hasBeginning [ a time:Instant ; time:inXSDDate "2020-10-01"^^xsd:date ] ;
+  time:hasEnd       [ a time:Instant ; time:inXSDDate "2020-12-31"^^xsd:date ] ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+# Techniques as instances (linked to SKOS concepts in bsc-skos.ttl)
+id:Technique_Neurosensory a bsc:Technique ;
+  rdfs:label "Audiovisual neurosensory stimulation"@en ;
+  skos:exactMatch id:NeurosensoryStimulation ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_Binaural a bsc:Technique ;
+  rdfs:label "Binaural beats"@en ;
+  skos:exactMatch id:BinauralBeats ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_Monaural a bsc:Technique ;
+  rdfs:label "Monaural beats"@en ;
+  skos:exactMatch id:MonauralBeats ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_Isochronic a bsc:Technique ;
+  rdfs:label "Isochronic tones"@en ;
+  skos:exactMatch id:IsochronicTones ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_Breathing a bsc:Technique ;
+  rdfs:label "Slow rhythmic breathing"@en ;
+  skos:exactMatch id:SlowRhythmicBreathing ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_SupportGroup a bsc:Technique ;
+  rdfs:label "Support groups"@en ;
+  skos:exactMatch id:SupportGroups ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Technique_LKM a bsc:Technique ;
+  rdfs:label "Loving-kindness meditation"@en ;
+  skos:exactMatch id:LovingKindnessMeditation ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+# Outcomes as instances (mapped to SKOS concepts)
+id:Outcome_SuicidalRelief a bsc:Outcome ;
+  rdfs:label "Relief of suicidal ideation"@en ;
+  skos:exactMatch id:SuicidalIdeationRelief ;
+  bsc:minLatencyDays "3"^^xsd:decimal ;
+  bsc:maxLatencyDays "5"^^xsd:decimal ;
+  rdfs:comment "Considerable relief reported in 3–5 days."@en ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Outcome_MigraineRelief a bsc:Outcome ;
+  rdfs:label "Migraine relief"@en ;
+  skos:exactMatch id:MigraineRelief ;
+  rdfs:comment "Reported solving for many cases."@en ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+id:Outcome_Cognitive a bsc:Outcome ;
+  rdfs:label "Cognitive enhancement and well-being"@en ;
+  skos:closeMatch id:CognitiveEnhancement, id:Wellbeing ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+# Protocol referenced in the document
+id:CocktailProtocol a bsc:Protocol ;
+  rdfs:label "Four-component session cocktail"@en ;
+  dct:description "Mix of neurosensory stimulation, slow rhythmic breathing, support group conversation, and loving-kindness meditation."@en ;
+  bsc:usesTechnique id:Technique_Neurosensory, id:Technique_Breathing, id:Technique_SupportGroup, id:Technique_LKM ;
+  bsc:partOfProject id:BioSynCareLab ;
+  prov:wasDerivedFrom id:HistoryDoc .
+
+# Example session shape (as described)
+id:Session_Prototype_2020 a bsc:Session ;
+  rdfs:label "Prototype sessions (Oct–Dec 2020)"@en ;
+  bsc:partOfProject id:BioSynCareLab ;
+  bsc:occurredDuring id:Period_2020_Q4 ;
+  bsc:appliesTechnique id:Technique_Neurosensory, id:Technique_Breathing ;
+  bsc:durationMinutes "15"^^xsd:decimal ;
+  bsc:hasOutcome id:Outcome_Cognitive ;
+  prov:wasDerivedFrom id:HistoryDoc ;
+  rdfs:comment "Real-time browser sessions; emphasis on audio, plus breathing cues."@en .
+
+# Triplification provenance
+id:HistoryTriplification_20251105 a prov:Activity ;
+  rdfs:label "History triplification (2025-11-05)"@en ;
+  dct:description "Triplification of docs/history.md into RDF for BioSynCare."@en ;
+  prov:used id:HistoryDoc ;
+  prov:generated id:HistoryGraph_20251105 ;
+  prov:endedAtTime "2025-11-05"^^xsd:date ;
+  prov:wasAssociatedWith id:BioSynCareLab .

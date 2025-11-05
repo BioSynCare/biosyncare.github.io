@@ -3185,6 +3185,118 @@ const audioPresets = {
     },
     describe: (params = {}) => `Brown · gain ${Number(params.gain ?? 0.22).toFixed(2)}`,
   },
+  martigliOscillation: {
+    label: 'Martigli oscillation • Breathing tone',
+    description:
+      'Carrier frequency modulated by the global Martigli breathing controller.',
+    params: [
+      {
+        id: 'baseFrequency',
+        label: 'Base frequency',
+        type: 'range',
+        min: 40,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 200,
+        live: true,
+      },
+      {
+        id: 'amplitude',
+        label: 'Modulation amplitude',
+        type: 'range',
+        min: 0,
+        max: 500,
+        step: 1,
+        unit: 'Hz',
+        default: 100,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.2,
+        live: true,
+      },
+      {
+        id: 'pan',
+        label: 'Stereo pan',
+        type: 'range',
+        min: -1,
+        max: 1,
+        step: 0.01,
+        default: 0,
+        live: true,
+        formatValue: (value) => {
+          if (!Number.isFinite(value)) return '0';
+          if (Math.abs(value) < 0.01) return 'Center';
+          return value > 0
+            ? `Right ${value.toFixed(2)}`
+            : `Left ${Math.abs(value).toFixed(2)}`;
+        },
+      },
+    ],
+    start(params = {}) {
+      const baseFrequency = Number(params.baseFrequency ?? 200);
+      const amplitude = Number(params.amplitude ?? 100);
+      const gain = Number(params.gain ?? 0.2);
+      const pan = Number(params.pan ?? 0);
+
+      const nodeId = audioEngine.playMartigliOscillation({
+        baseFrequency,
+        amplitude,
+        gain,
+        pan,
+      });
+
+      const detail = this.describe(params);
+      return {
+        nodeId,
+        detail,
+        parameters: {
+          baseFrequency,
+          amplitude,
+          gain,
+          pan,
+        },
+        meta: {
+          type: 'martigliOscillation',
+          baseFrequency,
+          amplitude,
+          gain,
+          pan,
+        },
+      };
+    },
+    update(track, params = {}) {
+      audioEngine.updateMartigliOscillation(track.nodeId, {
+        baseFrequency: params.baseFrequency,
+        amplitude: params.amplitude,
+        gain: params.gain,
+        pan: params.pan,
+      });
+      return {
+        detail: this.describe(params),
+        meta: {
+          baseFrequency: params.baseFrequency,
+          amplitude: params.amplitude,
+          gain: params.gain,
+          pan: params.pan,
+        },
+      };
+    },
+    describe: (params = {}) => {
+      const base = Number(params.baseFrequency ?? 200);
+      const amp = Number(params.amplitude ?? 100);
+      const min = base - amp;
+      const max = base + amp;
+      return `Martigli ${base.toFixed(0)} Hz ± ${amp.toFixed(0)} Hz (${min.toFixed(0)}-${max.toFixed(0)} Hz)`;
+    },
+  },
 };
 
 const audioParameterState = new Map();

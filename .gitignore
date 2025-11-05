@@ -1,4 +1,8 @@
-# macOS artifacts
+# Local virtual environments
+.venv-rdf/
+
+# macOS
+.DS_Store# macOS artifacts
 .DS_Store
 
 # Node / frontend dependencies

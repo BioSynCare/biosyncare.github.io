@@ -1,0 +1,70 @@
+@prefix bsc:   <https://biosyncare.github.io/ont#> .
+@prefix id:    <https://biosyncare.github.io/id/> .
+@prefix skos:  <http://www.w3.org/2004/02/skos/core#> .
+@prefix dct:   <http://purl.org/dc/terms/> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+id:BSC-Vocabulary a skos:ConceptScheme ;
+  dct:title "BioSynCare Vocabulary" ;
+  dct:description "SKOS concepts for techniques and outcomes used in BioSynCare." ;
+  dct:created "2025-11-05"^^xsd:date .
+
+# Top concepts
+id:Techniques a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ;
+  skos:prefLabel "Techniques"@en .
+
+id:Outcomes a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ;
+  skos:prefLabel "Outcomes"@en .
+
+# Techniques
+id:NeurosensoryStimulation a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Techniques ;
+  skos:prefLabel "Audiovisual neurosensory stimulation"@en ;
+  skos:altLabel "Brainwave entrainment"@en .
+
+id:BinauralBeats a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:NeurosensoryStimulation ;
+  skos:prefLabel "Binaural beats"@en .
+
+id:MonauralBeats a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:NeurosensoryStimulation ;
+  skos:prefLabel "Monaural beats"@en .
+
+id:IsochronicTones a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:NeurosensoryStimulation ;
+  skos:prefLabel "Isochronic tones"@en .
+
+id:SlowRhythmicBreathing a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Techniques ;
+  skos:prefLabel "Slow rhythmic breathing"@en ;
+  skos:altLabel "Rhythmic breathing"@en .
+
+id:SupportGroups a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Techniques ;
+  skos:prefLabel "Support groups"@en .
+
+id:LovingKindnessMeditation a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Techniques ;
+  skos:prefLabel "Loving-kindness meditation"@en ;
+  skos:altLabel "Compassion meditation"@en .
+
+# Outcomes
+id:SuicidalIdeationRelief a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Outcomes ;
+  skos:prefLabel "Relief of suicidal ideation"@en ;
+  skos:definition "Reported considerable relief in 3–5 days."@en .
+
+id:MigraineRelief a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Outcomes ;
+  skos:prefLabel "Migraine relief"@en ;
+  skos:definition "Reported solving for many cases."@en .
+
+id:CognitiveEnhancement a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Outcomes ;
+  skos:prefLabel "Cognitive enhancement"@en .
+
+id:Wellbeing a skos:Concept ;
+  skos:inScheme id:BSC-Vocabulary ; skos:broader id:Outcomes ;
+  skos:prefLabel "Well-being"@en .
