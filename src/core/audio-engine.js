@@ -25,6 +25,12 @@
  *   engine.playNoise({ type: 'pink', duration: 30 });
  */
 
+
+const clamp = (value, min, max) => {
+  if (min !== undefined && value < min) return min;
+  if (max !== undefined && value > max) return max;
+  return value;
+};
 export class AudioEngine {
   constructor() {
     this.ctx = null;
@@ -157,6 +163,9 @@ export class AudioEngine {
       gainRight,
       merger,
       masterOut,
+      _base: base,
+      _beat: beat,
+      _gain: gain,
     });
 
     oscLeft.start();
@@ -224,6 +233,9 @@ export class AudioEngine {
       oscillators: [oscLow, oscHigh],
       mixGain,
       masterOut,
+      _base: base,
+      _beat: beat,
+      _gain: gain,
     });
 
     oscLow.start(now);
@@ -405,7 +417,7 @@ export class AudioEngine {
     osc.start(now);
 
     const nodeId = `waveform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    this.nodes.set(nodeId, { osc, gainNode, panner });
+    this.nodes.set(nodeId, { osc, gainNode, panner, _freq: freq, _gain: gain, _pan: pan });
 
     if (duration !== null) {
       const stopTime = now + duration;
@@ -541,7 +553,14 @@ export class AudioEngine {
     source.start(now);
 
     const nodeId = `noise_${type}_${Date.now()}`;
-    this.nodes.set(nodeId, { source, gainNode, panner });
+    this.nodes.set(nodeId, {
+      source,
+      gainNode,
+      panner,
+      _type: type,
+      _gain: gain,
+      _pan: pan,
+    });
 
     if (duration !== null) {
       const stopTime = now + duration;
@@ -606,7 +625,14 @@ export class AudioEngine {
     oscillators.forEach((osc) => osc.start(now));
 
     const nodeId = `martigli_${Date.now()}`;
-    this.nodes.set(nodeId, { oscillators, gainNodes, masterGainNode });
+    this.nodes.set(nodeId, {
+      oscillators,
+      gainNodes,
+      masterGainNode,
+      _fundamental: fundamental,
+      _harmonics: harmonics,
+      _gain: gain,
+    });
 
     if (duration !== null) {
       const stopTime = now + duration;
@@ -715,7 +741,15 @@ export class AudioEngine {
     lfo.start(now);
 
     const nodeId = `isochronic_${Date.now()}`;
-    this.nodes.set(nodeId, { osc, lfo, carrierGain, lfoGain });
+    this.nodes.set(nodeId, {
+      osc,
+      lfo,
+      carrierGain,
+      lfoGain,
+      _freq: freq,
+      _pulseFreq: pulseFreq,
+      _gain: gain,
+    });
 
     if (duration !== null) {
       const stopTime = now + duration;
@@ -731,6 +765,158 @@ export class AudioEngine {
     }
 
     return nodeId;
+  }
+
+  updateWaveform(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    if (params.freq !== undefined && node.osc?.frequency) {
+      const freq = clamp(params.freq, 1, 20000);
+      node.osc.frequency.setTargetAtTime(freq, now, 0.05);
+      node._freq = freq;
+    }
+    if (params.gain !== undefined && node.gainNode?.gain) {
+      const gain = clamp(params.gain, 0, 1);
+      node.gainNode.gain.setTargetAtTime(gain, now, 0.05);
+      node._gain = gain;
+    }
+    if (params.pan !== undefined && node.panner?.pan) {
+      const pan = clamp(params.pan, -1, 1);
+      node.panner.pan.setTargetAtTime(pan, now, 0.05);
+      node._pan = pan;
+    }
+    return true;
+  }
+
+  updateNoise(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    if (params.gain !== undefined && node.gainNode?.gain) {
+      const gain = clamp(params.gain, 0, 1);
+      node.gainNode.gain.setTargetAtTime(gain, now, 0.05);
+      node._gain = gain;
+    }
+    if (params.pan !== undefined && node.panner?.pan) {
+      const pan = clamp(params.pan, -1, 1);
+      node.panner.pan.setTargetAtTime(pan, now, 0.05);
+      node._pan = pan;
+    }
+    return true;
+  }
+
+  updateBinaural(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    const base = clamp(
+      params.base !== undefined ? params.base : node._base ?? 200,
+      20,
+      2000
+    );
+    const beat = clamp(
+      params.beat !== undefined ? params.beat : node._beat ?? 10,
+      0.1,
+      100
+    );
+    const gain = clamp(
+      params.gain !== undefined ? params.gain : node._gain ?? 0.25,
+      0,
+      1
+    );
+    const leftFreq = Math.max(1, base - beat / 2);
+    const rightFreq = Math.max(1, base + beat / 2);
+    if (node.oscLeft?.frequency) {
+      node.oscLeft.frequency.setTargetAtTime(leftFreq, now, 0.05);
+    }
+    if (node.oscRight?.frequency) {
+      node.oscRight.frequency.setTargetAtTime(rightFreq, now, 0.05);
+    }
+    if (node.masterOut?.gain) {
+      node.masterOut.gain.setTargetAtTime(gain, now, 0.05);
+    }
+    node._base = base;
+    node._beat = beat;
+    node._gain = gain;
+    return true;
+  }
+
+  updateMonaural(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    const base = clamp(
+      params.base !== undefined ? params.base : node._base ?? 210,
+      20,
+      2000
+    );
+    const beat = clamp(
+      params.beat !== undefined ? params.beat : node._beat ?? 6,
+      0.1,
+      100
+    );
+    const gain = clamp(
+      params.gain !== undefined ? params.gain : node._gain ?? 0.3,
+      0,
+      1
+    );
+    const lowFreq = Math.max(1, base - beat / 2);
+    const highFreq = Math.max(1, base + beat / 2);
+    if (Array.isArray(node.oscillators) && node.oscillators.length >= 2) {
+      node.oscillators[0]?.frequency?.setTargetAtTime(lowFreq, now, 0.05);
+      node.oscillators[1]?.frequency?.setTargetAtTime(highFreq, now, 0.05);
+    }
+    if (node.masterOut?.gain) {
+      node.masterOut.gain.setTargetAtTime(gain, now, 0.05);
+    }
+    node._base = base;
+    node._beat = beat;
+    node._gain = gain;
+    return true;
+  }
+
+  updateIsochronic(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    if (params.freq !== undefined && node.osc?.frequency) {
+      const freq = clamp(params.freq, 20, 4000);
+      node.osc.frequency.setTargetAtTime(freq, now, 0.05);
+      node._freq = freq;
+    }
+    if (params.pulseFreq !== undefined && node.lfo?.frequency) {
+      const pulseFreq = clamp(params.pulseFreq, 0.1, 100);
+      node.lfo.frequency.setTargetAtTime(pulseFreq, now, 0.05);
+      node._pulseFreq = pulseFreq;
+    }
+    if (params.gain !== undefined && node.carrierGain?.gain) {
+      const gain = clamp(params.gain, 0, 1);
+      node.carrierGain.gain.setTargetAtTime(gain, now, 0.05);
+      node._gain = gain;
+    }
+    return true;
+  }
+
+  updateMartigliWave(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+    const now = this.ctx.currentTime;
+    if (params.gain !== undefined && node.masterGainNode?.gain) {
+      const gain = clamp(params.gain, 0, 1);
+      node.masterGainNode.gain.setTargetAtTime(gain, now, 0.05);
+      node._gain = gain;
+    }
+    if (params.fundamental !== undefined && Array.isArray(node.oscillators)) {
+      const fundamental = clamp(params.fundamental, 20, 1200);
+      const ratios = node._harmonics || node.harmonics || [];
+      node.oscillators.forEach((osc, index) => {
+        const ratio = ratios[index] ?? 1;
+        osc.frequency.setTargetAtTime(fundamental * ratio, now, 0.05);
+      });
+      node._fundamental = fundamental;
+    }
+    return true;
   }
 
   _ensureInit() {

@@ -13,6 +13,15 @@ export function addAudioTrack(trackId, trackData) {
   activeAudioTracks.set(trackId, trackData);
 }
 
+export function updateAudioTrack(trackId, updater) {
+  const current = activeAudioTracks.get(trackId);
+  if (!current) return null;
+  const next =
+    typeof updater === 'function' ? updater({ ...current }) : { ...current, ...updater };
+  activeAudioTracks.set(trackId, next);
+  return next;
+}
+
 /**
  * Remove audio track
  */

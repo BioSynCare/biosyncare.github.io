@@ -76,6 +76,7 @@ import {
   addAudioTrack,
   removeAudioTrack,
   getAudioTrack,
+  updateAudioTrack,
   clearAudioTracks,
   addVisualTrack,
   removeVisualTrack,
@@ -191,9 +192,13 @@ const updateStimulationHeaderSummary = () => {
   }
   chipStimulationSummaryEl.textContent = summaryText;
 
-  const audioLabels = audioEntries.map(
-    ([, track]) => track?.label || track?.presetKey || 'Audio layer'
-  );
+  const audioLabels = audioEntries.map(([, track]) => {
+    const preset = track?.presetKey ? audioPresets[track.presetKey] : null;
+    const params = track?.parameters || {};
+    const descriptor = preset?.describe ? preset.describe(params) : '';
+    const baseLabel = track?.label || preset?.label || track?.presetKey || 'Audio layer';
+    return descriptor ? `${baseLabel} (${descriptor})` : baseLabel;
+  });
   const visualLabels = visualEntries.map(
     ([, track]) => track?.label || track?.presetKey || 'Visual layer'
   );
@@ -1237,6 +1242,7 @@ const updateAuthUI = (user) => {
   setAuthLoading(false);
   updateProfileSummary();
   updateUsageView();
+  updateHeaderSummaries();
 };
 
 const handleAuthError = (error, fallbackMessage) => {
@@ -1483,6 +1489,7 @@ const stopBtn = document.getElementById('btn-stop');
 const statusEl = document.getElementById('status');
 const audioMenu = document.getElementById('audio-menu');
 const audioDescriptionEl = document.getElementById('audio-description');
+const audioParameterPanel = document.getElementById('audio-parameter-panel');
 const addAudioBtn = document.getElementById('btn-add-audio');
 const stopAllAudioBtn = document.getElementById('btn-stop-all-audio');
 const audioActiveList = document.getElementById('audio-active-list');
@@ -1622,96 +1629,285 @@ const audioPresets = {
   sine: {
     label: 'Pure sine • 440Hz',
     description: 'Pure sine tone at 440Hz for quick calibration and reference.',
-    start: () => {
-      const freq = 440;
+    params: [
+      {
+        id: 'frequency',
+        label: 'Frequency',
+        type: 'range',
+        min: 40,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 440,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.2,
+        live: true,
+      },
+      {
+        id: 'pan',
+        label: 'Stereo pan',
+        type: 'range',
+        min: -1,
+        max: 1,
+        step: 0.01,
+        default: 0,
+        live: true,
+        formatValue: (value) => {
+          if (!Number.isFinite(value)) return '0';
+          if (Math.abs(value) < 0.01) return 'Center';
+          return value > 0 ? `Right ${value.toFixed(2)}` : `Left ${Math.abs(value).toFixed(2)}`;
+        },
+      },
+    ],
+    start: (params = {}) => {
+      const frequency = Number(params.frequency ?? 440);
+      const gain = Number(params.gain ?? 0.2);
+      const pan = Number(params.pan ?? 0);
       const nodeId = audioEngine.playWaveform({
         type: 'sine',
-        freq,
-        gain: 0.2,
+        freq: frequency,
+        gain,
+        pan,
       });
+      const parameters = {
+        frequency,
+        gain,
+        pan,
+      };
       return {
         nodeId,
-        detail: '440 Hz reference tone at moderate gain.',
+        detail: `${frequency.toFixed(1)} Hz · gain ${gain.toFixed(2)}`,
+        parameters,
         meta: {
           type: 'waveform',
           wave: 'sine',
-          freq,
+          frequency,
+          gain,
+          pan,
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateWaveform(track.nodeId, {
+        freq: params.frequency,
+        gain: params.gain,
+        pan: params.pan,
+      });
+      return {
+        detail: `${params.frequency.toFixed(1)} Hz · gain ${params.gain.toFixed(2)}`,
+        meta: {
+          frequency: params.frequency,
+          gain: params.gain,
+          pan: params.pan,
+        },
+      };
+    },
+    describe: (params = {}) => `${Math.round(params.frequency ?? 440)} Hz`,
   },
   binaural: {
     label: 'Binaural beat • Alpha 10Hz',
     description: 'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
-    start: () => {
-      const base = 200;
-      const beat = 10;
-      const leftFreq = base - beat / 2;
-      const rightFreq = base + beat / 2;
+    params: [
+      {
+        id: 'base',
+        label: 'Carrier frequency',
+        type: 'range',
+        min: 60,
+        max: 800,
+        step: 1,
+        unit: 'Hz',
+        default: 200,
+        live: true,
+      },
+      {
+        id: 'beat',
+        label: 'Beat frequency',
+        type: 'range',
+        min: 0.5,
+        max: 40,
+        step: 0.1,
+        unit: 'Hz',
+        default: 10,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.25,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const base = Number(params.base ?? 200);
+      const beat = Number(params.beat ?? 10);
+      const gain = Number(params.gain ?? 0.25);
       const nodeId = audioEngine.playBinaural({
         base,
         beat,
         duration: 0,
-        gain: 0.25,
+        gain,
       });
+      const parameters = { base, beat, gain };
       return {
         nodeId,
-        detail: 'Carrier 200 Hz, beat 10 Hz (alpha window).',
+        detail: `${base.toFixed(1)} Hz carrier • ${beat.toFixed(2)} Hz beat`,
+        parameters,
         meta: {
           type: 'binaural',
           base,
           beat,
-          carrier: base,
-          modulator: beat,
-          components: [leftFreq, rightFreq],
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateBinaural(track.nodeId, params);
+      return {
+        detail: `${params.base.toFixed(1)} Hz carrier • ${params.beat.toFixed(2)} Hz beat`,
+        meta: {
+          base: params.base,
+          beat: params.beat,
+          gain: params.gain,
+        },
+      };
+    },
+    describe: (params = {}) => `${Math.round(params.base ?? 200)} Hz • ${Number(params.beat ?? 10).toFixed(1)} Hz`,
   },
   monaural: {
     label: 'Monaural beat • Theta 6Hz',
-    description:
-      'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
-    start: () => {
-      const base = 210;
-      const beat = 6;
-      const lowFreq = Math.max(20, base - beat / 2);
-      const highFreq = base + beat / 2;
+    description: 'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
+    params: [
+      {
+        id: 'base',
+        label: 'Carrier frequency',
+        type: 'range',
+        min: 60,
+        max: 800,
+        step: 1,
+        unit: 'Hz',
+        default: 210,
+        live: true,
+      },
+      {
+        id: 'beat',
+        label: 'Beat frequency',
+        type: 'range',
+        min: 0.5,
+        max: 40,
+        step: 0.1,
+        unit: 'Hz',
+        default: 6,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.3,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const base = Number(params.base ?? 210);
+      const beat = Number(params.beat ?? 6);
+      const gain = Number(params.gain ?? 0.3);
       const nodeId = audioEngine.playMonaural({
         base,
         beat,
         duration: 0,
-        gain: 0.3,
+        gain,
       });
+      const parameters = { base, beat, gain };
       return {
         nodeId,
-        detail: 'Carrier 210 Hz, beat 6 Hz (theta).',
+        detail: `${base.toFixed(1)} Hz carrier • ${beat.toFixed(2)} Hz beat`,
+        parameters,
         meta: {
           type: 'monaural',
           base,
           beat,
-          carrier: base,
-          modulator: beat,
-          components: [lowFreq, highFreq],
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateMonaural(track.nodeId, params);
+      return {
+        detail: `${params.base.toFixed(1)} Hz carrier • ${params.beat.toFixed(2)} Hz beat`,
+        meta: {
+          base: params.base,
+          beat: params.beat,
+          gain: params.gain,
+        },
+      };
+    },
+    describe: (params = {}) => `${Math.round(params.base ?? 210)} Hz • ${Number(params.beat ?? 6).toFixed(1)} Hz`,
   },
   isochronic: {
     label: 'Isochronic pulse • 12Hz breathing',
     description: 'Amplitude-gated tone delivering crisp rhythmic cues for breath pacing.',
-    start: () => {
-      const freq = 180;
-      const pulseFreq = 12;
+    params: [
+      {
+        id: 'freq',
+        label: 'Carrier frequency',
+        type: 'range',
+        min: 40,
+        max: 1200,
+        step: 1,
+        unit: 'Hz',
+        default: 180,
+        live: true,
+      },
+      {
+        id: 'pulseFreq',
+        label: 'Pulse frequency',
+        type: 'range',
+        min: 0.5,
+        max: 30,
+        step: 0.1,
+        unit: 'Hz',
+        default: 12,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.22,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const freq = Number(params.freq ?? 180);
+      const pulseFreq = Number(params.pulseFreq ?? 12);
+      const gain = Number(params.gain ?? 0.22);
       const nodeId = audioEngine.playIsochronic({
         freq,
         pulseFreq,
         duration: null,
-        gain: 0.22,
+        gain,
       });
+      const parameters = { freq, pulseFreq, gain };
       return {
         nodeId,
-        detail: '180 Hz carrier with 12 Hz gating pulses.',
+        detail: `${freq.toFixed(0)} Hz carrier • ${pulseFreq.toFixed(1)} Hz pulses`,
+        parameters,
         meta: {
           type: 'isochronic',
           freq,
@@ -1719,25 +1915,62 @@ const audioPresets = {
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateIsochronic(track.nodeId, params);
+      return {
+        detail: `${params.freq.toFixed(0)} Hz carrier • ${params.pulseFreq.toFixed(1)} Hz pulses`,
+        meta: {
+          freq: params.freq,
+          pulseFreq: params.pulseFreq,
+          gain: params.gain,
+        },
+      };
+    },
+    describe: (params = {}) => `${Math.round(params.freq ?? 180)} Hz • ${Number(params.pulseFreq ?? 12).toFixed(1)} Hz`,
   },
   martigli: {
     label: 'Martigli harmonics',
-    description:
-      'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
-    start: () => {
-      const fundamental = 220;
+    description: 'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
+    params: [
+      {
+        id: 'fundamental',
+        label: 'Fundamental',
+        type: 'range',
+        min: 60,
+        max: 600,
+        step: 1,
+        unit: 'Hz',
+        default: 220,
+        live: true,
+      },
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.14,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const fundamental = Number(params.fundamental ?? 220);
       const harmonics = [1, 1.5, 2, 3, 5, 8, 13];
+      const gain = Number(params.gain ?? 0.14);
       const nodeId = audioEngine.playMartigliWave({
         fundamental,
         harmonics,
         duration: null,
-        gain: 0.14,
+        gain,
         fadeIn: 0.6,
         fadeOut: 0.6,
       });
+      const parameters = { fundamental, gain };
       return {
         nodeId,
-        detail: 'Fundamental 220 Hz with Martigli/Fibonacci ratios.',
+        detail: `${fundamental.toFixed(0)} Hz fundamental`,
+        parameters,
         meta: {
           type: 'martigli',
           fundamental,
@@ -1745,69 +1978,433 @@ const audioPresets = {
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateMartigliWave(track.nodeId, params);
+      return {
+        detail: `${params.fundamental.toFixed(0)} Hz fundamental`,
+        meta: {
+          fundamental: params.fundamental,
+          gain: params.gain,
+        },
+      };
+    },
+    describe: (params = {}) => `${Math.round(params.fundamental ?? 220)} Hz fundamental`,
   },
   'noise-white': {
     label: 'Noise • White spectrum',
     description: 'Broad-spectrum white noise for masking and focus.',
-    start: () => {
-      const color = 'white';
+    params: [
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.18,
+        live: true,
+      },
+      {
+        id: 'pan',
+        label: 'Stereo pan',
+        type: 'range',
+        min: -1,
+        max: 1,
+        step: 0.01,
+        default: 0,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const gain = Number(params.gain ?? 0.18);
+      const pan = Number(params.pan ?? 0);
       const nodeId = audioEngine.playNoise({
-        type: color,
+        type: 'white',
         duration: null,
-        gain: 0.18,
+        gain,
+        pan,
       });
+      const parameters = { gain, pan };
       return {
         nodeId,
-        detail: 'Flat broadband spectrum.',
+        detail: `White noise · gain ${gain.toFixed(2)}`,
+        parameters,
         meta: {
           type: 'noise',
-          color,
+          color: 'white',
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateNoise(track.nodeId, params);
+      return {
+        detail: `White noise · gain ${params.gain.toFixed(2)}`,
+        meta: {
+          gain: params.gain,
+          pan: params.pan,
+        },
+      };
+    },
+    describe: (params = {}) => `White · gain ${Number(params.gain ?? 0.18).toFixed(2)}`,
   },
   'noise-pink': {
     label: 'Noise • Pink spectrum',
     description: '1/f pink noise with gentle energy taper, supportive for relaxation.',
-    start: () => {
-      const color = 'pink';
+    params: [
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.18,
+        live: true,
+      },
+      {
+        id: 'pan',
+        label: 'Stereo pan',
+        type: 'range',
+        min: -1,
+        max: 1,
+        step: 0.01,
+        default: 0,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const gain = Number(params.gain ?? 0.18);
+      const pan = Number(params.pan ?? 0);
       const nodeId = audioEngine.playNoise({
-        type: color,
+        type: 'pink',
         duration: null,
-        gain: 0.18,
+        gain,
+        pan,
       });
+      const parameters = { gain, pan };
       return {
         nodeId,
-        detail: 'Pink noise (1/f falloff).',
+        detail: `Pink noise · gain ${gain.toFixed(2)}`,
+        parameters,
         meta: {
           type: 'noise',
-          color,
+          color: 'pink',
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateNoise(track.nodeId, params);
+      return {
+        detail: `Pink noise · gain ${params.gain.toFixed(2)}`,
+        meta: {
+          gain: params.gain,
+          pan: params.pan,
+        },
+      };
+    },
+    describe: (params = {}) => `Pink · gain ${Number(params.gain ?? 0.18).toFixed(2)}`,
   },
   'noise-brown': {
     label: 'Noise • Brown spectrum',
     description: 'Low-frequency weighted brown noise ideal for grounding and masking.',
-    start: () => {
-      const color = 'brown';
+    params: [
+      {
+        id: 'gain',
+        label: 'Gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.22,
+        live: true,
+      },
+      {
+        id: 'pan',
+        label: 'Stereo pan',
+        type: 'range',
+        min: -1,
+        max: 1,
+        step: 0.01,
+        default: 0,
+        live: true,
+      },
+    ],
+    start: (params = {}) => {
+      const gain = Number(params.gain ?? 0.22);
+      const pan = Number(params.pan ?? 0);
       const nodeId = audioEngine.playNoise({
-        type: color,
+        type: 'brown',
         duration: null,
-        gain: 0.22,
+        gain,
+        pan,
       });
+      const parameters = { gain, pan };
       return {
         nodeId,
-        detail: 'Brown noise with warm low emphasis.',
+        detail: `Brown noise · gain ${gain.toFixed(2)}`,
+        parameters,
         meta: {
           type: 'noise',
-          color,
+          color: 'brown',
         },
       };
     },
+    update: (track, params = {}) => {
+      audioEngine.updateNoise(track.nodeId, params);
+      return {
+        detail: `Brown noise · gain ${params.gain.toFixed(2)}`,
+        meta: {
+          gain: params.gain,
+          pan: params.pan,
+        },
+      };
+    },
+    describe: (params = {}) => `Brown · gain ${Number(params.gain ?? 0.22).toFixed(2)}`,
   },
 };
 
+
+const audioParameterState = new Map();
+let audioParameterPreviewEl = null;
+
+const getStepPrecision = (step = 1) => {
+  if (!step) return 0;
+  if (Number.isInteger(step)) return 0;
+  const stepString = step.toString();
+  if (stepString.includes('e-')) {
+    const exponent = Number(stepString.split('e-')[1]);
+    return Number.isFinite(exponent) ? exponent : 0;
+  }
+  const decimals = stepString.split('.')[1];
+  return decimals ? decimals.length : 0;
+};
+
+const normalizeParameterValue = (field, rawValue) => {
+  let value = Number(rawValue);
+  if (!Number.isFinite(value)) {
+    value = Number(field.default ?? field.min ?? 0);
+  }
+  if (field.min !== undefined) {
+    value = Math.max(field.min, value);
+  }
+  if (field.max !== undefined) {
+    value = Math.min(field.max, value);
+  }
+  if (field.step) {
+    const step = Number(field.step);
+    if (Number.isFinite(step) && step > 0) {
+      value = Math.round(value / step) * step;
+    }
+  }
+  return Number.isFinite(value) ? value : 0;
+};
+
+const formatParameterValue = (field, value) => {
+  if (field?.formatValue) {
+    try {
+      return field.formatValue(value);
+    } catch (error) {
+      console.warn('Parameter formatValue failed', error);
+    }
+  }
+  if (!Number.isFinite(value)) return String(value ?? '');
+  const precision = Math.min(getStepPrecision(field.step || 0.01), 4);
+  const formatted = value.toFixed(precision);
+  return field.unit ? `${formatted}${field.unit}` : formatted;
+};
+
+const getPresetDefaults = (presetKey) => {
+  const preset = audioPresets[presetKey];
+  if (!preset?.params) return {};
+  const defaults = {};
+  preset.params.forEach((field) => {
+    defaults[field.id] = normalizeParameterValue(field, field.default ?? field.min ?? 0);
+  });
+  return defaults;
+};
+
+const ensurePresetState = (presetKey) => {
+  if (!audioParameterState.has(presetKey)) {
+    audioParameterState.set(presetKey, getPresetDefaults(presetKey));
+  }
+  return audioParameterState.get(presetKey);
+};
+
+const getPresetParameterValues = (presetKey) => {
+  const preset = audioPresets[presetKey];
+  if (!preset?.params) return {};
+  const state = ensurePresetState(presetKey);
+  const values = {};
+  preset.params.forEach((field) => {
+    values[field.id] = normalizeParameterValue(field, state[field.id]);
+  });
+  return values;
+};
+
+const createParameterControl = (field, value, { context = 'form', onInput } = {}) => {
+  const wrapper = document.createElement('div');
+  wrapper.className = context === 'track' ? 'track-parameter-field' : 'parameter-field';
+
+  const label = document.createElement('label');
+  label.className = context === 'track' ? 'track-parameter-label' : 'parameter-label';
+  label.textContent = field.label;
+
+  const inputs = document.createElement('div');
+  inputs.className = context === 'track' ? 'track-parameter-inputs' : 'parameter-inputs';
+
+  const valueDisplay = document.createElement('span');
+  valueDisplay.className = context === 'track' ? 'track-parameter-value' : 'parameter-value';
+
+  const inputId = `${context}-param-${field.id}-${Math.random().toString(36).slice(2, 8)}`;
+  label.htmlFor = inputId;
+
+  const applyValue = (nextValue, emit = true) => {
+    const normalized = normalizeParameterValue(field, nextValue);
+    if (Number.isFinite(normalized)) {
+      if (rangeInput) rangeInput.value = normalized;
+      if (numberInput) numberInput.value = normalized;
+    }
+    valueDisplay.textContent = formatParameterValue(field, normalized);
+    if (emit && typeof onInput === 'function') {
+      if (context === 'track') {
+        if (applyValue._raf) cancelAnimationFrame(applyValue._raf);
+        applyValue._raf = requestAnimationFrame(() => {
+          onInput(normalized);
+          applyValue._raf = null;
+        });
+      } else {
+        onInput(normalized);
+      }
+    }
+  };
+
+  let rangeInput = null;
+  let numberInput = null;
+
+  switch (field.type) {
+    case 'range': {
+      rangeInput = document.createElement('input');
+      rangeInput.type = 'range';
+      rangeInput.id = inputId;
+      if (field.min !== undefined) rangeInput.min = field.min;
+      if (field.max !== undefined) rangeInput.max = field.max;
+      if (field.step !== undefined) rangeInput.step = field.step;
+      rangeInput.value = value;
+      rangeInput.setAttribute('aria-label', field.label);
+      rangeInput.addEventListener('input', (event) => {
+        applyValue(event.target.value, true);
+      });
+      inputs.appendChild(rangeInput);
+
+      numberInput = document.createElement('input');
+      numberInput.type = 'number';
+      numberInput.className = context === 'track' ? 'track-parameter-number' : 'parameter-number';
+      if (field.min !== undefined) numberInput.min = field.min;
+      if (field.max !== undefined) numberInput.max = field.max;
+      if (field.step !== undefined) numberInput.step = field.step;
+      numberInput.value = value;
+      numberInput.setAttribute('aria-label', `${field.label} value`);
+      const commitNumber = (event) => {
+        applyValue(event.target.value, true);
+      };
+      numberInput.addEventListener('change', commitNumber);
+      numberInput.addEventListener('blur', commitNumber);
+      inputs.appendChild(numberInput);
+      break;
+    }
+    case 'select': {
+      const select = document.createElement('select');
+      select.id = inputId;
+      select.className = context === 'track' ? 'track-parameter-select' : 'parameter-select';
+      (field.options || []).forEach((option) => {
+        const opt = document.createElement('option');
+        opt.value = option.value;
+        opt.textContent = option.label;
+        if (option.value === value) opt.selected = true;
+        select.appendChild(opt);
+      });
+      select.addEventListener('change', (event) => {
+        onInput?.(event.target.value);
+      });
+      inputs.appendChild(select);
+      break;
+    }
+    default: {
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = inputId;
+      input.value = value;
+      input.addEventListener('change', (event) => {
+        onInput?.(event.target.value);
+      });
+      inputs.appendChild(input);
+    }
+  }
+
+  valueDisplay.textContent = formatParameterValue(field, value);
+  inputs.appendChild(valueDisplay);
+
+  wrapper.appendChild(label);
+  wrapper.appendChild(inputs);
+
+  applyValue(value, false);
+
+  return wrapper;
+};
+
+const updateAudioPresetSummary = (presetKey, state) => {
+  const preset = audioPresets[presetKey];
+  if (!preset) return;
+  const summary = preset.describe ? preset.describe(state) : '';
+  if (audioDescriptionEl) {
+    audioDescriptionEl.textContent = summary
+      ? `${preset.description} Current: ${summary}.`
+      : preset.description;
+  }
+  if (audioParameterPreviewEl) {
+    audioParameterPreviewEl.textContent = summary ? `Current: ${summary}` : '';
+  }
+};
+
+const renderAudioParameterForm = () => {
+  if (!audioParameterPanel || !audioMenu) return;
+  const presetKey = audioMenu.value;
+  const preset = audioPresets[presetKey];
+  audioParameterPanel.innerHTML = '';
+  audioParameterPreviewEl = null;
+
+  if (!preset?.params || preset.params.length === 0) {
+    audioParameterPanel.classList.add('hidden');
+    updateAudioPresetSummary(presetKey, {});
+    return;
+  }
+
+  audioParameterPanel.classList.remove('hidden');
+  const state = ensurePresetState(presetKey);
+
+  const title = document.createElement('h4');
+  title.className = 'parameter-panel-title';
+  title.textContent = 'Preset parameters';
+  audioParameterPanel.appendChild(title);
+
+  preset.params.forEach((field) => {
+    const value = normalizeParameterValue(field, state[field.id]);
+    state[field.id] = value;
+    const control = createParameterControl(field, value, {
+      context: 'form',
+      onInput: (nextValue) => {
+        state[field.id] = nextValue;
+        updateAudioPresetSummary(presetKey, state);
+      },
+    });
+    audioParameterPanel.appendChild(control);
+  });
+
+  audioParameterPreviewEl = document.createElement('p');
+  audioParameterPreviewEl.className = 'parameter-preview';
+  audioParameterPanel.appendChild(audioParameterPreviewEl);
+  updateAudioPresetSummary(presetKey, state);
+};
 const visualPresets = {
   blink: {
     label: 'Blinking colors',
@@ -1938,6 +2535,55 @@ const updateVisualDescription = () => {
     : 'Select a visual feature to display.';
 };
 
+const handleAudioTrackParameterChange = (trackId, field, value, detailElement) => {
+  const track = getAudioTrack(trackId);
+  if (!track) return;
+  const preset = track.presetKey ? audioPresets[track.presetKey] : null;
+  if (!preset || typeof preset.update !== 'function') return;
+
+  const nextParams = {
+    ...(track.parameters || {}),
+    [field.id]: value,
+  };
+
+  try {
+    const updateOutcome = preset.update({ ...track }, nextParams);
+    if (updateOutcome === false) {
+      return;
+    }
+    const updateResult = updateOutcome || {};
+    const descriptor = updateResult.detail
+      ? updateResult.detail
+      : preset.describe
+        ? preset.describe(nextParams)
+        : track.detail;
+
+    const updatedTrack = updateAudioTrack(trackId, (current) => ({
+      ...current,
+      parameters: { ...nextParams },
+      detail: descriptor,
+      meta: updateResult.meta
+        ? { ...(current.meta || {}), ...updateResult.meta }
+        : current.meta,
+    }));
+
+    if (detailElement && descriptor) {
+      detailElement.textContent = descriptor;
+    }
+
+    updateStimulationHeaderSummary();
+    recordUsageEvent('audio_param_update', {
+      label: track.label,
+      presetKey: track.presetKey,
+      paramId: field.id,
+      value,
+      parameters: nextParams,
+    });
+  } catch (error) {
+    console.error('Failed to update audio parameter', error);
+  }
+};
+
 const renderAudioTracks = ({ message } = {}) => {
   audioActiveList.innerHTML = '';
   const entries = getAllAudioTracks();
@@ -1954,23 +2600,61 @@ const renderAudioTracks = ({ message } = {}) => {
     const info = document.createElement('div');
     info.className = 'flex-1 pr-4';
 
+    const preset = track?.presetKey ? audioPresets[track.presetKey] : null;
+    const defaults = preset?.params ? getPresetDefaults(track.presetKey) : {};
+    const paramValues = {
+      ...defaults,
+      ...(track.parameters || {}),
+    };
+
+    if (!track.parameters && preset?.params?.length) {
+      updateAudioTrack(id, (current) => ({
+        ...current,
+        parameters: { ...paramValues },
+      }));
+    }
+
     const title = document.createElement('h4');
-    title.textContent = track.label;
+    title.textContent = track?.label || preset?.label || 'Audio layer';
     info.appendChild(title);
 
-    if (track.detail) {
-      const detail = document.createElement('p');
-      detail.textContent = track.detail;
-      info.appendChild(detail);
+    const detailText = preset?.describe
+      ? preset.describe(paramValues)
+      : track.detail || '';
+    const detailEl = document.createElement('p');
+    detailEl.className = 'text-xs text-gray-500 mt-1';
+    detailEl.textContent = detailText;
+    info.appendChild(detailEl);
+
+    const liveParams = preset?.params?.filter((field) => field.live !== false) || [];
+    if (liveParams.length > 0) {
+      const controls = document.createElement('div');
+      controls.className = 'track-parameter-controls';
+      liveParams.forEach((field) => {
+        const value = normalizeParameterValue(field, paramValues[field.id]);
+        paramValues[field.id] = value;
+        const control = createParameterControl(field, value, {
+          context: 'track',
+          onInput: (nextValue) => {
+            const normalized = normalizeParameterValue(field, nextValue);
+            paramValues[field.id] = normalized;
+            handleAudioTrackParameterChange(id, field, normalized, detailEl);
+          },
+        });
+        controls.appendChild(control);
+      });
+      info.appendChild(controls);
     }
+
+    const actions = document.createElement('div');
+    actions.className = 'track-actions';
 
     const stopButton = document.createElement('button');
     stopButton.type = 'button';
     stopButton.dataset.trackId = id;
     stopButton.textContent = 'Stop';
     stopButton.classList.add('track-stop');
-    const actions = document.createElement('div');
-    actions.className = 'track-actions';
+
     actions.appendChild(stopButton);
 
     item.appendChild(info);
@@ -1978,23 +2662,20 @@ const renderAudioTracks = ({ message } = {}) => {
     audioActiveList.appendChild(item);
   });
 
-  if (statusEl) {
-    if (message) {
-      statusEl.textContent = message;
-    } else if (!audioEngineInitPromise) {
-      if (!audioEngine) {
-        statusEl.textContent = 'Audio engine idle. Start audio to play tracks.';
-      } else if (count === 0) {
-        statusEl.textContent = 'Audio engine running. No active layers.';
-      } else {
-        statusEl.textContent = `${count} audio layer${count === 1 ? '' : 's'} running.`;
-      }
+  if (message) {
+    statusEl.textContent = message;
+  } else if (!audioEngineInitPromise) {
+    if (!audioEngine) {
+      statusEl.textContent = 'Audio engine idle. Start audio to play tracks.';
+    } else if (count === 0) {
+      statusEl.textContent = 'Audio engine running. No active layers.';
+    } else {
+      statusEl.textContent = `${count} audio layer${count === 1 ? '' : 's'} running.`;
     }
   }
 
   updateUsageView();
 };
-
 const renderVisualTracks = ({ message } = {}) => {
   visualActiveList.innerHTML = '';
   const entries = getAllVisualTracks();
@@ -2089,7 +2770,10 @@ const shutdownAudioSession = async ({ message } = {}) => {
   updateUsageView();
 };
 
-audioMenu.addEventListener('change', updateAudioDescription);
+audioMenu.addEventListener('change', () => {
+  updateAudioDescription();
+  renderAudioParameterForm();
+});
 visualMenu.addEventListener('change', updateVisualDescription);
 
 addAudioBtn.addEventListener('click', async () => {
@@ -2097,24 +2781,33 @@ addAudioBtn.addEventListener('click', async () => {
   const preset = audioPresets[presetKey];
   if (!preset) return;
 
+  const params = getPresetParameterValues(presetKey);
+
   try {
     const engine = await ensureAudioEngine({ userInitiated: false });
     if (!engine) {
       return;
     }
     await engine.resume?.();
-    const result = preset.start();
+    const result = preset.start(params);
     if (!result || !result.nodeId) {
       throw new Error('Preset did not return a node id');
     }
 
     const trackId = generateTrackId('audio');
+    const parameters = { ...(result.parameters || params) };
+    const detailText = result.detail
+      ? result.detail
+      : preset.describe
+        ? preset.describe(parameters)
+        : '';
     const trackMeta = result.meta || { type: presetKey };
     addAudioTrack(trackId, {
       presetKey,
       label: preset.label,
-      detail: result.detail || '',
+      detail: detailText,
       nodeId: result.nodeId,
+      parameters,
       startedAt: Date.now(),
       finalized: false,
       meta: trackMeta,
@@ -2126,6 +2819,7 @@ addAudioBtn.addEventListener('click', async () => {
       category: 'audio',
       count: 1,
       meta: trackMeta,
+      parameters,
     });
 
     const count = getAllAudioTracks().length;
@@ -2257,6 +2951,7 @@ stopBtn.addEventListener('click', async () => {
 });
 
 updateAudioDescription();
+renderAudioParameterForm();
 updateVisualDescription();
 renderAudioTracks();
 renderVisualTracks();
