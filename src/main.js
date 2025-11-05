@@ -107,6 +107,136 @@ const extendedRangeSettings = {
 };
 const EXTENDED_RANGE_STORAGE_KEY = 'biosyncare_extended_ranges';
 
+// Martigli/Breathing Controller - Global shared breathing oscillation
+const martigliController = {
+  active: false,
+  startTime: null,
+  endTime: null,
+  waveform: 'sine', // 'sine', 'triangle', 'sawtooth', 'square'
+  inhaleRatio: 0.5, // 0.5 = equal inhale/exhale
+  trajectory: [
+    { period: 10, duration: 0 }, // Start at 10s breathing period
+    { period: 20, duration: 600 }, // Transition to 20s over 600 seconds
+  ],
+
+  // Calculate current breathing period based on trajectory
+  getCurrentPeriod(elapsedTime) {
+    if (!this.trajectory || this.trajectory.length === 0) {
+      return 10; // Default period
+    }
+
+    let accumulatedTime = 0;
+    let currentPeriod = this.trajectory[0].period;
+
+    for (let i = 0; i < this.trajectory.length - 1; i++) {
+      const current = this.trajectory[i];
+      const next = this.trajectory[i + 1];
+      const transitionEnd = accumulatedTime + next.duration;
+
+      if (elapsedTime <= transitionEnd) {
+        // We're in this transition
+        if (next.duration === 0) {
+          return next.period;
+        }
+        const progress = (elapsedTime - accumulatedTime) / next.duration;
+        return current.period + (next.period - current.period) * progress;
+      }
+
+      accumulatedTime = transitionEnd;
+      currentPeriod = next.period;
+    }
+
+    // Past all transitions, use final period
+    return this.trajectory[this.trajectory.length - 1].period;
+  },
+
+  // Get oscillation value [-1, 1] where -1 = full exhale, 1 = full inhale
+  getValue(currentTime = Date.now()) {
+    if (!this.active || !this.startTime) {
+      return 0;
+    }
+
+    const elapsedMs = currentTime - this.startTime;
+    const elapsedSec = elapsedMs / 1000;
+
+    // Check if we've reached end time
+    if (this.endTime && currentTime >= this.endTime) {
+      return 0;
+    }
+
+    const period = this.getCurrentPeriod(elapsedSec);
+    const cyclePosition = (elapsedSec % period) / period; // 0 to 1
+
+    // Apply inhale/exhale ratio
+    let value;
+    if (cyclePosition < this.inhaleRatio) {
+      // Inhale phase (0 to 1)
+      const inhaleProgress = cyclePosition / this.inhaleRatio;
+      value = this.applyWaveform(inhaleProgress, true);
+    } else {
+      // Exhale phase (1 to 0)
+      const exhaleProgress = (cyclePosition - this.inhaleRatio) / (1 - this.inhaleRatio);
+      value = this.applyWaveform(exhaleProgress, false);
+    }
+
+    return value;
+  },
+
+  // Apply selected waveform to progress value
+  applyWaveform(progress, isInhale) {
+    // progress goes from 0 to 1
+    // For inhale: map to -1 to 1
+    // For exhale: map to 1 to -1
+    let rawValue;
+
+    switch (this.waveform) {
+      case 'sine':
+        rawValue = Math.sin(progress * Math.PI - Math.PI / 2);
+        break;
+      case 'triangle':
+        rawValue = 2 * progress - 1;
+        break;
+      case 'sawtooth':
+        rawValue = progress * 2 - 1;
+        break;
+      case 'square':
+        rawValue = progress < 0.5 ? -1 : 1;
+        break;
+      default:
+        rawValue = Math.sin(progress * Math.PI - Math.PI / 2);
+    }
+
+    return isInhale ? rawValue : -rawValue;
+  },
+
+  // Start breathing pattern
+  start(durationMs = null) {
+    this.active = true;
+    this.startTime = Date.now();
+    this.endTime = durationMs ? this.startTime + durationMs : null;
+  },
+
+  // Stop breathing pattern
+  stop() {
+    this.active = false;
+    this.startTime = null;
+    this.endTime = null;
+  },
+
+  // Reset to default configuration
+  reset() {
+    this.stop();
+    this.waveform = 'sine';
+    this.inhaleRatio = 0.5;
+    this.trajectory = [
+      { period: 10, duration: 0 },
+      { period: 20, duration: 600 },
+    ];
+  },
+};
+
+const MARTIGLI_STORAGE_KEY = 'biosyncare_martigli_config';
+
 // --- Identity UI ---
 const authStatusEl = document.getElementById('auth-status');
 const authIdentityEl = document.getElementById('auth-identity');
@@ -302,6 +432,19 @@ const extendedCarrierFreqToggle = document.getElementById('toggle-extended-carri
 const extendedLRFreqToggle = document.getElementById('toggle-extended-lr-freq');
 const extendedPanFreqToggle = document.getElementById('toggle-extended-pan-freq');
 const extendedCrossfadeToggle = document.getElementById('toggle-extended-crossfade');
+const martigliStartBtn = document.getElementById('btn-martigli-start');
+const martigliStopBtn = document.getElementById('btn-martigli-stop');
+const martigliWaveformSelect = document.getElementById('martigli-waveform');
+const martigliInhaleRatioInput = document.getElementById('martigli-inhale-ratio');
+const martigliInhaleRatioValue = document.getElementById('martigli-inhale-ratio-value');
+const martigliTrajectoryList = document.getElementById('martigli-trajectory-list');
+const btnAddTrajectoryPoint = document.getElementById('btn-add-trajectory-point');
+const martigliStatusText = document.getElementById('martigli-status-text');
+const martigliIndicator = document.getElementById('martigli-indicator');
+const martigliCurrentValues = document.getElementById('martigli-current-values');
+const martigliCurrentPeriod = document.getElementById('martigli-current-period');
+const martigliCurrentPhase = document.getElementById('martigli-current-phase');
+const martigliCurrentValue = document.getElementById('martigli-current-value');
 const myActivityTab = document.getElementById('tab-my-activity');
 const publicActivityTab = document.getElementById('tab-public-activity');
 const refreshActivityBtn = document.getElementById('btn-refresh-activity');
@@ -472,6 +615,162 @@ const saveExtendedRangeSettings = () => {
     localStorage.setItem(EXTENDED_RANGE_STORAGE_KEY, payload);
   } catch (error) {
     console.warn('[Settings] Failed to save extended range settings', error);
+  }
+};
+
+const loadMartigliConfig = () => {
+  try {
+    const raw = localStorage.getItem(MARTIGLI_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      if (parsed.waveform) martigliController.waveform = parsed.waveform;
+      if (typeof parsed.inhaleRatio === 'number') {
+        martigliController.inhaleRatio = parsed.inhaleRatio;
+      }
+      if (Array.isArray(parsed.trajectory) && parsed.trajectory.length > 0) {
+        martigliController.trajectory = parsed.trajectory;
+      }
+    }
+  } catch (error) {
+    console.warn('[Martigli] Failed to load config', error);
+  }
+};
+
+const saveMartigliConfig = () => {
+  try {
+    const payload = JSON.stringify({
+      waveform: martigliController.waveform,
+      inhaleRatio: martigliController.inhaleRatio,
+      trajectory: martigliController.trajectory,
+    });
+    localStorage.setItem(MARTIGLI_STORAGE_KEY, payload);
+  } catch (error) {
+    console.warn('[Martigli] Failed to save config', error);
+  }
+};
+
+// Render the trajectory list
+const renderMartigliTrajectory = () => {
+  if (!martigliTrajectoryList) return;
+
+  martigliTrajectoryList.innerHTML = '';
+
+  martigliController.trajectory.forEach((point, index) => {
+    const item = document.createElement('div');
+    item.className = 'flex items-center gap-2 p-2 bg-white border border-gray-200 rounded';
+
+    const content = document.createElement('div');
+    content.className = 'flex-1 grid grid-cols-2 gap-2 text-sm';
+
+    const periodLabel = document.createElement('div');
+    periodLabel.innerHTML = `<span class="text-gray-600">Period:</span> <input type="number" min="0.1" max="300" step="0.1" value="${point.period}" class="w-20 px-2 py-1 border rounded text-sm" data-index="${index}" data-field="period">s`;
+
+    const durationLabel = document.createElement('div');
+    if (index === 0) {
+      durationLabel.innerHTML = `<span class="text-gray-600">Initial</span>`;
+    } else {
+      durationLabel.innerHTML = `<span class="text-gray-600">Transition:</span> <input type="number" min="0" max="3600" step="1" value="${point.duration}" class="w-20 px-2 py-1 border rounded text-sm" data-index="${index}" data-field="duration">s`;
+    }
+
+    content.appendChild(periodLabel);
+    content.appendChild(durationLabel);
+    item.appendChild(content);
+
+    if (martigliController.trajectory.length > 1) {
+      const removeBtn = document.createElement('button');
+      removeBtn.textContent = '×';
+      removeBtn.className = 'text-red-600 hover:text-red-800 font-bold text-lg px-2';
+      removeBtn.type = 'button';
+      removeBtn.onclick = () => {
+        if (index === 0 && martigliController.trajectory.length > 1) {
+          // Don't remove first point if there are others
+          return;
+        }
+        martigliController.trajectory.splice(index, 1);
+        if (martigliController.trajectory.length === 0) {
+          martigliController.trajectory.push({ period: 10, duration: 0 });
+        }
+        saveMartigliConfig();
+        renderMartigliTrajectory();
+      };
+      item.appendChild(removeBtn);
+    }
+
+    martigliTrajectoryList.appendChild(item);
+  });
+
+  // Add event listeners to inputs
+  const inputs = martigliTrajectoryList.querySelectorAll('input');
+  inputs.forEach((input) => {
+    input.addEventListener('change', (e) => {
+      const index = parseInt(e.target.dataset.index);
+      const field = e.target.dataset.field;
+      const value = parseFloat(e.target.value);
+
+      if (Number.isFinite(value) && value >= 0) {
+        martigliController.trajectory[index][field] = value;
+        saveMartigliConfig();
+      }
+    });
+  });
+};
+
+// Update Martigli UI state
+const updateMartigliUI = () => {
+  if (!martigliStartBtn || !martigliStopBtn) return;
+
+  // Update waveform select
+  if (martigliWaveformSelect) {
+    martigliWaveformSelect.value = martigliController.waveform;
+  }
+
+  // Update inhale ratio
+  if (martigliInhaleRatioInput) {
+    martigliInhaleRatioInput.value = martigliController.inhaleRatio;
+  }
+  if (martigliInhaleRatioValue) {
+    martigliInhaleRatioValue.textContent = `${Math.round(martigliController.inhaleRatio * 100)}%`;
+  }
+
+  if (martigliController.active) {
+    martigliStartBtn.disabled = true;
+    martigliStopBtn.disabled = false;
+    if (martigliStatusText) martigliStatusText.textContent = 'Active';
+    if (martigliIndicator) {
+      martigliIndicator.classList.remove('bg-gray-400');
+      martigliIndicator.classList.add('bg-green-500', 'animate-pulse');
+    }
+    if (martigliCurrentValues) martigliCurrentValues.classList.remove('hidden');
+  } else {
+    martigliStartBtn.disabled = false;
+    martigliStopBtn.disabled = true;
+    if (martigliStatusText) martigliStatusText.textContent = 'Inactive';
+    if (martigliIndicator) {
+      martigliIndicator.classList.remove('bg-green-500', 'animate-pulse');
+      martigliIndicator.classList.add('bg-gray-400');
+    }
+    if (martigliCurrentValues) martigliCurrentValues.classList.add('hidden');
+  }
+};
+
+// Update real-time Martigli values display
+const updateMartigliValues = () => {
+  if (!martigliController.active || !martigliCurrentPeriod) return;
+
+  const now = Date.now();
+  const elapsedSec = (now - martigliController.startTime) / 1000;
+  const period = martigliController.getCurrentPeriod(elapsedSec);
+  const value = martigliController.getValue(now);
+  const cyclePosition = (elapsedSec % period) / period;
+
+  martigliCurrentPeriod.textContent = period.toFixed(1);
+  martigliCurrentValue.textContent = value.toFixed(3);
+
+  if (cyclePosition < martigliController.inhaleRatio) {
+    martigliCurrentPhase.textContent = 'Inhale';
+  } else {
+    martigliCurrentPhase.textContent = 'Exhale';
   }
 };
 
@@ -1593,6 +1892,42 @@ extendedCrossfadeToggle?.addEventListener('change', (event) => {
   updateActiveTrackRanges();
 });
 
+martigliStartBtn?.addEventListener('click', () => {
+  martigliController.start();
+  updateMartigliUI();
+  saveMartigliConfig();
+});
+
+martigliStopBtn?.addEventListener('click', () => {
+  martigliController.stop();
+  updateMartigliUI();
+  saveMartigliConfig();
+});
+
+martigliWaveformSelect?.addEventListener('change', (event) => {
+  martigliController.waveform = event.target.value;
+  saveMartigliConfig();
+});
+
+martigliInhaleRatioInput?.addEventListener('input', (event) => {
+  const value = parseFloat(event.target.value);
+  martigliController.inhaleRatio = value;
+  if (martigliInhaleRatioValue) {
+    martigliInhaleRatioValue.textContent = `${Math.round(value * 100)}%`;
+  }
+  saveMartigliConfig();
+});
+
+btnAddTrajectoryPoint?.addEventListener('click', () => {
+  const lastPoint = martigliController.trajectory[martigliController.trajectory.length - 1];
+  martigliController.trajectory.push({
+    period: lastPoint.period,
+    duration: 60,
+  });
+  saveMartigliConfig();
+  renderMartigliTrajectory();
+});
+
 audioEngineSelect?.addEventListener('change', async (event) => {
   const value = event.target.value;
   setEngineSelection({ audio: value });
@@ -1631,12 +1966,22 @@ refreshActivityBtn?.addEventListener('click', () => {
 
 // Initial render after functions are defined
 loadExtendedRangeSettings();
+loadMartigliConfig();
 initDiagnostics();
 populateEngineSelects();
 updateProfileSummary();
 applySettingsToUI();
 updateUsageView();
 renderActivityFeeds();
+renderMartigliTrajectory();
+updateMartigliUI();
+
+// Update Martigli values in real-time
+setInterval(() => {
+  if (martigliController.active) {
+    updateMartigliValues();
+  }
+}, 100);
 
 window.addEventListener('storage', (event) => {
   if (event.key === 'biosyncare_user_profile') {

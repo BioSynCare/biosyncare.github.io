@@ -81,5 +81,26 @@ On the positive side, aligned with such strong results:
 
 - Neurosensory stimulation is has indeed shown scientific evidence of helping in a broad spectrum of cases, from pain management, to cognitive enhancement.
 - The cocktail of such sessions went beyond Neurosensory stimulation, which was perfomed in 15 minutes. We empirically arrived in a mix of 1) yes, neurosensory stimulation, specially audio; 2) slow rithmic breathing, guided through audiovisual cues;
+3) Support groups, because we were meeting and talking for the first 15-30 minutes, and the last 30-45 minutes, talking about anything and about the problem/thing to solve; 4) A sort of Loving-kindness meditation (we used another name for it), because it was part of the 15 minutes that the person would concentrate in a theme, decided upon and agreed in the first conversation of the meeting. For example, I would propose 3-4 words for the person to choose so we would focus on for the 15 min session. The theme choosed could then be "understanding", let's say. The instruction we passed on was: concentrate on the theme, then the theme for yourself, then the theme for the others in the session, then the theme for the people that are around us, live with us, or neighbors and family, and expand it. Ideally we should reach the whole world.
 
-3. Support groups, because we were meeting and talking for the first 15-30 minutes, and the last 30-45 minutes, talking about anything and about the problem/thing to solve; 4) .
+Because the techniques are reported to be so beneficial:
+1) Audiovisual Neurosensory stimulation brainwave entrainment
+2) Slow rythmic breathing
+3) Support groups
+4) Mindfulness/Loving-kindness meditation
+
+I think the result I report, of it helping so much,
+might not be (so much) far from the truth.
+The dilema is:
+A) The results are way beyond what is achieved with current pills, for suicidal tendencies (3-5 days for considerable relief), migranes (solving for many cases), and maybe also overall performance and wellbeing.
+B) The Cocktail is indeed capable of helping in so much.
+
+Anyway, we are in contact until today, some of the people that knew each other during these sessions.
+
+I realized that I/we had to input so much energy into making these sessions, and it was not feasible at least for me.
+For it to take a life on its own, we decided to start a commercial application, now called BioSynCare.
+
+BioSynCare Lab, BLab, Blab, B side of BioSynCare's front page,
+is the free framework put up to host the algorithms, formalized vocabulary and ontology, allow for experimenting, sharing thoughts and feedbacks, ideas and experiments, mix of audiovisual features created with a desired effect or a goal or a theme.
+
+BioSynCare stands as the Multiplatform Neurosensory stimulation for end users. It is very easy to use, is available as iOS and Android mobile apps, have the plans and the style to be diffused and used by the general public.
