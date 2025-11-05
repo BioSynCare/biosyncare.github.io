@@ -109,7 +109,7 @@ const EXTENDED_RANGE_STORAGE_KEY = 'biosyncare_extended_ranges';
 
 // Martigli/Breathing Controller - Global shared breathing oscillation
 const martigliController = {
-  DEBUG: true,
+  DEBUG: false,
   active: false,
   startTime: null,
   endTime: null,
@@ -117,6 +117,8 @@ const martigliController = {
   _perfOffsetMs: null,
   _phase: 0,
   _lastPhaseTimestampMs: null,
+  _workletPort: null,
+  _workletState: null,
   waveform: 'sine', // 'sine', 'triangle', 'sawtooth', 'square'
   inhaleRatio: 0.5, // 0.5 = equal inhale/exhale
   trajectory: [
@@ -165,6 +167,9 @@ const martigliController = {
   },
 
   getElapsedMilliseconds(timeValue) {
+    if (this._workletState?.elapsedSamples && this._workletState?.sampleRate) {
+      return (this._workletState.elapsedSamples / this._workletState.sampleRate) * 1000;
+    }
     if (!this.active || (!this.startTime && this._startPerfTime === null)) {
       return 0;
     }
@@ -204,6 +209,11 @@ const martigliController = {
   },
 
   _updatePhase(timeReference) {
+    if (this._workletState && typeof this._workletState.phase === 'number') {
+      this._phase = this._workletState.phase;
+      this._lastPhaseTimestampMs = this._toMonotonicMs(timeReference);
+      return this._phase;
+    }
     if (!this.active) {
       return this._phase;
     }
@@ -230,11 +240,17 @@ const martigliController = {
   },
 
   getPhase() {
+    if (this._workletState && typeof this._workletState.phase === 'number') {
+      return this._workletState.phase;
+    }
     return this._phase;
   },
 
   // Calculate current breathing period based on trajectory
   getCurrentPeriod(elapsedTime) {
+    if (this._workletState && typeof this._workletState.period === 'number') {
+      return this._workletState.period;
+    }
     if (!this.trajectory || this.trajectory.length === 0) {
       return 10; // Default period
     }
@@ -266,6 +282,9 @@ const martigliController = {
 
   // Get oscillation value [-1, 1] where -1 = full exhale, 1 = full inhale
   getValue(currentTime = Date.now()) {
+    if (this._workletState && typeof this._workletState.value === 'number') {
+      return this._workletState.value;
+    }
     if (!this.active || !this.startTime) {
       return 0;
     }
@@ -367,6 +386,7 @@ const martigliController = {
       this.endTime = durationMs ? this.startTime + durationMs : null;
       this._phase = 0;
       this._lastPhaseTimestampMs = this._hasPerformance() ? this._startPerfTime : this.startTime;
+      this._syncWorkletConfig({ reset: true });
     } else {
       // When already active we still refresh time base to avoid drift
       if (this._hasPerformance()) {
@@ -374,6 +394,7 @@ const martigliController = {
       }
       this.startTime = Date.now();
       this.endTime = durationMs ? this.startTime + durationMs : this.endTime;
+      this._syncWorkletConfig({ reset: true });
     }
   },
 
@@ -385,6 +406,10 @@ const martigliController = {
     this._startPerfTime = null;
     this._phase = 0;
     this._lastPhaseTimestampMs = null;
+    if (this._workletPort) {
+      this._workletPort.postMessage({ type: 'stop' });
+    }
+    this._workletState = null;
   },
 
   // Reset to default configuration
@@ -396,6 +421,82 @@ const martigliController = {
       { period: 10, duration: 0 },
       { period: 20, duration: 600 },
     ];
+    this._syncWorkletConfig({ reset: true });
+  },
+
+  attachWorkletPort(port) {
+    if (!port || this._workletPort === port) {
+      if (port) {
+        this._syncWorkletConfig({ reset: true });
+      }
+      return;
+    }
+    this._workletPort = port;
+    this._workletPort.onmessage = (event) => {
+      const data = event.data || {};
+      if (data.type === 'state') {
+        this.updateFromWorkletState(data);
+      }
+    };
+    this._syncWorkletConfig({ reset: true });
+  },
+
+  detachWorkletPort() {
+    if (this._workletPort) {
+      this._workletPort.postMessage({ type: 'stop' });
+    }
+    this._workletPort = null;
+    this._workletState = null;
+  },
+
+  updateFromWorkletState(state = {}) {
+    const defaultSampleRate =
+      typeof sampleRate !== 'undefined' ? sampleRate : 48000;
+    const sampleRateFromState =
+      typeof state.sampleRate === 'number' && state.sampleRate > 0
+        ? state.sampleRate
+        : this._workletState?.sampleRate ?? defaultSampleRate;
+    this._workletState = {
+      value:
+        typeof state.value === 'number'
+          ? state.value
+          : this._workletState?.value ?? 0,
+      phase:
+        typeof state.phase === 'number'
+          ? state.phase % 1
+          : this._workletState?.phase ?? 0,
+      elapsedSamples:
+        typeof state.elapsedSamples === 'number'
+          ? state.elapsedSamples
+          : this._workletState?.elapsedSamples ?? 0,
+      period:
+        typeof state.period === 'number'
+          ? state.period
+          : this._workletState?.period ?? this.trajectory[0]?.period ?? 10,
+      sampleRate: sampleRateFromState,
+      timestamp: Date.now(),
+    };
+    this._phase = this._workletState.phase;
+    this._lastPhaseTimestampMs = this._toMonotonicMs();
+  },
+
+  _syncWorkletConfig({ reset } = {}) {
+    if (!this._workletPort) return;
+    this._workletPort.postMessage({
+      type: 'configure',
+      data: {
+        waveform: this.waveform,
+        inhaleRatio: this.inhaleRatio,
+        trajectory: this.trajectory,
+      },
+    });
+    if (reset) {
+      this._workletPort.postMessage({ type: 'reset' });
+    }
+  },
+
+  notifyConfigChanged({ reset = false } = {}) {
+    this._syncWorkletConfig({ reset });
   },
 };
 
@@ -807,6 +908,7 @@ const loadMartigliConfig = () => {
       if (Array.isArray(parsed.trajectory) && parsed.trajectory.length > 0) {
         martigliController.trajectory = parsed.trajectory;
       }
+      martigliController.notifyConfigChanged({ reset: true });
     }
   } catch (error) {
     console.warn('[Martigli] Failed to load config', error);
@@ -868,6 +970,7 @@ const renderMartigliTrajectory = () => {
           martigliController.trajectory.push({ period: 10, duration: 0 });
         }
         saveMartigliConfig();
+        martigliController.notifyConfigChanged();
         renderMartigliTrajectory();
       };
       item.appendChild(removeBtn);
@@ -887,6 +990,7 @@ const renderMartigliTrajectory = () => {
       if (Number.isFinite(value) && value >= 0) {
         martigliController.trajectory[index][field] = value;
         saveMartigliConfig();
+        martigliController.notifyConfigChanged();
       }
     });
   });
@@ -2246,6 +2350,7 @@ martigliStopBtn?.addEventListener('click', () => {
 martigliWaveformSelect?.addEventListener('change', (event) => {
   martigliController.waveform = event.target.value;
   saveMartigliConfig();
+  martigliController.notifyConfigChanged();
   renderMartigliVisualization();
 });
 
@@ -2256,6 +2361,7 @@ martigliInhaleRatioInput?.addEventListener('input', (event) => {
     martigliInhaleRatioValue.textContent = `${Math.round(value * 100)}%`;
   }
   saveMartigliConfig();
+  martigliController.notifyConfigChanged();
   renderMartigliVisualization();
 });
 
@@ -2266,6 +2372,7 @@ btnAddTrajectoryPoint?.addEventListener('click', () => {
     duration: 60,
   });
   saveMartigliConfig();
+  martigliController.notifyConfigChanged();
   renderMartigliTrajectory();
 });
 
@@ -2484,6 +2591,9 @@ const disposeAudioEngine = async () => {
     }
   }
   audioEngine = null;
+  if (typeof window !== 'undefined' && window.martigliController?.detachWorkletPort) {
+    window.martigliController.detachWorkletPort();
+  }
   updateStimulationHeaderSummary();
 };
 
@@ -2491,6 +2601,7 @@ const ensureAudioEngine = async ({ userInitiated = false } = {}) => {
   if (audioEngine) {
     try {
       await audioEngine.resume?.();
+      audioEngine._initMartigliWorklet?.();
     } catch (error) {
       console.warn('[Audio] Failed to resume audio context.', error);
     }

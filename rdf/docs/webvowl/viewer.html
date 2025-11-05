@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WebVOWL viewer (embedded) — BioSynCare</title>
+    <style>
+      :root { --border:#e5e7eb; }
+      body { font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 0; color: #111; }
+      header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); }
+      h1 { margin: 0 0 .25rem; font-size: 1.25rem; }
+      .bar { display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; }
+      button, a.btn, select, label { font: inherit; }
+      button, a.btn { background:#111; color:#fff; border:0; padding:.45rem .7rem; border-radius:6px; cursor:pointer; text-decoration:none; }
+      button.secondary { background:#fff; color:#111; border:1px solid var(--border); }
+      .info { color:#444; font-size:.95rem; }
+      .wrap { height: calc(100vh - 76px); }
+      iframe { width: 100%; height: 100%; border: 0; }
+      code { background:#f6f8fa; padding:.15rem .35rem; border-radius:4px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>WebVOWL viewer (embedded)</h1>
+      <div class="bar">
+        <button id="openBsc">Open bsc.json</button>
+  <button id="openSso" class="secondary">Open sso.json</button>
+  <a id="openApp" class="btn secondary" href="/rdf/docs/webvowl/app/webvowl.html">Open local app</a>
+        <label><input type="checkbox" id="useLive"> Use live site URLs (biosyncare.github.io)</label>
+        <span class="info">Tip: Generate JSON first with <code>make rdf-webvowl</code>. JSON is expected at <code>/rdf/docs/webvowl/*.json</code>.</span>
+        <a class="btn secondary" href="/rdf/">Back to RDF index</a>
+      </div>
+      <div id="status" class="info" style="margin-top:.5rem"></div>
+    </header>
+    <div class="wrap">
+      <div style="display:flex;align-items:center;justify-content:center;height:100%;color:#444;">
+        <div>
+          <p>Use the buttons above to open the ontology diagram using our local WebVOWL viewer.</p>
+          <p>If the viewer assets aren’t installed yet, you’ll see instructions here.</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const openBsc = document.getElementById('openBsc');
+      const openSso = document.getElementById('openSso');
+      const useLive = document.getElementById('useLive');
+
+  // Use ONLY the self-hosted WebVOWL viewer
+  const appViewer = '/rdf/docs/webvowl/app/webvowl.html';
+  // Expose a direct link to verify the app exists
+  document.getElementById('openApp').setAttribute('href', appViewer);
+
+      function jsonUrl(name) {
+        if (useLive.checked) {
+          return `https://biosyncare.github.io/rdf/docs/webvowl/${name}.json`;
+        } else {
+          return `${window.location.origin}/rdf/docs/webvowl/${name}.json`;
+        }
+      }
+
+      function go(name) {
+        const json = jsonUrl(name);
+        // Navigate to this launcher with the JSON url in the hash; onload handler will redirect to the app
+        const here = `${window.location.origin}/rdf/docs/webvowl/viewer.html#url=${encodeURIComponent(json)}`;
+        window.location.href = here;
+      }
+
+      openBsc.addEventListener('click', () => go('bsc'));
+      openSso.addEventListener('click', () => go('sso'));
+
+      async function tryRedirectFromHash() {
+        const status = document.getElementById('status');
+        const h = window.location.hash;
+        if (h && h.startsWith('#url=')) {
+          const json = decodeURIComponent(h.slice(5));
+          try {
+            const resp = await fetch(appViewer, { method: 'HEAD' });
+            if (resp.ok) {
+              window.location.replace(`${appViewer}#url=${encodeURIComponent(json)}`);
+              return;
+            }
+          } catch (e) { /* ignore */ }
+          // App not present: show install hint and a direct link that will work after install
+          const link = `${appViewer}#url=${encodeURIComponent(json)}`;
+          status.innerHTML = `Local WebVOWL app not found. Install it with <code>make rdf-webvowl-viewer</code> (or copy the WebVOWL gh-pages into <code>/rdf/docs/webvowl/app/</code>).<br>
+          After installing, open <a href="${link}">${link}</a>.`;
+        }
+      }
+
+      document.addEventListener('DOMContentLoaded', tryRedirectFromHash);
+      // No external fallback; we only use the local app
+    </script>
+        <p>
+          This page launches the local WebVOWL app only. It will never redirect to an external host. If the app isn’t installed yet, follow the instructions above.
+        </p>
+  </body>
+  </html>

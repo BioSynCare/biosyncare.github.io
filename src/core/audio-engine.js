@@ -39,6 +39,8 @@ const toNumberOr = (value, fallback) => {
   return Number.isFinite(parsed) ? parsed : fallback;
 };
 
+const MARTIGLI_WORKLET_URL = new URL('./worklets/martigli-processor.js', import.meta.url);
+
 const createPanAutomation = ({ ctx, mixMode = 'dichotic', leftPanner, rightPanner }) => {
   let config = null;
   let intervalId = null;
@@ -197,6 +199,8 @@ export class AudioEngine {
     this.masterGain = null;
     this.nodes = new Map(); // active nodes registry
     this.initialized = false;
+    this.martigliWorklet = null;
+    this.martigliBypassGain = null;
   }
 
   /**
@@ -216,12 +220,47 @@ export class AudioEngine {
     this.masterGain.gain.value = 0.2; // -14 dBFS aprox (safe default)
     this.masterGain.connect(this.ctx.destination);
 
+    this._initMartigliWorklet();
+
     this.initialized = true;
     console.log('[AudioEngine] Initialized', {
       sampleRate: this.ctx.sampleRate,
       state: this.ctx.state,
       baseLatency: this.ctx.baseLatency,
     });
+  }
+
+  async _initMartigliWorklet() {
+    if (!this.ctx?.audioWorklet || this.martigliWorklet) return;
+    try {
+      await this.ctx.audioWorklet.addModule(MARTIGLI_WORKLET_URL);
+      this.martigliWorklet = new AudioWorkletNode(this.ctx, 'martigli-processor', {
+        numberOfOutputs: 1,
+        outputChannelCount: [1],
+      });
+      this.martigliBypassGain = this.ctx.createGain();
+      this.martigliBypassGain.gain.value = 0;
+      this.martigliWorklet.connect(this.martigliBypassGain);
+      this.martigliBypassGain.connect(this.masterGain);
+
+      this.martigliWorklet.port.onmessage = (event) => {
+        if (
+          event?.data?.type === 'state' &&
+          typeof window !== 'undefined' &&
+          window.martigliController?.updateFromWorkletState
+        ) {
+          window.martigliController.updateFromWorkletState(event.data);
+        }
+      };
+
+      if (typeof window !== 'undefined' && window.martigliController?.attachWorkletPort) {
+        window.martigliController.attachWorkletPort(this.martigliWorklet.port);
+      }
+
+      console.log('[AudioEngine] Martigli worklet initialized');
+    } catch (error) {
+      console.warn('[AudioEngine] Failed to init Martigli worklet', error);
+    }
   }
 
   /**
