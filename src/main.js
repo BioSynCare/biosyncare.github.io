@@ -292,14 +292,7 @@ const martigliController = {
       return 0;
     }
 
-    this._updatePhase(timeReference);
-    const period = Math.max(0.01, this.getCurrentPeriod(elapsedSec));
-    let cyclePosition = this._phase;
-    if (elapsedSec >= period) {
-      cyclePosition = (elapsedSec % period) / period;
-      this._phase = cyclePosition;
-    }
-
+    const cyclePosition = this._updatePhase(timeReference);
     // Apply waveform to the full cycle position
     return this.applyWaveform(cyclePosition);
   },
