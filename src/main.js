@@ -3733,7 +3733,7 @@ const renderAudioTracks = ({ message } = {}) => {
     detailEl.textContent = detailText;
     info.appendChild(detailEl);
 
-    const liveParams = preset?.params?.filter((field) => field.live !== false) || [];
+    const liveParams = getPresetParams(preset)?.filter((field) => field.live !== false) || [];
     if (liveParams.length > 0) {
       const visibleControls = [];
       liveParams.forEach((field) => {
