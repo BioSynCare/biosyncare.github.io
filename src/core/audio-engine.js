@@ -31,6 +31,149 @@ const clamp = (value, min, max) => {
   if (max !== undefined && value > max) return max;
   return value;
 };
+
+const TWO_PI = Math.PI * 2;
+
+const toNumberOr = (value, fallback) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const createPanAutomation = ({ ctx, mixMode = 'dichotic', leftPanner, rightPanner }) => {
+  let config = null;
+  let intervalId = null;
+  let baseTime = ctx?.currentTime ?? 0;
+
+  const clearTimer = () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  };
+
+  const applyOrientation = (orientation) => {
+    if (!config) return;
+    const depth = clamp(toNumberOr(config.panDepth, 1), 0, 1);
+    const offset = clamp(toNumberOr(config.panBaseOffset, 0), -1, 1);
+    const mix = config.mixMode || mixMode || 'dichotic';
+    const now = ctx?.currentTime ?? 0;
+    const safeOrientation = clamp(orientation, -1, 1);
+
+    if (mix === 'monaural') {
+      const value = clamp(offset + safeOrientation * depth, -1, 1);
+      if (leftPanner?.pan) {
+        leftPanner.pan.setTargetAtTime(value, now, 0.05);
+      }
+      if (rightPanner?.pan) {
+        rightPanner.pan.setTargetAtTime(value, now, 0.05);
+      }
+      return;
+    }
+
+    const leftValue = clamp(offset + safeOrientation * depth, -1, 1);
+    const rightValue = clamp(offset - safeOrientation * depth, -1, 1);
+    if (leftPanner?.pan) {
+      leftPanner.pan.setTargetAtTime(leftValue, now, 0.05);
+    }
+    if (rightPanner?.pan) {
+      rightPanner.pan.setTargetAtTime(rightValue, now, 0.05);
+    }
+  };
+
+  const startLoop = (compute) => {
+    clearTimer();
+    baseTime = ctx?.currentTime ?? 0;
+    const tick = () => {
+      if (!config) return;
+      const now = ctx?.currentTime ?? 0;
+      const elapsed = now - baseTime;
+      applyOrientation(compute(elapsed));
+    };
+    tick();
+    intervalId = setInterval(tick, 1000 / 60);
+  };
+
+  return {
+    setConfig(nextConfig = {}) {
+      const previous = config || {};
+      config = {
+        ...previous,
+        ...nextConfig,
+      };
+      config.mixMode = nextConfig.mixMode || previous.mixMode || mixMode || 'dichotic';
+      config.panMode = config.panMode || 'static';
+      config.panDepth = clamp(toNumberOr(config.panDepth, 1), 0, 1);
+      config.panBaseOffset = clamp(toNumberOr(config.panBaseOffset, 0), -1, 1);
+      config.panFrequency = Math.max(0, toNumberOr(config.panFrequency, 0.2));
+      config.martigliFrequency = Math.max(0, toNumberOr(config.martigliFrequency, 0.1));
+      config.crossfadeHold = Math.max(0, toNumberOr(config.crossfadeHold, 90));
+      config.crossfadeDuration = Math.max(0.1, toNumberOr(config.crossfadeDuration, 15));
+      mixMode = config.mixMode;
+      baseTime = ctx?.currentTime ?? 0;
+
+      switch (config.panMode) {
+        case 'lfo': {
+          if (config.panDepth <= 0 || config.panFrequency <= 0) {
+            clearTimer();
+            applyOrientation(mixMode === 'monaural' ? 0 : -1);
+            break;
+          }
+          const phaseOffset = mixMode === 'monaural' ? 0 : -Math.PI / 2;
+          startLoop((elapsed) =>
+            Math.sin(TWO_PI * config.panFrequency * elapsed + phaseOffset)
+          );
+          break;
+        }
+        case 'martigli': {
+          if (config.panDepth <= 0 || config.martigliFrequency <= 0) {
+            clearTimer();
+            applyOrientation(mixMode === 'monaural' ? 0 : -1);
+            break;
+          }
+          const phaseOffset = mixMode === 'monaural' ? 0 : -Math.PI / 2;
+          startLoop((elapsed) =>
+            Math.sin(TWO_PI * config.martigliFrequency * elapsed + phaseOffset)
+          );
+          break;
+        }
+        case 'crossfade': {
+          if (config.panDepth <= 0) {
+            clearTimer();
+            applyOrientation(mixMode === 'monaural' ? 0 : -1);
+            break;
+          }
+          const hold = Math.max(0, config.crossfadeHold);
+          const fade = Math.max(0.1, config.crossfadeDuration);
+          const cycle = Math.max(0.1, hold + fade);
+          startLoop((elapsed) => {
+            if (cycle <= 0) {
+              return mixMode === 'monaural' ? 0 : -1;
+            }
+            const cycleIndex = Math.floor(elapsed / cycle);
+            const direction = cycleIndex % 2 === 0 ? -1 : 1;
+            const position = elapsed - cycleIndex * cycle;
+            if (position <= hold) {
+              return direction;
+            }
+            const progress = Math.min(1, (position - hold) / fade);
+            return direction * (1 - 2 * progress);
+          });
+          break;
+        }
+        default: {
+          clearTimer();
+          const orientation = mixMode === 'monaural' ? 0 : -1;
+          applyOrientation(orientation);
+        }
+      }
+    },
+    dispose() {
+      clearTimer();
+      config = null;
+    },
+  };
+};
+
 export class AudioEngine {
   constructor() {
     this.ctx = null;
@@ -114,81 +257,171 @@ export class AudioEngine {
     return id;
   }
 
+  _resolveBinauralFrequencies({
+    frequencyMode = 'carrier-beat',
+    base,
+    beat,
+    leftFrequency,
+    rightFrequency,
+  } = {}) {
+    const safeBase = clamp(toNumberOr(base, 200), 20, 4000);
+    const safeBeat = clamp(Math.abs(toNumberOr(beat, 10)), 0, 400);
+    if (frequencyMode === 'absolute') {
+      let left = toNumberOr(leftFrequency, safeBase - safeBeat / 2);
+      let right = toNumberOr(rightFrequency, safeBase + safeBeat / 2);
+      left = clamp(left, 20, 4000);
+      right = clamp(right, 20, 4000);
+      const resolvedBase = (left + right) / 2;
+      const resolvedBeat = Math.abs(right - left);
+      return {
+        left,
+        right,
+        base: clamp(resolvedBase, 20, 4000),
+        beat: clamp(resolvedBeat, 0, 400),
+      };
+    }
+    const left = clamp(safeBase - safeBeat / 2, 20, 4000);
+    const right = clamp(safeBase + safeBeat / 2, 20, 4000);
+    return {
+      left,
+      right,
+      base: safeBase,
+      beat: safeBeat,
+    };
+  }
+
   /**
-   * Play binaural beat
-   * L ear: base - beat/2
-   * R ear: base + beat/2
-   *
-   * @param {Object} params
-   * @param {number} params.base - Carrier frequency (Hz)
-   * @param {number} params.beat - Beat frequency (Hz, typically 1-40)
-   * @param {number} params.duration - Duration (seconds, 0 = infinite)
-   * @param {number} params.gain - Volume 0-1
+   * Play binaural or monaural beat with advanced panning
    */
-  playBinaural({ base = 300, beat = 8, duration = 0, gain = 0.4 }) {
+  playBinaural(options = {}) {
     this._ensureInit();
 
-    const leftFreq = base - beat / 2;
-    const rightFreq = base + beat / 2;
+    const {
+      mixMode = 'dichotic',
+      frequencyMode = 'carrier-beat',
+      base = 300,
+      beat = 8,
+      leftFrequency,
+      rightFrequency,
+      duration = 0,
+      gain = 0.4,
+      panMode = 'static',
+      panDepth = 1,
+      panFrequency = 0.2,
+      martigliFrequency = 0.1,
+      crossfadeHold = 90,
+      crossfadeDuration = 15,
+      panBaseOffset = 0,
+    } = options;
 
-    // Create stereo oscillators
+    const resolved = this._resolveBinauralFrequencies({
+      frequencyMode,
+      base,
+      beat,
+      leftFrequency,
+      rightFrequency,
+    });
+
     const oscLeft = this.ctx.createOscillator();
     const oscRight = this.ctx.createOscillator();
+    oscLeft.type = oscRight.type = 'sine';
+    oscLeft.frequency.value = resolved.left;
+    oscRight.frequency.value = resolved.right;
+
     const gainLeft = this.ctx.createGain();
     const gainRight = this.ctx.createGain();
-    const merger = this.ctx.createChannelMerger(2);
-    const masterOut = this.ctx.createGain();
+    gainLeft.gain.value = 0.5;
+    gainRight.gain.value = 0.5;
 
-    oscLeft.type = oscRight.type = 'sine';
-    oscLeft.frequency.value = leftFreq;
-    oscRight.frequency.value = rightFreq;
+    const leftPanner = this.ctx.createStereoPanner();
+    const rightPanner = this.ctx.createStereoPanner();
 
-    // Smooth fade in
-    masterOut.gain.setValueAtTime(0, this.ctx.currentTime);
-    masterOut.gain.linearRampToValueAtTime(gain, this.ctx.currentTime + 0.1);
-
-    // Route to stereo
     oscLeft.connect(gainLeft);
     oscRight.connect(gainRight);
-    gainLeft.connect(merger, 0, 0); // left channel
-    gainRight.connect(merger, 0, 1); // right channel
-    merger.connect(masterOut);
+    gainLeft.connect(leftPanner);
+    gainRight.connect(rightPanner);
+
+    const masterOut = this.ctx.createGain();
+    const now = this.ctx.currentTime;
+    masterOut.gain.setValueAtTime(0, now);
+    masterOut.gain.linearRampToValueAtTime(clamp(toNumberOr(gain, 0.4), 0, 1), now + 0.1);
+
+    leftPanner.connect(masterOut);
+    rightPanner.connect(masterOut);
     masterOut.connect(this.masterGain);
 
     const id = `binaural-${Date.now()}`;
-    this.nodes.set(id, {
+    const panAutomation = createPanAutomation({
+      ctx: this.ctx,
+      mixMode,
+      leftPanner,
+      rightPanner,
+    });
+
+    panAutomation.setConfig({
+      mixMode,
+      panMode,
+      panDepth,
+      panFrequency,
+      martigliFrequency,
+      crossfadeHold,
+      crossfadeDuration,
+      panBaseOffset,
+    });
+
+    const nodeData = {
+      type: 'binaural',
       oscLeft,
       oscRight,
       gainLeft,
       gainRight,
-      merger,
+      leftPanner,
+      rightPanner,
       masterOut,
-      _base: base,
-      _beat: beat,
-      _gain: gain,
-    });
+      panAutomation,
+      mixMode,
+      frequencyMode,
+      panMode,
+      panDepth,
+      panFrequency,
+      martigliFrequency,
+      crossfadeHold,
+      crossfadeDuration,
+      panBaseOffset,
+      _base: resolved.base,
+      _beat: resolved.beat,
+      _leftFrequency: resolved.left,
+      _rightFrequency: resolved.right,
+      _gain: clamp(toNumberOr(gain, 0.4), 0, 1),
+    };
 
-    oscLeft.start();
-    oscRight.start();
+    this.nodes.set(id, nodeData);
+
+    oscLeft.start(now);
+    oscRight.start(now);
 
     if (duration > 0) {
-      // Fade out
-      masterOut.gain.setValueAtTime(gain, this.ctx.currentTime + duration - 0.1);
-      masterOut.gain.linearRampToValueAtTime(0, this.ctx.currentTime + duration);
-
-      oscLeft.stop(this.ctx.currentTime + duration);
-      oscRight.stop(this.ctx.currentTime + duration);
+      const stopTime = now + duration;
+      masterOut.gain.setValueAtTime(nodeData._gain, stopTime - 0.1);
+      masterOut.gain.linearRampToValueAtTime(0, stopTime);
+      oscLeft.stop(stopTime);
+      oscRight.stop(stopTime);
 
       setTimeout(() => {
+        const stored = this.nodes.get(id);
+        stored?.panAutomation?.dispose?.();
         this.nodes.delete(id);
-      }, duration * 1000);
+      }, duration * 1000 + 100);
     }
 
     console.log('[AudioEngine] Binaural', {
-      base,
-      beat,
-      leftFreq,
-      rightFreq,
+      mixMode,
+      frequencyMode,
+      base: resolved.base,
+      beat: resolved.beat,
+      leftFreq: resolved.left,
+      rightFreq: resolved.right,
+      panMode,
       duration,
     });
 
@@ -196,75 +429,13 @@ export class AudioEngine {
   }
 
   /**
-   * Play monaural beat (two carriers summed into both ears)
-   * @param {Object} params
-   * @param {number} params.base - Carrier frequency (Hz)
-   * @param {number} params.beat - Beat frequency (Hz, typically 1-40)
-   * @param {number} params.duration - Duration (seconds, 0 = infinite)
-   * @param {number} params.gain - Volume 0-1
+   * Play monaural beat using binaural engine with summed output
    */
-  playMonaural({ base = 300, beat = 8, duration = 0, gain = 0.35 } = {}) {
-    this._ensureInit();
-
-    const lowFreq = Math.max(20, base - beat / 2);
-    const highFreq = base + beat / 2;
-
-    const oscLow = this.ctx.createOscillator();
-    const oscHigh = this.ctx.createOscillator();
-    oscLow.type = oscHigh.type = 'sine';
-    oscLow.frequency.value = lowFreq;
-    oscHigh.frequency.value = highFreq;
-
-    const mixGain = this.ctx.createGain();
-    mixGain.gain.value = 0.5; // balance summed amplitude
-
-    const masterOut = this.ctx.createGain();
-    const now = this.ctx.currentTime;
-    masterOut.gain.setValueAtTime(0, now);
-    masterOut.gain.linearRampToValueAtTime(gain, now + 0.1);
-
-    oscLow.connect(mixGain);
-    oscHigh.connect(mixGain);
-    mixGain.connect(masterOut);
-    masterOut.connect(this.masterGain);
-
-    const id = `monaural-${Date.now()}`;
-    this.nodes.set(id, {
-      oscillators: [oscLow, oscHigh],
-      mixGain,
-      masterOut,
-      _base: base,
-      _beat: beat,
-      _gain: gain,
+  playMonaural(options = {}) {
+    return this.playBinaural({
+      mixMode: 'monaural',
+      ...options,
     });
-
-    oscLow.start(now);
-    oscHigh.start(now);
-
-    if (duration > 0) {
-      const stopTime = now + duration;
-      masterOut.gain.setValueAtTime(gain, stopTime - 0.1);
-      masterOut.gain.linearRampToValueAtTime(0, stopTime);
-      oscLow.stop(stopTime);
-      oscHigh.stop(stopTime);
-
-      setTimeout(
-        () => {
-          this.nodes.delete(id);
-        },
-        duration * 1000 + 100
-      );
-    }
-
-    console.log('[AudioEngine] Monaural', {
-      base,
-      beat,
-      lowFreq,
-      highFreq,
-      duration,
-    });
-
-    return id;
   }
 
   /**
@@ -318,6 +489,13 @@ export class AudioEngine {
       if (Array.isArray(node.sources)) {
         node.sources.forEach(safeStop);
       }
+      if (node.panAutomation?.dispose) {
+        try {
+          node.panAutomation.dispose();
+        } catch {
+          // ignore cleanup errors
+        }
+      }
 
       safeDisconnect(node.gain);
       safeDisconnect(node.gainLeft);
@@ -326,6 +504,8 @@ export class AudioEngine {
       safeDisconnect(node.carrierGain);
       safeDisconnect(node.lfoGain);
       safeDisconnect(node.masterOut);
+      safeDisconnect(node.leftPanner);
+      safeDisconnect(node.rightPanner);
       safeDisconnect(node.masterGainNode);
       safeDisconnect(node.merger);
       safeDisconnect(node.panner);
@@ -815,70 +995,99 @@ export class AudioEngine {
     const node = this.nodes.get(nodeId);
     if (!node) return false;
     const now = this.ctx.currentTime;
-    const base = clamp(
-      params.base !== undefined ? params.base : node._base ?? 200,
-      20,
-      2000
-    );
-    const beat = clamp(
-      params.beat !== undefined ? params.beat : node._beat ?? 10,
-      0.1,
-      100
-    );
-    const gain = clamp(
-      params.gain !== undefined ? params.gain : node._gain ?? 0.25,
-      0,
-      1
-    );
-    const leftFreq = Math.max(1, base - beat / 2);
-    const rightFreq = Math.max(1, base + beat / 2);
+
+    const mixMode = params.mixMode || node.mixMode || 'dichotic';
+    const frequencyMode = params.frequencyMode || node.frequencyMode || 'carrier-beat';
+
+    const baseInput =
+      params.base !== undefined ? toNumberOr(params.base, node._base ?? 200) : node._base ?? 200;
+    const beatInput =
+      params.beat !== undefined ? toNumberOr(params.beat, node._beat ?? 10) : node._beat ?? 10;
+    const leftInput =
+      params.leftFrequency !== undefined
+        ? toNumberOr(params.leftFrequency, node._leftFrequency ?? baseInput - beatInput / 2)
+        : node._leftFrequency ?? baseInput - beatInput / 2;
+    const rightInput =
+      params.rightFrequency !== undefined
+        ? toNumberOr(params.rightFrequency, node._rightFrequency ?? baseInput + beatInput / 2)
+        : node._rightFrequency ?? baseInput + beatInput / 2;
+
+    const resolved = this._resolveBinauralFrequencies({
+      frequencyMode,
+      base: baseInput,
+      beat: beatInput,
+      leftFrequency: leftInput,
+      rightFrequency: rightInput,
+    });
+
     if (node.oscLeft?.frequency) {
-      node.oscLeft.frequency.setTargetAtTime(leftFreq, now, 0.05);
+      node.oscLeft.frequency.setTargetAtTime(resolved.left, now, 0.1);
     }
     if (node.oscRight?.frequency) {
-      node.oscRight.frequency.setTargetAtTime(rightFreq, now, 0.05);
+      node.oscRight.frequency.setTargetAtTime(resolved.right, now, 0.1);
     }
-    if (node.masterOut?.gain) {
-      node.masterOut.gain.setTargetAtTime(gain, now, 0.05);
+    if (params.gain !== undefined && node.masterOut?.gain) {
+      const nextGain = clamp(toNumberOr(params.gain, node._gain ?? 0.3), 0, 1);
+      node.masterOut.gain.setTargetAtTime(nextGain, now, 0.05);
+      node._gain = nextGain;
     }
-    node._base = base;
-    node._beat = beat;
-    node._gain = gain;
+
+    node._base = resolved.base;
+    node._beat = resolved.beat;
+    node._leftFrequency = resolved.left;
+    node._rightFrequency = resolved.right;
+    node.mixMode = mixMode;
+    node.frequencyMode = frequencyMode;
+
+    const panConfig = {
+      mixMode,
+      panMode: params.panMode !== undefined ? params.panMode : node.panMode,
+      panDepth: params.panDepth !== undefined ? params.panDepth : node.panDepth,
+      panFrequency:
+        params.panFrequency !== undefined ? params.panFrequency : node.panFrequency,
+      martigliFrequency:
+        params.martigliFrequency !== undefined
+          ? params.martigliFrequency
+          : node.martigliFrequency,
+      crossfadeHold:
+        params.crossfadeHold !== undefined ? params.crossfadeHold : node.crossfadeHold,
+      crossfadeDuration:
+        params.crossfadeDuration !== undefined
+          ? params.crossfadeDuration
+          : node.crossfadeDuration,
+      panBaseOffset:
+        params.panBaseOffset !== undefined ? params.panBaseOffset : node.panBaseOffset,
+    };
+
+    node.panMode = panConfig.panMode;
+    node.panDepth = panConfig.panDepth;
+    node.panFrequency = panConfig.panFrequency;
+    node.martigliFrequency = panConfig.martigliFrequency;
+    node.crossfadeHold = panConfig.crossfadeHold;
+    node.crossfadeDuration = panConfig.crossfadeDuration;
+    node.panBaseOffset = panConfig.panBaseOffset;
+
+    if (!node.panAutomation && node.leftPanner && node.rightPanner) {
+      node.panAutomation = createPanAutomation({
+        ctx: this.ctx,
+        mixMode,
+        leftPanner: node.leftPanner,
+        rightPanner: node.rightPanner,
+      });
+    }
+
+    if (node.panAutomation?.setConfig) {
+      node.panAutomation.setConfig(panConfig);
+    }
+
     return true;
   }
 
   updateMonaural(nodeId, params = {}) {
-    const node = this.nodes.get(nodeId);
-    if (!node) return false;
-    const now = this.ctx.currentTime;
-    const base = clamp(
-      params.base !== undefined ? params.base : node._base ?? 210,
-      20,
-      2000
-    );
-    const beat = clamp(
-      params.beat !== undefined ? params.beat : node._beat ?? 6,
-      0.1,
-      100
-    );
-    const gain = clamp(
-      params.gain !== undefined ? params.gain : node._gain ?? 0.3,
-      0,
-      1
-    );
-    const lowFreq = Math.max(1, base - beat / 2);
-    const highFreq = Math.max(1, base + beat / 2);
-    if (Array.isArray(node.oscillators) && node.oscillators.length >= 2) {
-      node.oscillators[0]?.frequency?.setTargetAtTime(lowFreq, now, 0.05);
-      node.oscillators[1]?.frequency?.setTargetAtTime(highFreq, now, 0.05);
-    }
-    if (node.masterOut?.gain) {
-      node.masterOut.gain.setTargetAtTime(gain, now, 0.05);
-    }
-    node._base = base;
-    node._beat = beat;
-    node._gain = gain;
-    return true;
+    return this.updateBinaural(nodeId, {
+      mixMode: 'monaural',
+      ...params,
+    });
   }
 
   updateIsochronic(nodeId, params = {}) {

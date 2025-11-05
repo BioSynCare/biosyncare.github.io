@@ -1717,15 +1717,29 @@ const audioPresets = {
     description: 'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
     params: [
       {
+        id: 'frequencyMode',
+        label: 'Frequency control',
+        type: 'select',
+        options: [
+          { value: 'carrier-beat', label: 'Carrier & beat' },
+          { value: 'absolute', label: 'Explicit L/R' },
+        ],
+        default: 'carrier-beat',
+        triggersLayout: true,
+        formatValue: (value) =>
+          value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
+      },
+      {
         id: 'base',
         label: 'Carrier frequency',
         type: 'range',
         min: 60,
-        max: 800,
+        max: 1200,
         step: 1,
         unit: 'Hz',
         default: 200,
         live: true,
+        isVisible: (state) => state.frequencyMode !== 'absolute',
       },
       {
         id: 'beat',
@@ -1736,6 +1750,122 @@ const audioPresets = {
         step: 0.1,
         unit: 'Hz',
         default: 10,
+        live: true,
+        isVisible: (state) => state.frequencyMode !== 'absolute',
+      },
+      {
+        id: 'leftFrequency',
+        label: 'Left component',
+        type: 'range',
+        min: 60,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 195,
+        live: true,
+        isVisible: (state) => state.frequencyMode === 'absolute',
+      },
+      {
+        id: 'rightFrequency',
+        label: 'Right component',
+        type: 'range',
+        min: 60,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 205,
+        live: true,
+        isVisible: (state) => state.frequencyMode === 'absolute',
+      },
+      {
+        id: 'panMode',
+        label: 'Panning pattern',
+        type: 'select',
+        options: [
+          { value: 'static', label: 'Static channels' },
+          { value: 'lfo', label: 'Oscillating sine' },
+          { value: 'martigli', label: 'Sync with Martigli' },
+          { value: 'crossfade', label: 'Timed crossfade' },
+        ],
+        default: 'static',
+        triggersLayout: true,
+        formatValue: (value) =>
+          (
+            {
+              static: 'Static channels',
+              lfo: 'Oscillating sine',
+              martigli: 'Sync with Martigli',
+              crossfade: 'Timed crossfade',
+            }[value] || value
+          ),
+      },
+      {
+        id: 'panDepth',
+        label: 'Pan depth',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 1,
+        live: true,
+        isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
+      },
+      {
+        id: 'panFrequency',
+        label: 'Pan frequency',
+        type: 'range',
+        min: 0.01,
+        max: 5,
+        step: 0.01,
+        unit: 'Hz',
+        default: 0.2,
+        live: true,
+        isVisible: (state) => state.panMode === 'lfo',
+      },
+      {
+        id: 'martigliFrequency',
+        label: 'Martigli/breath frequency',
+        type: 'range',
+        min: 0.02,
+        max: 0.6,
+        step: 0.01,
+        unit: 'Hz',
+        default: 0.1,
+        live: true,
+        isVisible: (state) => state.panMode === 'martigli',
+      },
+      {
+        id: 'crossfadeHold',
+        label: 'Hold duration',
+        type: 'range',
+        min: 1,
+        max: 300,
+        step: 1,
+        unit: 's',
+        default: 120,
+        live: false,
+        isVisible: (state) => state.panMode === 'crossfade',
+      },
+      {
+        id: 'crossfadeDuration',
+        label: 'Crossfade time',
+        type: 'range',
+        min: 0.5,
+        max: 60,
+        step: 0.5,
+        unit: 's',
+        default: 20,
+        live: false,
+        isVisible: (state) => state.panMode === 'crossfade',
+      },
+      {
+        id: 'panBaseOffset',
+        label: 'Pan offset',
+        type: 'range',
+        min: -0.8,
+        max: 0.8,
+        step: 0.01,
+        default: 0,
         live: true,
       },
       {
@@ -1749,55 +1879,106 @@ const audioPresets = {
         live: true,
       },
     ],
-    start: (params = {}) => {
-      const base = Number(params.base ?? 200);
-      const beat = Number(params.beat ?? 10);
-      const gain = Number(params.gain ?? 0.25);
+    start(params = {}) {
+      const values = { ...params };
       const nodeId = audioEngine.playBinaural({
-        base,
-        beat,
-        duration: 0,
-        gain,
+        mixMode: 'dichotic',
+        frequencyMode: values.frequencyMode,
+        base: values.base,
+        beat: values.beat,
+        leftFrequency: values.leftFrequency,
+        rightFrequency: values.rightFrequency,
+        gain: values.gain,
+        panMode: values.panMode,
+        panDepth: values.panDepth,
+        panFrequency: values.panFrequency,
+        martigliFrequency: values.martigliFrequency,
+        crossfadeHold: values.crossfadeHold,
+        crossfadeDuration: values.crossfadeDuration,
+        panBaseOffset: values.panBaseOffset,
       });
-      const parameters = { base, beat, gain };
+      const detail = this.describe(values);
       return {
         nodeId,
-        detail: `${base.toFixed(1)} Hz carrier • ${beat.toFixed(2)} Hz beat`,
-        parameters,
+        detail,
+        parameters: { ...values },
         meta: {
           type: 'binaural',
-          base,
-          beat,
+          frequencyMode: values.frequencyMode,
+          base: values.base,
+          beat: values.beat,
+          leftFrequency: values.leftFrequency,
+          rightFrequency: values.rightFrequency,
+          panMode: values.panMode,
         },
       };
     },
-    update: (track, params = {}) => {
-      audioEngine.updateBinaural(track.nodeId, params);
+    update(track, params = {}) {
+      audioEngine.updateBinaural(track.nodeId, {
+        mixMode: 'dichotic',
+        ...params,
+      });
+      const detail = this.describe(params);
       return {
-        detail: `${params.base.toFixed(1)} Hz carrier • ${params.beat.toFixed(2)} Hz beat`,
+        detail,
         meta: {
+          frequencyMode: params.frequencyMode,
           base: params.base,
           beat: params.beat,
-          gain: params.gain,
+          leftFrequency: params.leftFrequency,
+          rightFrequency: params.rightFrequency,
+          panMode: params.panMode,
         },
       };
     },
-    describe: (params = {}) => `${Math.round(params.base ?? 200)} Hz • ${Number(params.beat ?? 10).toFixed(1)} Hz`,
+    describe(params = {}) {
+      const mode = params.frequencyMode || 'carrier-beat';
+      const base = Number(params.base ?? 200);
+      const beat = Number(params.beat ?? 10);
+      const left = Number(params.leftFrequency ?? base - beat / 2);
+      const right = Number(params.rightFrequency ?? base + beat / 2);
+      const panMode = params.panMode || 'static';
+      const panLabel =
+        {
+          static: 'static pan',
+          lfo: 'sine pan',
+          martigli: 'martigli pan',
+          crossfade: 'crossfade pan',
+        }[panMode] || panMode;
+      if (mode === 'absolute') {
+        return `L ${left.toFixed(1)} Hz • R ${right.toFixed(1)} Hz (${panLabel})`;
+      }
+      return `Carrier ${base.toFixed(1)} Hz • Beat ${beat.toFixed(2)} Hz (${panLabel})`;
+    },
   },
   monaural: {
     label: 'Monaural beat • Theta 6Hz',
     description: 'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
     params: [
       {
+        id: 'frequencyMode',
+        label: 'Frequency control',
+        type: 'select',
+        options: [
+          { value: 'carrier-beat', label: 'Carrier & beat' },
+          { value: 'absolute', label: 'Explicit L/R' },
+        ],
+        default: 'carrier-beat',
+        triggersLayout: true,
+        formatValue: (value) =>
+          value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
+      },
+      {
         id: 'base',
         label: 'Carrier frequency',
         type: 'range',
         min: 60,
-        max: 800,
+        max: 1200,
         step: 1,
         unit: 'Hz',
         default: 210,
         live: true,
+        isVisible: (state) => state.frequencyMode !== 'absolute',
       },
       {
         id: 'beat',
@@ -1808,6 +1989,122 @@ const audioPresets = {
         step: 0.1,
         unit: 'Hz',
         default: 6,
+        live: true,
+        isVisible: (state) => state.frequencyMode !== 'absolute',
+      },
+      {
+        id: 'leftFrequency',
+        label: 'Left component',
+        type: 'range',
+        min: 60,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 207,
+        live: true,
+        isVisible: (state) => state.frequencyMode === 'absolute',
+      },
+      {
+        id: 'rightFrequency',
+        label: 'Right component',
+        type: 'range',
+        min: 60,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 213,
+        live: true,
+        isVisible: (state) => state.frequencyMode === 'absolute',
+      },
+      {
+        id: 'panMode',
+        label: 'Panning pattern',
+        type: 'select',
+        options: [
+          { value: 'static', label: 'Static mix' },
+          { value: 'lfo', label: 'Oscillating sine' },
+          { value: 'martigli', label: 'Sync with Martigli' },
+          { value: 'crossfade', label: 'Timed crossfade' },
+        ],
+        default: 'static',
+        triggersLayout: true,
+        formatValue: (value) =>
+          (
+            {
+              static: 'Static mix',
+              lfo: 'Oscillating sine',
+              martigli: 'Sync with Martigli',
+              crossfade: 'Timed crossfade',
+            }[value] || value
+          ),
+      },
+      {
+        id: 'panDepth',
+        label: 'Pan depth',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.6,
+        live: true,
+        isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
+      },
+      {
+        id: 'panFrequency',
+        label: 'Pan frequency',
+        type: 'range',
+        min: 0.01,
+        max: 5,
+        step: 0.01,
+        unit: 'Hz',
+        default: 0.2,
+        live: true,
+        isVisible: (state) => state.panMode === 'lfo',
+      },
+      {
+        id: 'martigliFrequency',
+        label: 'Martigli/breath frequency',
+        type: 'range',
+        min: 0.02,
+        max: 0.6,
+        step: 0.01,
+        unit: 'Hz',
+        default: 0.1,
+        live: true,
+        isVisible: (state) => state.panMode === 'martigli',
+      },
+      {
+        id: 'crossfadeHold',
+        label: 'Hold duration',
+        type: 'range',
+        min: 1,
+        max: 300,
+        step: 1,
+        unit: 's',
+        default: 90,
+        live: false,
+        isVisible: (state) => state.panMode === 'crossfade',
+      },
+      {
+        id: 'crossfadeDuration',
+        label: 'Crossfade time',
+        type: 'range',
+        min: 0.5,
+        max: 60,
+        step: 0.5,
+        unit: 's',
+        default: 15,
+        live: false,
+        isVisible: (state) => state.panMode === 'crossfade',
+      },
+      {
+        id: 'panBaseOffset',
+        label: 'Pan offset',
+        type: 'range',
+        min: -0.5,
+        max: 0.5,
+        step: 0.01,
+        default: 0,
         live: true,
       },
       {
@@ -1821,40 +2118,77 @@ const audioPresets = {
         live: true,
       },
     ],
-    start: (params = {}) => {
-      const base = Number(params.base ?? 210);
-      const beat = Number(params.beat ?? 6);
-      const gain = Number(params.gain ?? 0.3);
-      const nodeId = audioEngine.playMonaural({
-        base,
-        beat,
-        duration: 0,
-        gain,
+    start(params = {}) {
+      const values = { ...params };
+      const nodeId = audioEngine.playBinaural({
+        mixMode: 'monaural',
+        frequencyMode: values.frequencyMode,
+        base: values.base,
+        beat: values.beat,
+        leftFrequency: values.leftFrequency,
+        rightFrequency: values.rightFrequency,
+        gain: values.gain,
+        panMode: values.panMode,
+        panDepth: values.panDepth,
+        panFrequency: values.panFrequency,
+        martigliFrequency: values.martigliFrequency,
+        crossfadeHold: values.crossfadeHold,
+        crossfadeDuration: values.crossfadeDuration,
+        panBaseOffset: values.panBaseOffset,
       });
-      const parameters = { base, beat, gain };
+      const detail = this.describe(values);
       return {
         nodeId,
-        detail: `${base.toFixed(1)} Hz carrier • ${beat.toFixed(2)} Hz beat`,
-        parameters,
+        detail,
+        parameters: { ...values },
         meta: {
           type: 'monaural',
-          base,
-          beat,
+          frequencyMode: values.frequencyMode,
+          base: values.base,
+          beat: values.beat,
+          leftFrequency: values.leftFrequency,
+          rightFrequency: values.rightFrequency,
+          panMode: values.panMode,
         },
       };
     },
-    update: (track, params = {}) => {
-      audioEngine.updateMonaural(track.nodeId, params);
+    update(track, params = {}) {
+      audioEngine.updateBinaural(track.nodeId, {
+        mixMode: 'monaural',
+        ...params,
+      });
+      const detail = this.describe(params);
       return {
-        detail: `${params.base.toFixed(1)} Hz carrier • ${params.beat.toFixed(2)} Hz beat`,
+        detail,
         meta: {
+          frequencyMode: params.frequencyMode,
           base: params.base,
           beat: params.beat,
-          gain: params.gain,
+          leftFrequency: params.leftFrequency,
+          rightFrequency: params.rightFrequency,
+          panMode: params.panMode,
         },
       };
     },
-    describe: (params = {}) => `${Math.round(params.base ?? 210)} Hz • ${Number(params.beat ?? 6).toFixed(1)} Hz`,
+    describe(params = {}) {
+      const mode = params.frequencyMode || 'carrier-beat';
+      const base = Number(params.base ?? 210);
+      const beat = Number(params.beat ?? 6);
+      const left = Number(params.leftFrequency ?? base - beat / 2);
+      const right = Number(params.rightFrequency ?? base + beat / 2);
+      const panMode = params.panMode || 'static';
+      const panLabel =
+        {
+          static: 'static mix',
+          lfo: 'sine pan',
+          martigli: 'martigli pan',
+          crossfade: 'crossfade pan',
+        }[panMode] || panMode;
+      if (mode === 'absolute') {
+        return `Monaural L ${left.toFixed(1)} Hz • R ${right.toFixed(1)} Hz (${panLabel})`;
+      }
+      return `Monaural carrier ${base.toFixed(1)} Hz • Beat ${beat.toFixed(2)} Hz (${panLabel})`;
+    },
   },
   isochronic: {
     label: 'Isochronic pulse • 12Hz breathing',
@@ -2390,11 +2724,26 @@ const renderAudioParameterForm = () => {
   preset.params.forEach((field) => {
     const value = normalizeParameterValue(field, state[field.id]);
     state[field.id] = value;
+    let visible = true;
+    if (typeof field.isVisible === 'function') {
+      try {
+        visible = field.isVisible(state);
+      } catch (error) {
+        console.warn('Parameter visibility check failed', error);
+      }
+    }
+    if (!visible) {
+      return;
+    }
     const control = createParameterControl(field, value, {
       context: 'form',
       onInput: (nextValue) => {
         state[field.id] = nextValue;
-        updateAudioPresetSummary(presetKey, state);
+        if (field.triggersLayout) {
+          renderAudioParameterForm();
+        } else {
+          updateAudioPresetSummary(presetKey, state);
+        }
       },
     });
     audioParameterPanel.appendChild(control);
@@ -2567,7 +2916,9 @@ const handleAudioTrackParameterChange = (trackId, field, value, detailElement) =
         : current.meta,
     }));
 
-    if (detailElement && descriptor) {
+    const requiresLayoutRefresh = Boolean(field.triggersLayout);
+
+    if (!requiresLayoutRefresh && detailElement && descriptor) {
       detailElement.textContent = descriptor;
     }
 
@@ -2579,6 +2930,10 @@ const handleAudioTrackParameterChange = (trackId, field, value, detailElement) =
       value,
       parameters: nextParams,
     });
+
+    if (requiresLayoutRefresh) {
+      renderAudioTracks();
+    }
   } catch (error) {
     console.error('Failed to update audio parameter', error);
   }
@@ -2628,11 +2983,21 @@ const renderAudioTracks = ({ message } = {}) => {
 
     const liveParams = preset?.params?.filter((field) => field.live !== false) || [];
     if (liveParams.length > 0) {
-      const controls = document.createElement('div');
-      controls.className = 'track-parameter-controls';
+      const visibleControls = [];
       liveParams.forEach((field) => {
         const value = normalizeParameterValue(field, paramValues[field.id]);
         paramValues[field.id] = value;
+        let visible = true;
+        if (typeof field.isVisible === 'function') {
+          try {
+            visible = field.isVisible(paramValues);
+          } catch (error) {
+            console.warn('Track parameter visibility check failed', error);
+          }
+        }
+        if (!visible) {
+          return;
+        }
         const control = createParameterControl(field, value, {
           context: 'track',
           onInput: (nextValue) => {
@@ -2641,9 +3006,14 @@ const renderAudioTracks = ({ message } = {}) => {
             handleAudioTrackParameterChange(id, field, normalized, detailEl);
           },
         });
-        controls.appendChild(control);
+        visibleControls.push(control);
       });
-      info.appendChild(controls);
+      if (visibleControls.length > 0) {
+        const controlsContainer = document.createElement('div');
+        controlsContainer.className = 'track-parameter-controls';
+        visibleControls.forEach((control) => controlsContainer.appendChild(control));
+        info.appendChild(controlsContainer);
+      }
     }
 
     const actions = document.createElement('div');
@@ -2674,6 +3044,7 @@ const renderAudioTracks = ({ message } = {}) => {
     }
   }
 
+  updateStimulationHeaderSummary();
   updateUsageView();
 };
 const renderVisualTracks = ({ message } = {}) => {
