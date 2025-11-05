@@ -79,21 +79,72 @@ rdf-docs-ontospy:
 	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/bsc rdf/core/bsc-owl.ttl || true
 	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/sso rdf/external/sso/sso-ontology.ttl || true
 
-.PHONY: rdf-webvowl rdf-webvowl-setup
+.PHONY: rdf-webvowl rdf-webvowl-setup rdf-webvowl-jar rdf-webvowl-build-owl2vowl
 
 rdf-webvowl-setup:
 	mkdir -p scripts/rdf/tools rdf/docs/webvowl
-	@if [ ! -f scripts/rdf/tools/owl2vowl.jar ]; then \
-		curl -L -o scripts/rdf/tools/owl2vowl.jar https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.3.6/owl2vowl.jar ; \
-		echo "Downloaded OWL2VOWL jar." ; \
+	@# Download OWL2VOWL jar robustly with fallbacks if missing or clearly too small
+	@if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \
+		echo "Fetching OWL2VOWL jar..."; \
+		rm -f scripts/rdf/tools/owl2vowl.jar; \
+		for URL in \
+			https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.3.6/owl2vowl.jar \
+			https://raw.githubusercontent.com/VisualDataWeb/OWL2VOWL/0.3.6/owl2vowl.jar ; do \
+			echo "  -> trying $$URL"; \
+			curl -fL -H "Accept: application/octet-stream" -o scripts/rdf/tools/owl2vowl.jar "$$URL" && break; \
+			done; \
+		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \\
+			echo "WARN: Direct jar download failed; trying legacy 0.2.0 zip asset..."; \\
+			rm -rf scripts/rdf/tools/owl2vowl-zip && mkdir -p scripts/rdf/tools/owl2vowl-zip; \\
+			curl -fL -H "Accept: application/octet-stream" -o scripts/rdf/tools/owl2vowl-0.2.0.zip https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.2.0/owl2vowl.zip || true; \\
+			unzip -q -o scripts/rdf/tools/owl2vowl-0.2.0.zip -d scripts/rdf/tools/owl2vowl-zip || true; \\
+			JAR=$$(cd scripts/rdf/tools/owl2vowl-zip && find . -name 'owl2vowl.jar' -maxdepth 3 -print -quit); \\
+			if [ -n "$$JAR" ]; then \\
+				cp "scripts/rdf/tools/owl2vowl-zip/$$JAR" scripts/rdf/tools/owl2vowl.jar; \\
+			fi; \\
+		fi; \\
+		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \\
+			echo "WARN: Could not obtain owl2vowl.jar from releases; will attempt to build from source."; \\
+			$(MAKE) rdf-webvowl-build-owl2vowl || { echo "ERROR: Build failed. Install Maven or download the jar manually."; exit 1; }; \\
+		fi; \
+		if ! unzip -t scripts/rdf/tools/owl2vowl.jar >/dev/null 2>&1; then \
+			echo "ERROR: owl2vowl.jar appears to be invalid."; \
+			exit 1; \
+		fi; \
+		echo "Downloaded OWL2VOWL jar."; \
 	else \
-		echo "OWL2VOWL jar already present." ; \
+		echo "OWL2VOWL jar already present."; \
 	fi
 
-rdf-webvowl: rdf-webvowl-setup
+rdf-webvowl-build-owl2vowl:
+	mkdir -p scripts/rdf/tools
+	@if ! command -v mvn >/dev/null 2>&1; then \
+		echo "ERROR: Maven (mvn) not found. Please install Maven or provide owl2vowl.jar manually."; \
+		exit 1; \
+	fi
+	@if [ ! -d scripts/rdf/tools/OWL2VOWL ]; then \
+		git clone --depth 1 https://github.com/VisualDataWeb/OWL2VOWL.git scripts/rdf/tools/OWL2VOWL; \
+	else \
+		git -C scripts/rdf/tools/OWL2VOWL pull --ff-only; \
+	fi
+	@echo "Building OWL2VOWL with Maven (this may take a minute)..."
+	@cd scripts/rdf/tools/OWL2VOWL && mvn -q -DskipTests package
+	@JAR=$$(cd scripts/rdf/tools/OWL2VOWL/target && ls -1 *-shaded.jar 2>/dev/null | head -n1); \
+	if [ -z "$$JAR" ]; then \
+		echo "ERROR: Built jar not found (expected *-shaded.jar)."; exit 1; \
+	fi; \
+	cp "scripts/rdf/tools/OWL2VOWL/target/$$JAR" scripts/rdf/tools/owl2vowl.jar
+	@echo "OWL2VOWL jar built at scripts/rdf/tools/owl2vowl.jar"
+
+rdf-webvowl: rdf-webvowl-setup rdf-webvowl-jar
 	@echo "Generating VOWL JSON for bsc-owl.ttl and sso-ontology.ttl (Java required)..."
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -o rdf/docs/webvowl/bsc.json || true
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -o rdf/docs/webvowl/sso.json || true
+
+rdf-webvowl-jar:
+	@if [ ! -s scripts/rdf/tools/owl2vowl.jar ]; then \
+		$(MAKE) rdf-webvowl-setup; \
+	fi
 
 rdf-webvowl-viewer:
 	mkdir -p scripts/rdf/tools rdf/docs/webvowl/app

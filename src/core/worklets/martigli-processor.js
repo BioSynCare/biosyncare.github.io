@@ -1,3 +1,55 @@
+/**
+ * Martigli Breathing Signal Processor - AudioWorklet
+ *
+ * Generates sample-accurate breathing oscillation with modulation support.
+ *
+ * Message Protocol:
+ * ==================
+ *
+ * Incoming Messages (main thread -> worklet):
+ * -------------------------------------------
+ *
+ * 1. Configure breathing parameters:
+ *    { type: 'configure', data: { waveform, inhaleRatio, trajectory } }
+ *    - waveform: 'sine' | 'triangle' | 'sawtooth' | 'square'
+ *    - inhaleRatio: number (0-1), ratio of inhale vs exhale
+ *    - trajectory: Array<{ period: number, duration: number }>
+ *
+ * 2. Reset phase:
+ *    { type: 'reset' }
+ *
+ * 3. Stop signal:
+ *    { type: 'stop' }
+ *
+ * 4. Register modulation target:
+ *    { type: 'registerModulation', data: { nodeId, parameters } }
+ *    - nodeId: string - unique identifier for the audio node
+ *    - parameters: Array<{ param, base, depth, min, max }>
+ *      - param: string - parameter name (e.g., 'base', 'beat', 'freq', 'gain')
+ *      - base: number - base value of parameter
+ *      - depth: number - modulation depth (value = base + depth * martigliValue)
+ *      - min: number - minimum allowed value
+ *      - max: number - maximum allowed value
+ *
+ * 5. Unregister modulation target:
+ *    { type: 'unregisterModulation', data: { nodeId } }
+ *
+ * 6. Update modulation parameters:
+ *    { type: 'updateModulation', data: { nodeId, parameters } }
+ *
+ * Outgoing Messages (worklet -> main thread):
+ * --------------------------------------------
+ *
+ * State updates (sent every ~16ms):
+ *    { type: 'state', value, phase, elapsedSamples, period, sampleRate, modulations }
+ *    - value: number [-1, 1] - current breathing value
+ *    - phase: number [0, 1] - position in breathing cycle
+ *    - elapsedSamples: number - total samples processed
+ *    - period: number - current breathing period in seconds
+ *    - sampleRate: number - audio context sample rate
+ *    - modulations: Object<nodeId, Object<param, modulatedValue>>
+ *      Example: { 'binaural-123': { base: 305.2, beat: 8.1, gain: 0.42 } }
+ */
 class MartigliProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
@@ -13,6 +65,10 @@ class MartigliProcessor extends AudioWorkletProcessor {
     this.elapsedSamples = 0;
     this.lastSnapshotSamples = 0;
     this.snapshotInterval = Math.max(128, Math.floor(sampleRate / 60)); // ~16ms
+
+    // Modulation targets registry
+    // Map<nodeId, { type, base, depth, min, max }>
+    this.modulationTargets = new Map();
 
     this.port.onmessage = (event) => {
       const { type, data } = event.data || {};
@@ -35,6 +91,39 @@ class MartigliProcessor extends AudioWorkletProcessor {
         this.phase = 0;
         this.elapsedSamples = 0;
         this.lastSnapshotSamples = 0;
+      } else if (type === 'registerModulation' && data) {
+        // Register a modulation target
+        // data: { nodeId, parameters: [{ param, base, depth, min, max }] }
+        if (data.nodeId && Array.isArray(data.parameters)) {
+          this.modulationTargets.set(data.nodeId, {
+            parameters: data.parameters.map((p) => ({
+              param: p.param,
+              base: Number(p.base) || 0,
+              depth: Number(p.depth) || 0,
+              min: Number(p.min) ?? -Infinity,
+              max: Number(p.max) ?? Infinity,
+            })),
+          });
+        }
+      } else if (type === 'unregisterModulation' && data) {
+        // Unregister a modulation target
+        if (data.nodeId) {
+          this.modulationTargets.delete(data.nodeId);
+        }
+      } else if (type === 'updateModulation' && data) {
+        // Update modulation parameters for existing target
+        if (data.nodeId && Array.isArray(data.parameters)) {
+          const existing = this.modulationTargets.get(data.nodeId);
+          if (existing) {
+            existing.parameters = data.parameters.map((p) => ({
+              param: p.param,
+              base: Number(p.base) || 0,
+              depth: Number(p.depth) || 0,
+              min: Number(p.min) ?? -Infinity,
+              max: Number(p.max) ?? Infinity,
+            }));
+          }
+        }
       }
     };
   }
@@ -141,6 +230,28 @@ class MartigliProcessor extends AudioWorkletProcessor {
 
       if (this.elapsedSamples - this.lastSnapshotSamples >= this.snapshotInterval) {
         this.lastSnapshotSamples = this.elapsedSamples;
+
+        // Compute modulation values for all registered targets
+        const modulations = {};
+        if (this.modulationTargets.size > 0) {
+          this.modulationTargets.forEach((target, nodeId) => {
+            const paramValues = {};
+            target.parameters.forEach((param) => {
+              // modulated = base + (depth * value)
+              let modulated = param.base + (param.depth * value);
+              // Clamp to min/max
+              if (Number.isFinite(param.min)) {
+                modulated = Math.max(param.min, modulated);
+              }
+              if (Number.isFinite(param.max)) {
+                modulated = Math.min(param.max, modulated);
+              }
+              paramValues[param.param] = modulated;
+            });
+            modulations[nodeId] = paramValues;
+          });
+        }
+
         this.port.postMessage({
           type: 'state',
           value,
@@ -148,6 +259,7 @@ class MartigliProcessor extends AudioWorkletProcessor {
           elapsedSamples: this.elapsedSamples,
           period,
           sampleRate,
+          modulations, // Include modulated values
         });
       }
     }
