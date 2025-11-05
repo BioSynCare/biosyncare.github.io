@@ -1,0 +1,333 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Template for a LaTex article in English.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass{article}
+
+% AMS packages:
+\usepackage{amsmath, amsthm, amsfonts}
+\usepackage{url}
+\usepackage{graphicx}
+
+% Theorems
+%-----------------------------------------------------------------
+\newtheorem{thm}{Theorem}[section]
+\newtheorem{cor}[thm]{Corollary}
+\newtheorem{lem}[thm]{Lemma}
+\newtheorem{prop}[thm]{Proposition}
+\theoremstyle{definition}
+\newtheorem{defn}[thm]{Definition}
+\theoremstyle{remark}
+\newtheorem{rem}[thm]{Remark}
+
+% Shortcuts.
+% One can define new commands to shorten frequently used
+% constructions. As an example, this defines the R and Z used
+% for the real and integer numbers.
+%-----------------------------------------------------------------
+\def\RR{\mathbb{R}}
+\def\ZZ{\mathbb{Z}}
+
+% Similarly, one can define commands that take arguments. In this
+% example we define a command for the absolute value.
+% -----------------------------------------------------------------
+\newcommand{\abs}[1]{\left\vert#1\right\vert}
+
+% Operators
+% New operators must defined as such to have them typeset
+% correctly. As an example we define the Jacobian:
+% -----------------------------------------------------------------
+\DeclareMathOperator{\Jac}{Jac}
+
+%-----------------------------------------------------------------
+\title{Web-based Open-loop Audiovisual Neuromodulation: modeling, implementation, and preliminary results}
+\author{Renato Fabbri\\
+  \small Æterni Anima, Modena, Italy \\
+}
+
+\begin{document}
+\maketitle
+
+\abstract{
+Both audiovisual entrainment and respiration exercises have been reported to ameliorate several pathological conditions and enhance cognitive functions. This paper describes a web-based audiovisual stimulation apparatus that administers brainwave entrainment procedures and biofeedback for breathing using only free and widely available technologies. The lightweight implementation enables the apparatus to be hosted using costless services and benefit hundreds (or thousands) of daily users using standard HTML browsers. Preliminary results are in accordance with recent scientific literature: alleviation and withdrawal from depression, anxiety, migraine, muscular pain, insomnia, and lethargy. Future work should encompass further entrainment techniques and obtain results of its application for specific medical conditions such as Mild Cognitive Impairment. \\
+{\bf keywords:} Neuroenhancement, Brainwave entrainment, Breathing, Audiovisual stimulation, Mindfulness,  Web technologies
+}
+
+\section{Introduction}\label{sec:int}
+Brainwave entrainment (BE) is the synchronization of brainwaves to periodic external stimuli.
+Audiovisual entrainment (AVE) is BE when the external stimuli are audiovisual.
+AVE is also termed audiovisual stimulation (AVS), light and sound entrainment (LSE), audio photic stimulation (APS), to exeplify just a few of the many names given to the phenomena.
+In fact, AVE is recognized to have a long history, going back to ancient Greece (circa 150 A.D. with Ptolemy and Apuleius),
+receiving its first clinical usages in the beginning of the nineteenth century,
+various scientific observations and both scientific and commercial equipments in the twentieth century,
+and finally accumulated consistent scientific evidences that it enhances cognitive function and ameliorates diverse mental conditions in the XXI century~\cite{mem,nu2}.
+In fact, daily sessions often entail the remission of depression, anxiety, insomnia, mind wandering, migraines, muscle pains, etc. in few weeks and often alleviates symptoms during a single session~\cite{cantor, revsis}.
+It has also been observed to mitigate Alzheimer's Disease~\cite{alz}, motor functions and performance in detail-oriented tasks~\cite{motor}.
+IQ boosts are reported to be in average between 5 and 10\% for a single session (returns to normal after a few hours) and up to more than 20\% after a few months with daily AVE sessions (seems to last for at least a few weeks but further studies are needed to know the persistence)~\cite{???}.
+Such compelling results raise the question as to why AVE is not a more widespread technique: why has it has not impacted public health policies and standard medical procedures.
+The question is even more pertinent given that AVE is a non-invasive and non-farmacological intervention,
+considered completely secure if the person does not have a history epiletic seizures,
+and that pervasive devices such as current personal computers and mobile phones are capable of providing
+the necessary stimuli with negligible costs.
+Moreover, AVE can be combined with other techniques for enhanced results.~\cite{review,inso,nu1,nu2,pinoMind}
+
+A thorough discussion of the premises, claims, and consequences of this perplexing overview is
+beyond the scope of this document and is promptly available by visiting the Bibliography or usual scientific search engines.
+Our present contribution is the description of an accessible web-based system that combines
+AVE with breathing, mindfulness meditation, and support groups.
+Such extented AVE that encompasses these other techniques are herein called AVE++, will be carefully delineated, and can be used as a standard AVE system if intended, i.e. the other techniques may be ignored and it will not undermine the pure AVE usage.
+The model serves as a lighweight software prototype, and as a proof of concept, that exercises only free services and technologies,
+and makes available AVE++ for hundreds (and potentially thousands)
+of monthly users employing their own household computers or smartphones.
+
+\subsection{Related work}
+Since the mid-XX century, at least a few dozens of AVE hardware devices have been developed, most usually with commercial goals although some were only employed for scientific experiments.
+The way they were marketed may at least partially explain why AVE is not yet a standard medical procedure worldwide: the devices were almost always advertized as having spiritual, psicodelic, or unreal results.
+Also, the use of specific equipment, and the lack of a serious scientific background, most probably debilitated the judgment of both the general public and the authorities.
+
+Focusing on the serious contributions, AVE is often combined with meditation and sometimes also with tactile (or haptic) entrainment.
+Given the advent of personal computers, software has been made in the last decades for personal, scientific and clinical usage of AVE\footnote{\url{https://en.wikipedia.org/wiki/Comparison_of_brainwave_entrainment_software}}.
+All of them are platform-dependent desktop sofware, i.e. none of them are available as standard web pages, and they do not incorporate breathing techniques, as far as the authors are aware of.
+On the other hand, all of them are compliant with mindfulness meditation because such technique relies on the individual practice and not the software.
+Moreover, some of these systems allow for networked connectivity in order to start sessions at the same time for an arbitrary number of individuals, which facilitates the support groups technique.
+
+\section{Methods}\label{sec:met}
+In summary, the model uses auditory entrainment
+and not visual entrainment due to the limitations of current usual computer and smartphone screens;
+there are both visual and auditory cues for breathing;
+and finally the mindfulness meditation and support groups are assistive techniques
+that depend on the practices adopted by each user.
+Current implementation is serverless, i.e. executes completely on the browser of each visitor,
+and relies only on free technologies, and is so lightweight that it can be made available using
+only unpaid services even with hundreds of daily users.
+
+\subsection{Auditory entrainment}
+
+\subsubsection{Monaural and binaural beats}
+Binaural beats are auditory illusions in which two sine waves with a difference (tipically smaller than
+40Hz) are presented separatelly to each ear.
+The person hears the mean of the two frequencies modulated by their difference.
+If the person is not using a headphone, binaural beats turn into monaural beats,
+i.e. the oscilations mix physically before reaching the ears.
+Figure~\ref{fig:beat} illustrates both binaural and monaural beats.
+These are the most popular techniques for auditory entrainment both in the scientific literature
+and in the commercial venues.
+They are most often reported as very effective and, among practitioners, monaural beats are very much appreciated.
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/beats}
+  \caption{Monaural and binaural beats. The 10Hz beat is entrains the brainwaves at 10Hz. If the X and Y sine waves are presented dichotically (separately to each ear using earphones or headphones), the 105Hz wave with the 10Hz beat is considered an \emph{auditory illusion} resulting from neuronal phase locking that spreads from the auditory system and the inferior colliculus to the cortex.}
+  \label{fig:beat}
+\end{figure}
+
+\subsubsection{Isochronic tones and symmetries}
+Isochronic tones are regular beats of a single tone.
+Typically, an isochronic tone is a tone turned on and off, creating a sequence of distinctive sounds.
+If the separation between the sounds is small enough, the individual sounds are not distinguishable,
+and therefore isochronic tones are commonly used for lower frequencies (no higher than 20Hz).
+
+The \emph{symmetries} consist in the only auditive spectro-temporal entrainment technique the
+authors knows to exist.
+It was developed by the first researcher~\cite{fabbriG} as a musical composition technique, has yielded assertive outcomes, and needs further research to ensure its effectiveness for  brainwave entrainment.
+The inclusion in the model is justified by:
+\begin{itemize}
+  \item It adds to the aesthetic appeal of the overall sonority by the usage of standard musical notes, which makes the experience more approachable since traditional music most often consists, at least partially, in (sequences and superpositions of)  notes.
+  \item Symmetries are argued to be essential to cognition~\cite{deleuze} and the technique relies on algebraic groups, which are how symmetry is expressed mathematically~\cite{groupT}.
+  \item The author has conducted diverse experiments using this technique over more than 15 years and has found effects which should be verified in a scientific setting.
+  \item Moreover: the isochronic tones are an outcome of the symmetries for the cases where the frequency ambit is 0.
+\end{itemize}
+
+Such sonic symmetries consist in a sequence $S = (S_p, S_t)$ of notes evenly distributed in pitch and in time,
+where $S_p$ and $S_t$ are sequences of the same length with values specifying pitch and duration respectively.
+The sequence is repeated in succession with or without a permutation of the notes.
+Let $N \in \mathbb{N}_{> 0}$ be the number of notes, $I \in \mathbb{R}_{\geq 0}$ the number of octaves (an octave is the interval between a frequency $f$
+and $2f$), and $f_0$ the frequency of the lowest-pitch note. Then $S_p = \{n_i\}_{i=0}^{N-1}$ has elements:
+\begin{equation}
+  n_i = f_0 2 ^ {iI / N}
+\end{equation}
+
+Notice that the highest-pitch of the frequency interval is not included
+(e.g. if the interval is one octave, the octave is omitted).
+The onsets of the notes are evenly distributed in a duration $D \in \mathbb{R}_{>0}$ such that $S_t = \{s_i\}_0^{N-1}$ has elements:
+
+\begin{equation}
+  s_i = iD / N + t_0
+\end{equation}
+
+where $t_0$ is the starting time of the sequence.
+Figure~\ref{fig:sym} illustrates the sonic symmetries and the isochronic tones.
+The theory makes available the use of numerous sets permutations, associated to special algebraic groups
+and to specific symmetries.
+For simplicity, the only sets of permutations implemented at the moment are:
+random permutations, forward rotation (in which the last note becomes the first note), backward rotation, and the identity (in which the permutation results in the same sequence).
+
+\begin{figure}
+  \includegraphics[width=\linewidth]{figs/sym}
+  \caption{Sonic symmetries and isochronic tones.
+  A sequence of musical notes is constructed in a way that the notes are evenly distributed in time and in pitch.
+  Each time the sequence is repeated, the sequence may be permuted.
+  If the pitch ambit is zero, the sonic symmetry is exactly what is known as isochronic tones, a well known brainwave entrainment technique.
+  In this example, the sequence consists of three notes.}
+  \label{fig:sym}
+\end{figure}
+
+
+\subsection{Martigli oscillations for breathing}
+The other core technique used in the AVE++ is the use of audiovisual cues for regular breathing.
+The inhale/exhale pattern follows sinusoidal wave mapped to an auditory cue as illustrated in Figure~\ref{fig:bre}.The same pattern are mapped to visual positional, size, and color cues to assist the user in grasping the audible correlate.
+The respiration rhythm progressively slows down and stabilizes at a slow and comfortable pace.
+Although parametrizable by the user for each session, the typical setting is illustrated in Figure~\ref{fig:bre}.
+Visual cues are given to the user for the breathing to facilitate tracking, but the breathing rhythm is also mapped to an audible cue.
+In fact, newcomers usually benefit from the visual cues and in a few sessions they are guided by the auditory cue, which enables them to concentrate with their eyes closed.
+
+The main motivations for the inclusion of this breathing procedure are:
+\begin{itemize}
+  \item The scientific evidence that breathing exercises, specially slow and rhythmic breathing, are effective in enhancing various health conditions (specially mental health) and general well-being, as evidenced in Section~\ref{sec:int}.
+  \item The experiential evidence that slow breathing helps concentration and general well-being, gathered by the creators of the model.~\cite{breath}
+  \item The fact that the auditive cue for breathing does not conflict with the auditory brainwave entrainment.
+\end{itemize}
+
+The name \emph{'Martigli'} in the 'Martigli oscillations' come from the Otávio Martigli,
+a concert music composer which has been developing and employing similar techniques for over a decade.
+He assisted in the creation of this model and is a regular user of the software described in Section~\ref{sec:res}.
+The need to name such oscillatory cues for breathing became already evident when developing the first versions
+of the AVE++ model because there are many oscillations involved.
+
+\begin{figure}
+  \hspace*{-0.5cm}
+  \includegraphics[width=\linewidth]{figs/bre1}
+  \caption{One cycle of a Martigli oscillation.
+  An auditory cue is given by an oscillation around central frequency $F_0$ with amplitude $A_m$ and period $P_m$.
+  While $F_0$ and $A_m$ are static, $d_m$ varies as depicted in Figure~\ref{fig:bre}.
+  A typical setting example is: $F_0=200Hz$, $A_m=40Hz$, $d_m \in [10,20]$ seconds.}
+  \label{fig:bre1}
+\end{figure}
+
+\begin{figure}
+  \hspace*{-0.5cm}
+  \includegraphics[width=\linewidth]{figs/bre}
+  \caption{The typical progressive increase of the breathing cycle duration used in the AVE++.
+  For almost all subjects, starting at 10 seconds for the whole inspiration and expiration cycle was comfortable.
+  The 20 seconds breathing cycle reached after 10 minutes was comfortable to all the subjects except for those with age above 60 years with a smoking habit or history.
+  The breathing cues were both visual and audible and followed a sinusoidal pattern.
+  The initial ($d_1 = 10 s$) and final ($d_2 = 20 s$) breathing duration,
+  the transition duration ($d = 10 min$) between $d_1$ and $d_2$ and the total time ($D = 15 min$) are all parameterizable.}
+  \label{fig:bre}
+\end{figure}
+
+% additional figure with a Martigli oscillation: period, amplitude (in Hz), center frequency. Describe typical setting.
+
+\subsection{Martigli-binaural, panning, and waveforms}
+There are various possibilities in the use of the techniques described in this paper.
+This section describes the variations chosen by the authors in order to better explore the entrainment
+possibilities and to obtain audiovisual sessions that result more interesting for the users.
+
+The Martigli oscillation may be mingled with the binaural beat:
+consider two identical Martigli oscillations (same amplitude, same initial and final breathing durations, etc)
+with a center frequency displacement of e.g. $10Hz$.
+The resulting $10Hz$ beat is a monaural beat if both Martigli oscillations presented to both ears,
+and a binaural beat if presented dichotically.
+
+Among the many possibilities for panning, we chose to consider only panning for binaural beats and selected three possibilities:
+\begin{itemize}
+  \item periodic linear cross-fade entailing the swap between left and right auditory stimuli. For example: a 20 seconds cross-fade is performed each 120 seconds.
+  \item Sinusoidal pan, of an arbitrary frequency, applied to each of the two sounds that results in the beat. The panning applied to one of such sounds is inverted and applied to the other sound.
+  \item Sinusoidal pan, with the same frequency of the Martigli oscillation, applied to each of the two sounds that results in the beat. The panning applied to one of such sounds is inverted and applied to the other sound.
+\end{itemize}
+\noindent The periodic linear cross-fade is by far the most employed panning in our sessions because the other two possibilities imply that a binaural beat is mostly turned into a monaural beat.
+
+The waveform of the sonic stimulation may also be different from a sinusoid.
+For simplicity, and compliant to both musical and signal processing theoretical basis,
+we selected to use only the following waveforms: sine, triangular, square and sawtooth.
+Only the sinusoidal waveform is a pure tone, i.e. any other waveform is a combination of sinusoids following the harmonic series.
+Such fact entails that a binaural beat setting with a non-sinusoidal waveform results in a collection of binaural beats, each with increased frequency and decreased volume.
+For example, consider the beats resulting from two sawtooth waves with 100Hz and 110Hz:
+10Hz, 20Hz, 30Hz, 40Hz, etc.
+The use of sinusoidal waves was predominant; non-sinusoidal wave were used only for experimental purposes
+and were considered, by the authors, very effective in providing variation, interest and entrainment.
+
+\subsection{Visuals: assisting concentration and limitations for AVE}\label{vis}
+Using visual stimuli for brainwave entrainment through nowadays computers and mobile phones has one major shortcoming: the frequency of the visual stimulus is most probably not the frequency envisioned by the model or software.
+For example, the refresh rate is usually $60Hz$ or $75Hz$, which would not fit a $32Hz$ stimulus.
+Moreover, the refresh rate is not uniform across devices and there are further complications stemming
+from nuances usually specified e.g. in terms of refresh rate,
+frame rate, interlacing, resolution, and the overall visual interface provided.
+Such fact has induced us to use the visual stimuli only to support concentration,
+which was achieved through a few simple guidelines:
+\begin{itemize}
+  \item Movimenet captures attention.
+  \item Particle systems yields many moving elements, and thus captures attention effectively.
+  \item Particular shapes, such as related to well-known symbols and intricate patterns, are effective in capturing attention.
+\end{itemize}
+
+\subsection{Remarks on mindfulness and support groups}
+\subsection{Computational implementation}
+
+\section{Results and discussion}\label{sec:res}
+\subsection{The audiovisual compositions}
+\subsubsection{Effective musical audio for brainwave entrainment and meditation/concentration}
+\subsubsection{Assistive visual elements}
+Complying to the directives in Section~\ref{vis}, the initial model used three main moving elements:
+an attractor and two emitters. The two emitters move and emmit particles which travel to the attractor.
+The attractor performs a standard random walk.
+The emitters, although can be specified to perform a random walk, are usually specified to perform a trajectory among a topological knot (as represented by parametric equations)
+or a well-known pattern (a sinusoid or a leminiscate).
+The only exception is a trajectory for the emitters where they follow a parametric equation
+chosen for its oscillatory pattern~\cite{osc}.
+\subsubsection{Corresponging visual and auditive cues}
+% respiration
+% start & end
+\subsection{The resulting interface}
+\subsection{The usage received}
+\subsection{The health enhancements reported}
+\subsection{Technological feasibility. Usable by people that have difficulty in using technology. Cheap. Stable}
+
+
+\section{Conclusions}
+\subsection{Future work}
+% Acquire reference values for beats and isochronic sounds that are audible. For example: I may use my perception to derive initial reference values (e.g. below 100Hz, 1Hz beat is not heard; above 1000Hz, beats above 40Hz are not heard). Publish in journal "Medical Hypotheses"
+\subsection{Acknowledgments}
+
+% Bibliography
+%-----------------------------------------------------------------
+\begin{thebibliography}{99}
+
+  \bibitem{pinoMind} Pino, Olimpia, Roberta Crespi, and Giuliano Giucastro. "L'influenza della mindfulness e del benessere generale nel trattamento clinico dei fumatori di tabacco in un programma di disassuefazione: una valutazione a breve e lungo termine." (2020): 849-870.
+
+  \bibitem{nu1} Pino, Olimpia, and Francesco La Ragione. "A Brain Computer Interface for audio-visual entrainment in emotional regulation: preliminary evidence of its effects." Online International Interdisciplinary Journal (2016): 1-12.
+
+  \bibitem{nu2} Pino, Olimpia. "Neuro-Upper, a Novel Technology for Audio-Visual Entrainment. A Randomized Controlled Trial on Individu-als with Anxiety and Depressive Disorders." BAOJ Med Nursing 3 (2017): 041.
+
+\bibitem{inso} Tang, Hsin-Yi Jean, et al. "Open-loop audio-visual stimulation (AVS): A useful tool for management of insomnia?." Applied psychophysiology and biofeedback 41.1 (2016): 39-46.
+
+\bibitem{sleep} Tang, Hsin-Yi Jean, et al. "Open-loop Audio-Visual Stimulation for sleep promotion in older adults with comorbid insomnia and osteoarthritis pain: results of a pilot randomized controlled trial." Sleep Medicine 82 (2021): 37-42.
+
+\bibitem{paed} Schmid, Werner, et al. "Brainwave entrainment to minimise sedative drug doses in paediatric surgery: a randomised controlled trial." British Journal of Anaesthesia 125.3 (2020): 330-335.
+
+\bibitem{motor} Lagarrigue, Yannick, Céline Cappe, and Jessica Tallet. "Regular rhythmic and audio-visual stimulations enhance procedural learning of a perceptual-motor sequence in healthy adults: A pilot study." PloS one 16.11 (2021): e0259081.
+
+\bibitem{review} Basu, Sandhya, and Bidisha Banerjee. "Prospect of Brainwave Entrainment to Promote Well-Being in Individuals: A Brief Review." Psychological Studies (2020): 1-11.
+
+\bibitem{alz} Clements-Cortes, Amy. "Sound stimulation in patients with Alzheimer’s disease." (2015).
+
+\bibitem{mem} Roberts, Brooke M et al. “Entrainment enhances theta oscillations and improves episodic memory.” Cognitive neuroscience vol. 9,3-4 (2018): 181-193. doi:10.1080/17588928.2018.1521386
+
+\bibitem{cantor} David S. Cantor and  Emily   Stevens,  “QEEG Correlates of Auditory-Visual Entrainment Treatment Efficacy of Refractory Depression.”Journal of Neurotherapy, (2009).
+
+\bibitem{revsis} da Silva, Vernon Furtado et al. “Stimulation by Light and Sound: Therapeutics Effects in Humans. Systematic Review.” Clinical practice and epidemiology in mental health : CP \& EMH vol. 11 150-4.(2015), doi:10.2174/1745017901511010150
+
+\bibitem{fabbriG} Fabbri, Renato, and Adolfo Maia Jr. "Applications of group theory on granular synthesis." SIMPÓSIO BRASILERIO DE COMPUTAÇÃO MUSICAL 11 (2007).
+
+\bibitem{groupT} McWeeny, Roy. Symmetry: An introduction to group theory and its applications. Courier Corporation, 2002.
+
+\bibitem{deleuze} Deleuze, Gilles. Difference and repetition. Columbia University Press, 1994.
+
+\bibitem{breath} Zaccaro, Andrea et al. “How Breath-Control Can Change Your Life: A Systematic Review on Psycho-Physiological Correlates of Slow Breathing.” Frontiers in human neuroscience vol. 12 353. 7 Sep. 2018, doi:10.3389/fnhum.2018.00353
+
+\bibitem{Cd94} Author, \emph{Title}, Journal/Editor, (year)
+
+\end{thebibliography}
+
+\end{document}

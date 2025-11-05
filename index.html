@@ -137,12 +137,13 @@
       }
       .track-item {
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: space-between;
+        gap: 1rem;
         background: #f8fafc;
         border: 1px solid #e5e7eb;
         border-radius: 0.75rem;
-        padding: 0.75rem 1rem;
+        padding: 0.85rem 1rem;
       }
       .track-item h4 {
         font-size: 0.95rem;
@@ -154,7 +155,15 @@
         color: #6b7280;
         margin-top: 0.125rem;
       }
-      .track-item button {
+      .track-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        align-items: center;
+        justify-content: flex-end;
+        min-width: 6.5rem;
+      }
+      .track-actions button {
         font-size: 0.75rem;
         padding: 0.25rem 0.75rem;
         border-radius: 9999px;
@@ -165,7 +174,7 @@
           background 0.2s,
           color 0.2s;
       }
-      .track-item button:hover {
+      .track-actions button:hover {
         background-color: #fecaca;
         color: #7f1d1d;
       }
@@ -335,6 +344,195 @@
           box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
         }
       }
+      .header-bar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .header-summaries {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .header-chip {
+        position: relative;
+        display: inline-flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.125rem;
+        min-width: 9rem;
+        padding: 0.55rem 0.95rem;
+        border-radius: 0.85rem;
+        border: 1px solid #cbd5f5;
+        background: #f8fafc;
+        transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+      }
+      .header-chip:hover,
+      .header-chip:focus-visible {
+        border-color: #2563eb;
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.12);
+        outline: none;
+      }
+      .header-chip-active {
+        border-color: #2563eb;
+        background: #e0e7ff;
+      }
+      .chip-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #475569;
+      }
+      .chip-value {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .chip-tooltip {
+        position: absolute;
+        inset-inline-start: 50%;
+        bottom: calc(100% + 0.75rem);
+        transform: translateX(-50%) translateY(0.25rem);
+        min-width: 15rem;
+        max-width: 20rem;
+        background: #0f172a;
+        color: #f8fafc;
+        border-radius: 0.85rem;
+        padding: 0.85rem 1rem;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.4);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.18s ease, transform 0.18s ease;
+        z-index: 50;
+      }
+      .chip-tooltip::after {
+        content: '';
+        position: absolute;
+        inset-inline-start: 50%;
+        top: 100%;
+        transform: translateX(-50%);
+        border-width: 8px;
+        border-style: solid;
+        border-color: #0f172a transparent transparent transparent;
+      }
+      .header-chip:hover .chip-tooltip,
+      .header-chip:focus-visible .chip-tooltip {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+      .chip-tooltip h4 {
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin-bottom: 0.45rem;
+        color: #e0e7ff;
+      }
+      .chip-tooltip p,
+      .chip-tooltip li {
+        font-size: 0.7rem;
+        line-height: 1.4;
+        color: #cbd5f5;
+      }
+      .chip-tooltip ul {
+        margin: 0.35rem 0 0;
+        padding-inline-start: 1.05rem;
+      }
+      .header-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .workspace {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        width: 100%;
+      }
+      .dashboard-layout {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      @media (min-width: 1024px) {
+        .dashboard-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 2.3fr) minmax(0, 1fr);
+          gap: 1.75rem;
+          align-items: start;
+        }
+      }
+      .dashboard-primary {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .dashboard-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      @media (min-width: 1024px) {
+        .dashboard-sidebar {
+          position: sticky;
+          top: 6.5rem;
+        }
+      }
+      .control-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      @media (min-width: 768px) {
+        .control-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .control-panel h2 {
+        margin-bottom: 0.5rem;
+      }
+      .haptics-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+      .haptics-preview-list {
+        display: grid;
+        gap: 0.75rem;
+      }
+      @media (min-width: 640px) {
+        .haptics-preview-list {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .haptics-preview-card {
+        border: 1px dashed #c7d2fe;
+        border-radius: 0.75rem;
+        padding: 0.85rem 1rem;
+        background: #f8fafc;
+      }
+      .haptics-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 9999px;
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        background: #eef2ff;
+        color: #4338ca;
+      }
+      .session-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
       .activity-panel {
         display: flex;
         flex-direction: column;
@@ -422,7 +620,7 @@
   <body class="bg-gray-50 min-h-screen">
     <header class="bg-white border-b sticky top-0 z-50 shadow-sm">
       <div class="max-w-7xl mx-auto px-4 py-4">
-        <div class="flex items-center justify-between">
+        <div class="header-bar">
           <div class="flex items-center gap-3">
             <div
               class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold shadow"
@@ -434,7 +632,37 @@
               <p class="text-xs text-gray-500">Neurosensory Stimulation Dashboard</p>
             </div>
           </div>
-          <div class="flex gap-2">
+          <div class="header-summaries">
+            <button
+              id="chip-stimulation"
+              class="header-chip header-chip-active"
+              type="button"
+              aria-pressed="true"
+              aria-controls="workspace-stimulation"
+            >
+              <span class="chip-label">Stimulation</span>
+              <span id="chip-stimulation-summary" class="chip-value">Idle</span>
+              <div class="chip-tooltip" id="chip-stimulation-tooltip">
+                <h4>Active Tracks</h4>
+                <p>No tracks running. Start audio or visual cues to begin.</p>
+              </div>
+            </button>
+            <button
+              id="chip-identity"
+              class="header-chip"
+              type="button"
+              aria-pressed="false"
+              aria-controls="workspace-identity"
+            >
+              <span class="chip-label">Session &amp; Identity</span>
+              <span id="chip-identity-summary" class="chip-value">Guest session</span>
+              <div class="chip-tooltip" id="chip-identity-tooltip">
+                <h4>Account</h4>
+                <p>Not signed in. Sign in to sync your activity.</p>
+              </div>
+            </button>
+          </div>
+          <div class="header-controls">
             <button id="btn-init" class="btn-primary text-sm start-audio-btn">
               ▶ Start audio
             </button>
@@ -445,386 +673,430 @@
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
-      <div class="panel mb-6" id="identity-panel">
-        <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div class="space-y-2">
-            <h2 class="text-2xl font-bold">Session & Identity</h2>
-            <p id="auth-status" class="text-sm text-gray-600">
-              Checking authentication state...
-            </p>
-            <div class="flex flex-wrap items-center gap-2 text-sm">
-              <span class="uppercase tracking-wide text-gray-400 text-xs"
-                >Current identity</span
-              >
-              <span id="auth-identity" class="font-medium text-gray-800">—</span>
-              <span
-                id="auth-anonymous-badge"
-                class="hidden rounded-full bg-slate-200 px-2 py-1 text-xs font-medium text-slate-600"
-              >
-                Anonymous session
+      <div id="workspace-stimulation" class="workspace">
+        <section class="control-grid">
+          <div class="panel control-panel" id="audio-panel">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-2xl font-bold">Audio Controls</h2>
+              <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-blue-500">
+                Soundspace
               </span>
             </div>
-          </div>
-          <div class="flex items-start justify-end">
-            <button id="btn-signout" class="btn-secondary text-sm hidden" type="button">
-              ↩ Sign out
-            </button>
-          </div>
-        </div>
-        <div id="auth-login-section" class="mt-5 space-y-4">
-          <div class="space-y-3">
-            <p class="text-xs font-semibold uppercase text-gray-400">Quick login</p>
-            <div class="flex flex-wrap items-center gap-3">
-              <button id="btn-login-google" class="btn-primary text-sm" type="button">
-                ✨ Continue with Google
-              </button>
-              <button id="btn-login-github" class="btn-secondary text-sm" type="button">
-                🐙 Continue with GitHub
-              </button>
-            </div>
-          </div>
-          <div class="space-y-3 border-t border-slate-200 pt-4">
-            <p class="text-xs font-semibold uppercase text-gray-400">Email access</p>
-            <div class="grid gap-2 sm:grid-cols-2">
-              <input
-                id="auth-email"
-                type="email"
-                autocomplete="email"
-                placeholder="you@example.com"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-              />
-              <input
-                id="auth-password"
-                type="password"
-                autocomplete="current-password"
-                placeholder="Password"
-                class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-              />
-            </div>
-            <div class="flex flex-wrap items-center gap-3">
-              <button id="btn-email-login" class="btn-primary text-sm" type="button">
-                Login
-              </button>
-              <button id="btn-email-register" class="btn-secondary text-sm" type="button">
-                Register
-              </button>
-            </div>
-          </div>
-          <p id="auth-feedback" class="text-xs text-red-500 hidden" role="status"></p>
-        </div>
-        <div class="mt-6">
-          <div
-            class="usage-scope-tabs"
-            role="tablist"
-            aria-label="Usage metrics scope selection"
-            id="usage-scope-tabs"
-          >
-            <button
-              type="button"
-              class="usage-scope-tab"
-              data-usage-scope="session"
-              id="usage-scope-tab-session"
-            >
-              This session
-            </button>
-            <button
-              type="button"
-              class="usage-scope-tab usage-scope-tab-active"
-              data-usage-scope="user"
-              id="usage-scope-tab-user"
-            >
-              This user
-            </button>
-            <button
-              type="button"
-              class="usage-scope-tab"
-              data-usage-scope="global"
-              id="usage-scope-tab-global"
-            >
-              All other users
-            </button>
-          </div>
-          <p id="usage-scope-description" class="mt-2 text-xs text-gray-500">
-            Showing lifetime activity for this user across recorded sessions.
-          </p>
-        </div>
-        <div class="mt-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4" id="auth-stat-cards">
-          <div class="stat-card">
-            <span class="stat-label">Audio initializations</span>
-            <span id="stat-audio-inits" class="stat-value">0</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Audio tracks added</span>
-            <span id="stat-audio-adds" class="stat-value">0</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Visual cues added</span>
-            <span id="stat-visual-adds" class="stat-value">0</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Tracks stopped</span>
-            <span id="stat-track-stops" class="stat-value">0</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Session time</span>
-            <span id="stat-session-time" class="stat-value">00:00:00</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Neurostimulation time</span>
-            <span id="stat-neuro-time" class="stat-value">00:00:00</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">First sign-in</span>
-            <span id="stat-first-signin" class="stat-value text-sm">—</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-label">Last sign-in</span>
-            <span id="stat-last-signin" class="stat-value text-sm">—</span>
-          </div>
-        </div>
-        <div class="mt-6 grid gap-6 md:grid-cols-2">
-          <div class="stat-panel">
-            <h3>Audio track exposure</h3>
-            <ul id="stat-audio-duration-list" class="stat-list">
-              <li>No audio tracks yet.</li>
-            </ul>
-          </div>
-          <div class="stat-panel">
-            <h3>Visual cue exposure</h3>
-            <ul id="stat-visual-duration-list" class="stat-list">
-              <li>No visual cues yet.</li>
-            </ul>
-          </div>
-        </div>
-        <div class="mt-6">
-          <h3 class="text-xs font-semibold uppercase text-gray-400 mb-2">
-            Self-reported profile
-          </h3>
-          <div id="stat-profile" class="profile-summary">
-            No self-reported profile yet.
-          </div>
-        </div>
-        <div class="mt-8 grid gap-6 lg:grid-cols-2">
-          <div class="stat-panel">
-            <h3>Data & Privacy</h3>
-            <div class="toggle-group mt-3">
-              <label class="toggle-option" id="toggle-collect-wrapper">
-                <input type="checkbox" id="toggle-collect-data" checked />
-                <div>
-                  <span class="toggle-title">Collect usage statistics</span>
-                  <span class="toggle-desc"
-                    >Store personal metrics to resume sessions across devices.</span
-                  >
-                </div>
-              </label>
-              <label class="toggle-option" id="toggle-share-wrapper">
-                <input type="checkbox" id="toggle-share-anonymized" checked />
-                <div>
-                  <span class="toggle-title">Share anonymized logs publicly</span>
-                  <span class="toggle-desc"
-                    >Let others see your activity with an anonymous label.</span
-                  >
-                </div>
-              </label>
-              <label class="toggle-option" id="toggle-community-wrapper">
-                <input type="checkbox" id="toggle-include-community" checked />
-                <div>
-                  <span class="toggle-title">Contribute to community insights</span>
-                  <span class="toggle-desc"
-                    >Allow your anonymized data to be used in aggregate statistics.</span
-                  >
-                </div>
-              </label>
-            </div>
-            <div class="mt-6 space-y-3 border-t border-slate-200 pt-4">
-              <p class="text-xs font-semibold uppercase text-gray-400">Sensory engines</p>
-              <div class="grid gap-3 md:grid-cols-3">
-                <label class="text-sm font-medium text-gray-700">
-                  <span class="block mb-1">Audio</span>
-                  <select
-                    id="engine-audio-select"
-                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                  ></select>
-                  <span
-                    id="engine-audio-status"
-                    class="mt-1 block text-xs text-gray-500"
-                  ></span>
-                </label>
-                <label class="text-sm font-medium text-gray-700">
-                  <span class="block mb-1">Visual</span>
-                  <select
-                    id="engine-visual-select"
-                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                  ></select>
-                  <span
-                    id="engine-visual-status"
-                    class="mt-1 block text-xs text-gray-500"
-                  ></span>
-                </label>
-                <label class="text-sm font-medium text-gray-700">
-                  <span class="block mb-1">Haptics</span>
-                  <select
-                    id="engine-haptics-select"
-                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                  ></select>
-                  <span
-                    id="engine-haptics-status"
-                    class="mt-1 block text-xs text-gray-500"
-                  ></span>
-                </label>
-              </div>
-            </div>
-          </div>
-          <div class="stat-panel activity-panel">
-            <h3>Your Activity Logs</h3>
-            <div class="activity-tabs">
-              <button
-                id="tab-my-activity"
-                class="activity-tab activity-tab-active"
-                type="button"
-              >
-                My activity
-              </button>
-              <button id="tab-public-activity" class="activity-tab" type="button">
-                Public view
-              </button>
-              <button id="btn-refresh-activity" class="activity-refresh" type="button">
-                ⟳ Refresh
-              </button>
-            </div>
-            <p id="activity-public-note" class="activity-note">
-              Public feed displays anonymized entries shared by you and the community.
-            </p>
-            <div id="activity-my-panel" class="activity-feed">
-              <ul id="activity-my-list" class="activity-list">
-                <li class="activity-empty">No activity logged yet.</li>
-              </ul>
-            </div>
-            <div id="activity-public-panel" class="activity-feed hidden">
-              <ul id="activity-public-list" class="activity-list">
-                <li class="activity-empty">Public feed loading…</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid gap-6 lg:grid-cols-2">
-        <div class="panel">
-          <h2 class="text-2xl font-bold mb-4">Audio Controls</h2>
             <p id="status" class="text-gray-600 mb-4">
               Audio engine idle. Start audio to play tracks.
             </p>
-          <div class="space-y-6">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between gap-2">
-                <label for="audio-menu" class="block text-sm font-medium text-gray-700"
-                  >Audio feature</label
-                >
-                <span class="text-xs text-gray-400">Layer tracks to craft a session</span>
+            <div class="space-y-6">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <label for="audio-menu" class="block text-sm font-medium text-gray-700"
+                    >Audio feature</label
+                  >
+                  <span class="text-xs text-gray-400">Layer tracks to craft a session</span>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                  <select
+                    id="audio-menu"
+                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                  >
+                    <option value="sine">Pure sine • 440Hz</option>
+                    <option value="binaural">Binaural beat • Alpha 10Hz</option>
+                    <option value="monaural">Monaural beat • Theta 6Hz</option>
+                    <option value="isochronic">Isochronic pulse • 12Hz breathing</option>
+                    <option value="martigli">Martigli harmonics</option>
+                    <option value="noise-white">Noise • White spectrum</option>
+                    <option value="noise-pink">Noise • Pink spectrum</option>
+                    <option value="noise-brown">Noise • Brown spectrum</option>
+                  </select>
+                  <button id="btn-add-audio" class="btn-primary">➕ Add track</button>
+                </div>
+                <p id="audio-description" class="text-xs text-gray-500 leading-relaxed">
+                  Pure sine tone at 440Hz for quick calibration and reference.
+                </p>
               </div>
-              <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
-                <select
-                  id="audio-menu"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                >
-                  <option value="sine">Pure sine • 440Hz</option>
-                  <option value="binaural">Binaural beat • Alpha 10Hz</option>
-                  <option value="monaural">Monaural beat • Theta 6Hz</option>
-                  <option value="isochronic">Isochronic pulse • 12Hz breathing</option>
-                  <option value="martigli">Martigli harmonics</option>
-                  <option value="noise-white">Noise • White spectrum</option>
-                  <option value="noise-pink">Noise • Pink spectrum</option>
-                  <option value="noise-brown">Noise • Brown spectrum</option>
-                </select>
-                <button id="btn-add-audio" class="btn-primary">➕ Add track</button>
+              <div class="flex flex-wrap gap-3">
+                <button id="btn-stop-all-audio" class="btn-secondary text-sm">
+                  ⏹ Stop all audio
+                </button>
               </div>
-              <p id="audio-description" class="text-xs text-gray-500 leading-relaxed">
-                Pure sine tone at 440Hz for quick calibration and reference.
-              </p>
+              <div class="track-section">
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-sm font-semibold text-gray-700">Active audio tracks</h3>
+                  <span id="audio-track-count" class="text-xs font-medium text-gray-400"
+                    >0 layers</span
+                  >
+                </div>
+                <div id="audio-active-empty" class="track-empty">
+                  No audio layers running. Add a track to begin.
+                </div>
+                <div id="audio-active-list" class="track-list"></div>
+              </div>
             </div>
-            <div class="flex flex-wrap gap-3">
-              <button id="btn-stop-all-audio" class="btn-secondary text-sm">
-                ⏹ Stop all audio
-              </button>
+          </div>
+          <div class="panel control-panel" id="visual-panel">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-2xl font-bold">Visual Controls</h2>
+              <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-purple-500">
+                Visual field
+              </span>
             </div>
-            <div class="track-section">
+            <p class="text-gray-600 mb-4">
+              Pair color entrainment with audio sessions or run standalone.
+            </p>
+            <div class="space-y-6">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between gap-2">
+                  <label for="visual-menu" class="block text-sm font-medium text-gray-700"
+                    >Visual feature</label
+                  >
+                  <span class="text-xs text-gray-400">Stack light cues</span>
+                </div>
+                <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
+                  <select
+                    id="visual-menu"
+                    class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                  >
+                    <option value="blink">Blinking colors</option>
+                    <option value="undulate">Undulating colors</option>
+                  </select>
+                  <button id="btn-add-visual" class="btn-primary">➕ Add visual</button>
+                </div>
+                <p id="visual-description" class="text-xs text-gray-500 leading-relaxed">
+                  High-contrast blinking palette for alert focus and breathing cadence.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <button id="btn-stop-all-visual" class="btn-secondary text-sm">
+                  ⏹ Stop all visual
+                </button>
+              </div>
+            </div>
+            <div
+              id="visual-display"
+              class="visual-display mt-6 flex h-48 items-center justify-center px-4 text-center text-sm font-medium text-gray-600 transition-colors"
+            >
+              <div
+                id="visual-layer-container"
+                class="visual-layer-container"
+                aria-hidden="true"
+              ></div>
+              <span
+                id="visual-status-text"
+                class="visual-status-text transition-colors duration-300"
+                >Visual output appears here once started.</span
+              >
+            </div>
+            <div class="track-section mt-6">
               <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-gray-700">Active audio tracks</h3>
-                <span id="audio-track-count" class="text-xs font-medium text-gray-400"
+                <h3 class="text-sm font-semibold text-gray-700">Active visual layers</h3>
+                <span id="visual-track-count" class="text-xs font-medium text-gray-400"
                   >0 layers</span
                 >
               </div>
-              <div id="audio-active-empty" class="track-empty">
-                No audio layers running. Add a track to begin.
+              <div id="visual-active-empty" class="track-empty">
+                No visual layers running. Add a cue to illuminate the panel.
               </div>
-              <div id="audio-active-list" class="track-list"></div>
+              <div id="visual-active-list" class="track-list"></div>
             </div>
           </div>
-        </div>
-        <div class="panel">
-          <h2 class="text-2xl font-bold mb-4">Visual Controls</h2>
-          <p class="text-gray-600 mb-4">
-            Pair color entrainment with audio sessions or run standalone.
+        </section>
+        <section class="panel haptics-panel" id="haptics-panel">
+          <div class="flex items-center justify-between">
+            <h2 class="text-2xl font-bold">Haptics Control</h2>
+            <span class="haptics-badge">In roadmap</span>
+          </div>
+          <p class="text-gray-600">
+            We are preparing tactile entrainment that mirrors your audio and visual layers.
+            Define rhythmic pulses, spatial sweeps, and gradual transitions that synchronize
+            across modalities.
           </p>
-          <div class="space-y-6">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between gap-2">
-                <label for="visual-menu" class="block text-sm font-medium text-gray-700"
-                  >Visual feature</label
-                >
-                <span class="text-xs text-gray-400">Stack light cues</span>
-              </div>
-              <div class="grid gap-3 sm:grid-cols-[1fr_auto]">
-                <select
-                  id="visual-menu"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                >
-                  <option value="blink">Blinking colors</option>
-                  <option value="undulate">Undulating colors</option>
-                </select>
-                <button id="btn-add-visual" class="btn-primary">➕ Add visual</button>
-              </div>
-              <p id="visual-description" class="text-xs text-gray-500 leading-relaxed">
-                High-contrast blinking palette for alert focus and breathing cadence.
+          <div class="haptics-preview-list">
+            <div class="haptics-preview-card">
+              <h4 class="text-sm font-semibold text-gray-700">Rhythmic actuators</h4>
+              <p class="text-xs text-gray-600">
+                Map beat frequencies to wearable or chair-mounted vibrotactile cues.
               </p>
             </div>
-            <div class="flex flex-wrap gap-3">
-              <button id="btn-stop-all-visual" class="btn-secondary text-sm">
-                ⏹ Stop all visual
+            <div class="haptics-preview-card">
+              <h4 class="text-sm font-semibold text-gray-700">Spatial sweeps</h4>
+              <p class="text-xs text-gray-600">
+                Design directional panning patterns for multi-point haptic arrays.
+              </p>
+            </div>
+            <div class="haptics-preview-card">
+              <h4 class="text-sm font-semibold text-gray-700">Intensity envelopes</h4>
+              <p class="text-xs text-gray-600">
+                Configure attack, sustain, and release curves for gentle transitions.
+              </p>
+            </div>
+            <div class="haptics-preview-card">
+              <h4 class="text-sm font-semibold text-gray-700">Hardware matrix</h4>
+              <p class="text-xs text-gray-600">
+                Manage connected devices, safe limits, and session presets from one place.
+              </p>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div id="workspace-identity" class="workspace hidden">
+        <section id="identity-panel" class="panel session-panel">
+          <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div class="space-y-2">
+              <h2 class="text-2xl font-bold">Session &amp; Identity</h2>
+              <p id="auth-status" class="text-sm text-gray-600">
+                Checking authentication state...
+              </p>
+              <div class="flex flex-wrap items-center gap-2 text-sm">
+                <span class="uppercase tracking-wide text-gray-400 text-xs"
+                  >Current identity</span
+                >
+                <span id="auth-identity" class="font-medium text-gray-800">—</span>
+                <span
+                  id="auth-anonymous-badge"
+                  class="hidden rounded-full bg-slate-200 px-2 py-1 text-xs font-medium text-slate-600"
+                >
+                  Anonymous session
+                </span>
+              </div>
+            </div>
+            <div class="flex items-start justify-end">
+              <button id="btn-signout" class="btn-secondary text-sm hidden" type="button">
+                ↩ Sign out
               </button>
             </div>
           </div>
-          <div
-            id="visual-display"
-            class="visual-display mt-6 flex h-48 items-center justify-center px-4 text-center text-sm font-medium text-gray-600 transition-colors"
-          >
+          <div id="auth-login-section" class="space-y-4 mt-4">
+            <div class="space-y-3">
+              <p class="text-xs font-semibold uppercase text-gray-400">Quick login</p>
+              <div class="flex flex-wrap items-center gap-3">
+                <button id="btn-login-google" class="btn-primary text-sm" type="button">
+                  ✨ Continue with Google
+                </button>
+                <button id="btn-login-github" class="btn-secondary text-sm" type="button">
+                  🐙 Continue with GitHub
+                </button>
+              </div>
+            </div>
+            <div class="space-y-3 border-t border-slate-200 pt-4">
+              <p class="text-xs font-semibold uppercase text-gray-400">Email access</p>
+              <div class="grid gap-2 sm:grid-cols-2">
+                <input
+                  id="auth-email"
+                  type="email"
+                  autocomplete="email"
+                  placeholder="you@example.com"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                />
+                <input
+                  id="auth-password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Password"
+                  class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                />
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <button id="btn-email-login" class="btn-primary text-sm" type="button">
+                  Login
+                </button>
+                <button id="btn-email-register" class="btn-secondary text-sm" type="button">
+                  Register
+                </button>
+              </div>
+            </div>
+            <p id="auth-feedback" class="text-xs text-red-500 hidden" role="status"></p>
+          </div>
+          <div>
             <div
-              id="visual-layer-container"
-              class="visual-layer-container"
-              aria-hidden="true"
-            ></div>
-            <span
-              id="visual-status-text"
-              class="visual-status-text transition-colors duration-300"
-              >Visual output appears here once started.</span
+              class="usage-scope-tabs"
+              role="tablist"
+              aria-label="Usage metrics scope selection"
+              id="usage-scope-tabs"
             >
-          </div>
-          <div class="track-section mt-6">
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="text-sm font-semibold text-gray-700">Active visual layers</h3>
-              <span id="visual-track-count" class="text-xs font-medium text-gray-400"
-                >0 layers</span
+              <button
+                type="button"
+                class="usage-scope-tab"
+                data-usage-scope="session"
+                id="usage-scope-tab-session"
               >
+                This session
+              </button>
+              <button
+                type="button"
+                class="usage-scope-tab usage-scope-tab-active"
+                data-usage-scope="user"
+                id="usage-scope-tab-user"
+              >
+                This user
+              </button>
+              <button
+                type="button"
+                class="usage-scope-tab"
+                data-usage-scope="global"
+                id="usage-scope-tab-global"
+              >
+                All users
+              </button>
             </div>
-            <div id="visual-active-empty" class="track-empty">
-              No visual layers running. Add a cue to illuminate the panel.
-            </div>
-            <div id="visual-active-list" class="track-list"></div>
+            <p id="usage-scope-description" class="mt-2 text-xs text-gray-500">
+              Showing lifetime activity for this user across recorded sessions.
+            </p>
           </div>
-        </div>
+          <div class="grid gap-4 md:grid-cols-2" id="auth-stat-cards">
+            <div class="stat-card">
+              <span class="stat-label">Audio initializations</span>
+              <span id="stat-audio-inits" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Audio tracks added</span>
+              <span id="stat-audio-adds" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Visual cues added</span>
+              <span id="stat-visual-adds" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Tracks stopped</span>
+              <span id="stat-track-stops" class="stat-value">0</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Session time</span>
+              <span id="stat-session-time" class="stat-value">00:00:00</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Neurostimulation time</span>
+              <span id="stat-neuro-time" class="stat-value">00:00:00</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">First sign-in</span>
+              <span id="stat-first-signin" class="stat-value text-sm">—</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-label">Last sign-in</span>
+              <span id="stat-last-signin" class="stat-value text-sm">—</span>
+            </div>
+          </div>
+          <div class="grid gap-6 md:grid-cols-2">
+            <div class="stat-panel">
+              <h3>Audio track exposure</h3>
+              <ul id="stat-audio-duration-list" class="stat-list">
+                <li>No audio tracks yet.</li>
+              </ul>
+            </div>
+            <div class="stat-panel">
+              <h3>Visual cue exposure</h3>
+              <ul id="stat-visual-duration-list" class="stat-list">
+                <li>No visual cues yet.</li>
+              </ul>
+            </div>
+          </div>
+          <div>
+            <h3 class="text-xs font-semibold uppercase text-gray-400 mb-2">
+              Self-reported profile
+            </h3>
+            <div id="stat-profile" class="profile-summary">
+              No self-reported profile yet.
+            </div>
+          </div>
+          <div class="grid gap-6">
+            <div class="stat-panel">
+              <h3>Data &amp; Privacy</h3>
+              <div class="toggle-group mt-3">
+                <label class="toggle-option" id="toggle-collect-wrapper">
+                  <input type="checkbox" id="toggle-collect-data" checked />
+                  <div>
+                    <span class="toggle-title">Collect usage statistics</span>
+                    <span class="toggle-desc"
+                      >Store personal metrics to resume sessions across devices.</span
+                    >
+                  </div>
+                </label>
+                <label class="toggle-option" id="toggle-share-wrapper">
+                  <input type="checkbox" id="toggle-share-anonymized" checked />
+                  <div>
+                    <span class="toggle-title">Share anonymized logs publicly</span>
+                    <span class="toggle-desc"
+                      >Let others see your activity with an anonymous label.</span
+                    >
+                  </div>
+                </label>
+                <label class="toggle-option" id="toggle-community-wrapper">
+                  <input type="checkbox" id="toggle-include-community" checked />
+                  <div>
+                    <span class="toggle-title">Contribute to community insights</span>
+                    <span class="toggle-desc"
+                      >Allow your anonymized data to be used in aggregate statistics.</span
+                    >
+                  </div>
+                </label>
+              </div>
+              <div class="mt-6 space-y-3 border-t border-slate-200 pt-4">
+                <p class="text-xs font-semibold uppercase text-gray-400">
+                  Sensory engines
+                </p>
+                <div class="grid gap-3 md:grid-cols-3">
+                  <label class="text-sm font-medium text-gray-700">
+                    <span class="block mb-1">Audio</span>
+                    <select
+                      id="engine-audio-select"
+                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                    ></select>
+                    <span id="engine-audio-status" class="mt-1 block text-xs text-gray-500"></span>
+                  </label>
+                  <label class="text-sm font-medium text-gray-700">
+                    <span class="block mb-1">Visual</span>
+                    <select
+                      id="engine-visual-select"
+                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                    ></select>
+                    <span id="engine-visual-status" class="mt-1 block text-xs text-gray-500"></span>
+                  </label>
+                  <label class="text-sm font-medium text-gray-700">
+                    <span class="block mb-1">Haptics</span>
+                    <select
+                      id="engine-haptics-select"
+                      class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
+                    ></select>
+                    <span id="engine-haptics-status" class="mt-1 block text-xs text-gray-500"></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="stat-panel activity-panel">
+              <h3>Your Activity Logs</h3>
+              <div class="activity-tabs">
+                <button
+                  id="tab-my-activity"
+                  class="activity-tab activity-tab-active"
+                  type="button"
+                >
+                  My activity
+                </button>
+                <button id="tab-public-activity" class="activity-tab" type="button">
+                  Public view
+                </button>
+                <button id="btn-refresh-activity" class="activity-refresh" type="button">
+                  ⟳ Refresh
+                </button>
+              </div>
+              <p id="activity-public-note" class="activity-note">
+                Public feed displays anonymized entries shared by you and the community.
+              </p>
+              <div id="activity-my-panel" class="activity-feed">
+                <ul id="activity-my-list" class="activity-list">
+                  <li class="activity-empty">No activity logged yet.</li>
+                </ul>
+              </div>
+              <div id="activity-public-panel" class="activity-feed hidden">
+                <ul id="activity-public-list" class="activity-list">
+                  <li class="activity-empty">Public feed loading…</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
       </div>
     </main>
+
 
     <!-- System Diagnostics Widget (FAB: Floating Action Button) -->
     <div id="diag-fab" class="fixed bottom-4 left-4 z-50">

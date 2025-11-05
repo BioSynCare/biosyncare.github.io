@@ -122,6 +122,19 @@ const statLastSignInEl = document.getElementById('stat-last-signin');
 const statAudioDurationList = document.getElementById('stat-audio-duration-list');
 const statVisualDurationList = document.getElementById('stat-visual-duration-list');
 const profileSummaryEl = document.getElementById('stat-profile');
+const workspaceStimulation = document.getElementById('workspace-stimulation');
+const workspaceIdentity = document.getElementById('workspace-identity');
+const chipStimulation = document.getElementById('chip-stimulation');
+const chipStimulationSummaryEl = document.getElementById('chip-stimulation-summary');
+const chipStimulationTooltipEl = document.getElementById('chip-stimulation-tooltip');
+const chipIdentity = document.getElementById('chip-identity');
+const chipIdentitySummaryEl = document.getElementById('chip-identity-summary');
+const chipIdentityTooltipEl = document.getElementById('chip-identity-tooltip');
+const WORKSPACES = {
+  STIMULATION: 'stimulation',
+  IDENTITY: 'identity',
+};
+let activeWorkspace = WORKSPACES.STIMULATION;
 const usageScopeTabsEl = document.getElementById('usage-scope-tabs');
 const usageScopeDescriptionEl = document.getElementById('usage-scope-description');
 const usageScopeButtons = usageScopeTabsEl
@@ -131,10 +144,136 @@ const VALID_USAGE_SCOPES = new Set(['session', 'user', 'global']);
 const USAGE_SCOPE_DESCRIPTIONS = {
   session: 'Showing metrics collected in the current neurosensory session only.',
   user: 'Showing lifetime activity for this BioSynCare Lab identity.',
-  global: 'Showing community-wide activity across all public sessions.',
+  global: 'Showing community-wide activity across all public sessions (never less than your own totals).',
 };
 let activeUsageScope = 'user';
 let communityTotalsCache = { eventsRef: null, totals: null };
+const CHIP_MAX_TRACKS_LISTED = 4;
+
+const setActiveWorkspace = (target) => {
+  if (!workspaceStimulation || !workspaceIdentity || !chipStimulation || !chipIdentity) return;
+  const next =
+    target === WORKSPACES.IDENTITY ? WORKSPACES.IDENTITY : WORKSPACES.STIMULATION;
+  if (activeWorkspace === next) return;
+  activeWorkspace = next;
+  const showStimulation = activeWorkspace === WORKSPACES.STIMULATION;
+  workspaceStimulation.classList.toggle('hidden', !showStimulation);
+  workspaceIdentity.classList.toggle('hidden', showStimulation);
+  chipStimulation.classList.toggle('header-chip-active', showStimulation);
+  chipIdentity.classList.toggle('header-chip-active', !showStimulation);
+  chipStimulation.setAttribute('aria-pressed', showStimulation ? 'true' : 'false');
+  chipIdentity.setAttribute('aria-pressed', !showStimulation ? 'true' : 'false');
+};
+
+const summarizeLabels = (labels, prefix) => {
+  if (!labels.length) return '';
+  const limited = labels.slice(0, CHIP_MAX_TRACKS_LISTED);
+  const remaining = labels.length - limited.length;
+  const items = limited
+    .map((label) => `<li>${prefix} ${label}</li>`)
+    .join('');
+  const overflow = remaining > 0 ? `<li>… ${remaining} more</li>` : '';
+  return items + overflow;
+};
+
+const updateStimulationHeaderSummary = () => {
+  if (!chipStimulationSummaryEl || !chipStimulationTooltipEl) return;
+  const audioEntries = getAllAudioTracks();
+  const visualEntries = getAllVisualTracks();
+  const audioCount = audioEntries.length;
+  const visualCount = visualEntries.length;
+  const totalActive = audioCount + visualCount;
+  let summaryText = 'Idle';
+  if (totalActive > 0) {
+    summaryText = `${audioCount} audio • ${visualCount} visual`;
+  } else if (audioEngine || audioEngineInitPromise) {
+    summaryText = 'Engine ready';
+  }
+  chipStimulationSummaryEl.textContent = summaryText;
+
+  const audioLabels = audioEntries.map(
+    ([, track]) => track?.label || track?.presetKey || 'Audio layer'
+  );
+  const visualLabels = visualEntries.map(
+    ([, track]) => track?.label || track?.presetKey || 'Visual layer'
+  );
+  const now = Date.now();
+  const sessionTimeMs = Math.max(0, now - usageStats.sessionStart);
+  const sessionDuration = formatDuration(sessionTimeMs);
+  const loggedNeuro = formatDuration(Math.max(0, usageStats.totalNeuroMs));
+  let tooltipContent = '<h4>Active Tracks</h4>';
+  if (totalActive === 0) {
+    tooltipContent += '<p>No tracks running. Start audio or visual cues to begin.</p>';
+  } else {
+    tooltipContent += '<ul>';
+    tooltipContent += summarizeLabels(audioLabels, '🎧');
+    tooltipContent += summarizeLabels(visualLabels, '🌈');
+    tooltipContent += '</ul>';
+  }
+  tooltipContent += `<p><strong>Session time:</strong> ${sessionDuration}</p>`;
+  tooltipContent += `<p><strong>Logged neuro time:</strong> ${loggedNeuro}</p>`;
+  chipStimulationTooltipEl.innerHTML = tooltipContent;
+};
+
+const describeUserDisplayName = (user) => {
+  if (!user) return 'Guest';
+  return user.displayName || user.email || `User ${user.uid.slice(-6)}`;
+};
+
+const updateIdentityHeaderSummary = () => {
+  if (!chipIdentitySummaryEl || !chipIdentityTooltipEl) return;
+  const user = authState.currentUser;
+  const isSignedIn = Boolean(user) && !isAnonymousUser(user);
+  const isAnon = Boolean(user) && isAnonymousUser(user);
+  const myEvents = activityState.myEvents || [];
+  const sessionCount = myEvents.filter((event) => event?.eventType === 'session_stop').length;
+  const activityEntries = myEvents.length;
+
+  let summaryText = 'Guest session';
+  let tooltipContent =
+    '<h4>Account</h4><p>Not signed in. Sign in to sync your activity.</p>';
+
+  if (isAnon) {
+    summaryText = 'Anonymous session';
+    tooltipContent =
+      '<h4>Anonymous session</h4><p>Data remains local unless you choose to sign in.</p>';
+  } else if (isSignedIn) {
+    const displayName = describeUserDisplayName(user);
+    const sessionsLabel =
+      sessionCount > 0
+        ? `${sessionCount} session${sessionCount === 1 ? '' : 's'}`
+        : activityEntries > 0
+          ? `${activityEntries} log${activityEntries === 1 ? '' : 's'}`
+          : 'No sessions yet';
+    summaryText = `${displayName} • ${sessionsLabel}`;
+
+    const creation = user?.metadata?.creationTime
+      ? formatDateTime(user.metadata.creationTime)
+      : '—';
+    const lastSignIn = user?.metadata?.lastSignInTime
+      ? formatDateTime(user.metadata.lastSignInTime)
+      : '—';
+    tooltipContent = `<h4>${displayName}</h4>`;
+    if (user.email) {
+      tooltipContent += `<p><strong>Email:</strong> ${user.email}</p>`;
+    }
+    tooltipContent += `<p><strong>Sessions logged:</strong> ${sessionCount}</p>`;
+    tooltipContent += `<p><strong>Activity entries:</strong> ${activityEntries}</p>`;
+    tooltipContent += `<p><strong>First sign-in:</strong> ${creation}</p>`;
+    tooltipContent += `<p><strong>Last sign-in:</strong> ${lastSignIn}</p>`;
+    tooltipContent += `<p><strong>Data collection:</strong> ${
+      userSettings.collectData ? 'Enabled' : 'Disabled'
+    }</p>`;
+  }
+
+  chipIdentitySummaryEl.textContent = summaryText;
+  chipIdentityTooltipEl.innerHTML = tooltipContent;
+};
+
+const updateHeaderSummaries = () => {
+  updateStimulationHeaderSummary();
+  updateIdentityHeaderSummary();
+};
 const collectDataToggle = document.getElementById('toggle-collect-data');
 const shareAnonymizedToggle = document.getElementById('toggle-share-anonymized');
 const includeCommunityToggle = document.getElementById('toggle-include-community');
@@ -700,6 +839,7 @@ const updateUsageView = () => {
 
   updateDurationList(statAudioDurationList, totals.audioDurations, audioEmptyMessage);
   updateDurationList(statVisualDurationList, totals.visualDurations, visualEmptyMessage);
+  updateHeaderSummaries();
 };
 
 const setUsageScope = (scope) => {
@@ -1032,6 +1172,7 @@ const handleSettingsChange = (updates = {}) => {
       },
     });
   }
+  updateHeaderSummaries();
 };
 
 const handleUserContextChanged = async (user) => {
@@ -1244,6 +1385,15 @@ if (usageScopeButtons.length > 0) {
   updateUsageScopeDescription();
 }
 
+chipStimulation?.addEventListener('click', () => {
+  setActiveWorkspace(WORKSPACES.STIMULATION);
+  updateHeaderSummaries();
+});
+chipIdentity?.addEventListener('click', () => {
+  setActiveWorkspace(WORKSPACES.IDENTITY);
+  updateHeaderSummaries();
+});
+
 collectDataToggle?.addEventListener('change', (event) => {
   handleSettingsChange({ collectData: Boolean(event.target.checked) });
 });
@@ -1364,6 +1514,7 @@ const setAudioControlsIdle = (message) => {
   if (message && statusEl) {
     statusEl.textContent = message;
   }
+  updateStimulationHeaderSummary();
 };
 
 const setAudioControlsRunning = (message) => {
@@ -1378,6 +1529,7 @@ const setAudioControlsRunning = (message) => {
   if (message && statusEl) {
     statusEl.textContent = message;
   }
+  updateStimulationHeaderSummary();
 };
 
 const markAudioStarting = (message) => {
@@ -1391,6 +1543,7 @@ const markAudioStarting = (message) => {
   if (message && statusEl) {
     statusEl.textContent = message;
   }
+  updateStimulationHeaderSummary();
 };
 
 const disposeAudioEngine = async () => {
@@ -1413,6 +1566,7 @@ const disposeAudioEngine = async () => {
     }
   }
   audioEngine = null;
+  updateStimulationHeaderSummary();
 };
 
 const ensureAudioEngine = async ({ userInitiated = false } = {}) => {
@@ -1815,9 +1969,12 @@ const renderAudioTracks = ({ message } = {}) => {
     stopButton.dataset.trackId = id;
     stopButton.textContent = 'Stop';
     stopButton.classList.add('track-stop');
+    const actions = document.createElement('div');
+    actions.className = 'track-actions';
+    actions.appendChild(stopButton);
 
     item.appendChild(info);
-    item.appendChild(stopButton);
+    item.appendChild(actions);
     audioActiveList.appendChild(item);
   });
 
@@ -1869,9 +2026,12 @@ const renderVisualTracks = ({ message } = {}) => {
     stopButton.dataset.trackId = id;
     stopButton.textContent = 'Stop';
     stopButton.classList.add('track-stop');
+    const actions = document.createElement('div');
+    actions.className = 'track-actions';
+    actions.appendChild(stopButton);
 
     item.appendChild(info);
-    item.appendChild(stopButton);
+    item.appendChild(actions);
     visualActiveList.appendChild(item);
   });
 
@@ -2100,6 +2260,8 @@ updateAudioDescription();
 updateVisualDescription();
 renderAudioTracks();
 renderVisualTracks();
+setActiveWorkspace(WORKSPACES.STIMULATION);
+updateHeaderSummaries();
 
 // ====================================================================
 // Diagnostics Widget Integration
