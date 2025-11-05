@@ -16,6 +16,7 @@ help:
 	@printf "  rdf-report      Generate HTML summary of classes and properties\n"
 	@printf "  rdf-docs        Generate pyLODE and Ontospy HTML documentation\n"
 	@printf "  rdf-webvowl     Generate WebVOWL JSONs (requires Java)\n"
+	@printf "  rdf-webvowl-viewer  Vendor WebVOWL viewer assets (static)\n"
 
 deploy-rules:
 	firebase deploy --only firestore:rules --project $(PROJECT)
@@ -93,3 +94,14 @@ rdf-webvowl: rdf-webvowl-setup
 	@echo "Generating VOWL JSON for bsc-owl.ttl and sso-ontology.ttl (Java required)..."
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -o rdf/docs/webvowl/bsc.json || true
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -o rdf/docs/webvowl/sso.json || true
+
+rdf-webvowl-viewer:
+	mkdir -p scripts/rdf/tools rdf/docs/webvowl/app
+	@echo "Fetching WebVOWL gh-pages archive..."
+	@rm -f scripts/rdf/tools/webvowl-gh-pages.zip
+	@curl -L -A "biosyncare-webvowl-fetch" -o scripts/rdf/tools/webvowl-gh-pages.zip https://codeload.github.com/VisualDataWeb/WebVOWL/zip/refs/heads/gh-pages
+	@rm -rf scripts/rdf/tools/WebVOWL-gh-pages
+	@unzip -q -o scripts/rdf/tools/webvowl-gh-pages.zip -d scripts/rdf/tools
+	@# Copy viewer assets into site folder
+	@cp -R scripts/rdf/tools/WebVOWL-gh-pages/* rdf/docs/webvowl/app/ || true
+	@echo "WebVOWL viewer assets installed under rdf/docs/webvowl/app/"

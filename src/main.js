@@ -1161,7 +1161,7 @@ const getCrossfadeDurationRange = () => ({
 // Function to update range inputs in active track controls when extended settings change
 const updateActiveTrackRanges = () => {
   // Find all range inputs in the track controls and update their min/max attributes
-  const trackControls = document.querySelectorAll('.track-controls');
+  const trackControls = document.querySelectorAll('.track-parameter-controls');
   trackControls.forEach((control) => {
     const rangeInputs = control.querySelectorAll('input[type="range"]');
     rangeInputs.forEach((input) => {
@@ -2393,6 +2393,36 @@ const visualActiveList = document.getElementById('visual-active-list');
 const visualActiveEmpty = document.getElementById('visual-active-empty');
 const visualTrackCount = document.getElementById('visual-track-count');
 const visualStatusText = document.getElementById('visual-status-text');
+const panelToggleButtons = document.querySelectorAll('.panel-toggle');
+
+panelToggleButtons.forEach((button) => {
+  const panel = button.closest('.panel');
+  if (!panel) return;
+  const icon = button.querySelector('.panel-toggle-icon');
+  const label = button.querySelector('.panel-toggle-label');
+  const body = panel.querySelector('.panel-body');
+
+  const syncState = (expanded) => {
+    button.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    if (label) {
+      label.textContent = expanded ? 'Hide' : 'Show';
+    }
+    if (icon) {
+      icon.textContent = expanded ? '▾' : '▸';
+    }
+    if (body) {
+      body.hidden = !expanded;
+    }
+  };
+
+  panel.classList.remove('panel-collapsed');
+  syncState(true);
+
+  button.addEventListener('click', () => {
+    const collapsed = panel.classList.toggle('panel-collapsed');
+    syncState(!collapsed);
+  });
+});
 
 const isAudioContextRunning = () =>
   Boolean(audioEngine?.ctx && audioEngine.ctx.state === 'running');
@@ -4390,19 +4420,22 @@ const handleAudioTrackParameterChange = (trackId, field, value, detailElement) =
 
 const renderAudioTracks = ({ message } = {}) => {
   audioActiveList.innerHTML = '';
-  const entries = getAllAudioTracks();
+  const entries = getAllAudioTracks().slice().reverse();
   const count = entries.length;
 
   audioTrackCount.textContent = `${count} layer${count === 1 ? '' : 's'}`;
   audioActiveEmpty.hidden = count !== 0;
   audioActiveList.hidden = count === 0;
 
-  entries.forEach(([id, track]) => {
+  entries.forEach(([id, track], index) => {
     const item = document.createElement('div');
     item.className = 'track-item audio-track-item';
+    if (index === 0) {
+      item.classList.add('track-item-latest');
+    }
 
     const info = document.createElement('div');
-    info.className = 'flex-1 pr-4';
+    info.className = 'track-content pr-4';
 
     const preset = track?.presetKey ? audioPresets[track.presetKey] : null;
     const defaults = preset?.params ? getPresetDefaults(track.presetKey) : {};
@@ -4420,7 +4453,6 @@ const renderAudioTracks = ({ message } = {}) => {
 
     const title = document.createElement('h4');
     title.textContent = track?.label || preset?.label || 'Audio layer';
-    info.appendChild(title);
 
     const detailText = preset?.describe
       ? preset.describe(paramValues)
@@ -4428,41 +4460,90 @@ const renderAudioTracks = ({ message } = {}) => {
     const detailEl = document.createElement('p');
     detailEl.className = 'text-xs text-gray-500 mt-1';
     detailEl.textContent = detailText;
-    info.appendChild(detailEl);
 
     const liveParams = getPresetParams(preset)?.filter((field) => field.live !== false) || [];
-    if (liveParams.length > 0) {
-      const visibleControls = [];
-      liveParams.forEach((field) => {
-        const value = normalizeParameterValue(field, paramValues[field.id]);
-        paramValues[field.id] = value;
-        let visible = true;
-        if (typeof field.isVisible === 'function') {
-          try {
-            visible = field.isVisible(paramValues);
-          } catch (error) {
-            console.warn('Track parameter visibility check failed', error);
-          }
+    const visibleControls = [];
+    liveParams.forEach((field) => {
+      const value = normalizeParameterValue(field, paramValues[field.id]);
+      paramValues[field.id] = value;
+      let visible = true;
+      if (typeof field.isVisible === 'function') {
+        try {
+          visible = field.isVisible(paramValues);
+        } catch (error) {
+          console.warn('Track parameter visibility check failed', error);
         }
-        if (!visible) {
-          return;
-        }
-        const control = createParameterControl(field, value, {
-          context: 'track',
-          onInput: (nextValue) => {
-            const normalized = normalizeParameterValue(field, nextValue);
-            paramValues[field.id] = normalized;
-            handleAudioTrackParameterChange(id, field, normalized, detailEl);
-          },
-        });
-        visibleControls.push(control);
-      });
-      if (visibleControls.length > 0) {
-        const controlsContainer = document.createElement('div');
-        controlsContainer.className = 'track-parameter-controls';
-        visibleControls.forEach((control) => controlsContainer.appendChild(control));
-        info.appendChild(controlsContainer);
       }
+      if (!visible) {
+        return;
+      }
+      const control = createParameterControl(field, value, {
+        context: 'track',
+        onInput: (nextValue) => {
+          const normalized = normalizeParameterValue(field, nextValue);
+          paramValues[field.id] = normalized;
+          handleAudioTrackParameterChange(id, field, normalized, detailEl);
+        },
+      });
+      visibleControls.push(control);
+    });
+
+    let controlsContainer = null;
+    if (visibleControls.length > 0) {
+      controlsContainer = document.createElement('div');
+      controlsContainer.className = 'track-parameter-controls';
+      visibleControls.forEach((control) => controlsContainer.appendChild(control));
+    }
+
+    const header = document.createElement('div');
+    header.className = 'track-item-header';
+    header.appendChild(title);
+
+    let collapseBtn = null;
+    let isCollapsed = Boolean(track.uiCollapsed) && Boolean(controlsContainer);
+
+    if (controlsContainer) {
+      collapseBtn = document.createElement('button');
+      collapseBtn.type = 'button';
+      collapseBtn.className = 'track-collapse-btn';
+      header.appendChild(collapseBtn);
+    }
+
+    info.appendChild(header);
+    info.appendChild(detailEl);
+    if (controlsContainer) {
+      info.appendChild(controlsContainer);
+    }
+
+    if (collapseBtn && controlsContainer) {
+      const headingText = title.textContent || 'track';
+      const applyCollapsedState = (state) => {
+        isCollapsed = state;
+        item.classList.toggle('track-collapsed', state);
+        controlsContainer.hidden = state;
+        collapseBtn.setAttribute('aria-expanded', state ? 'false' : 'true');
+        collapseBtn.textContent = state ? 'Show controls' : 'Hide controls';
+        collapseBtn.setAttribute(
+          'aria-label',
+          state ? `Show controls for ${headingText}` : `Hide controls for ${headingText}`
+        );
+      };
+
+      collapseBtn.addEventListener('click', () => {
+        const nextState = !isCollapsed;
+        applyCollapsedState(nextState);
+        updateAudioTrack(id, (current) => ({
+          ...current,
+          uiCollapsed: nextState,
+        }));
+      });
+
+      applyCollapsedState(isCollapsed);
+    } else if (track.uiCollapsed) {
+      updateAudioTrack(id, (current) => ({
+        ...current,
+        uiCollapsed: false,
+      }));
     }
 
     const actions = document.createElement('div');
@@ -4498,19 +4579,22 @@ const renderAudioTracks = ({ message } = {}) => {
 };
 const renderVisualTracks = ({ message } = {}) => {
   visualActiveList.innerHTML = '';
-  const entries = getAllVisualTracks();
+  const entries = getAllVisualTracks().slice().reverse();
   const count = entries.length;
 
   visualTrackCount.textContent = `${count} layer${count === 1 ? '' : 's'}`;
   visualActiveEmpty.hidden = count !== 0;
   visualActiveList.hidden = count === 0;
 
-  entries.forEach(([id, track]) => {
+  entries.forEach(([id, track], index) => {
     const item = document.createElement('div');
     item.className = 'track-item visual-track-item';
+    if (index === 0) {
+      item.classList.add('track-item-latest');
+    }
 
     const info = document.createElement('div');
-    info.className = 'flex-1 pr-4';
+    info.className = 'track-content pr-4';
 
     const title = document.createElement('h4');
     title.textContent = track.label;
@@ -4631,6 +4715,7 @@ addAudioBtn.addEventListener('click', async () => {
       startedAt: Date.now(),
       finalized: false,
       meta: trackMeta,
+      uiCollapsed: false,
     });
     incrementAudioAdds();
     recordUsageEvent('audio_add', {

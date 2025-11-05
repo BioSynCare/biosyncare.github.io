@@ -23,16 +23,25 @@
       <li>SSO — JSON: <a href="/rdf/docs/webvowl/sso.json">/rdf/docs/webvowl/sso.json</a></li>
     </ul>
 
-    <h2>Open in WebVOWL (external viewer)</h2>
+    <h2>Self-hosted viewer (recommended)</h2>
+    <p>
+      We can serve the WebVOWL app directly from this site for a fully serverless setup. Install assets locally with
+      <code>make rdf-webvowl-viewer</code> (copies the <code>gh-pages</code> branch of WebVOWL under <code>/rdf/docs/webvowl/app/</code>),
+      then push.
+    </p>
+    <ul>
+      <li>Self-hosted app entry: <a href="/rdf/docs/webvowl/app/webvowl.html">/rdf/docs/webvowl/app/webvowl.html</a> (will 404 until installed)</li>
+      <li>Launcher page: <a href="/rdf/docs/webvowl/viewer.html">/rdf/docs/webvowl/viewer.html</a> (prefers self-hosted; falls back to mirror)</li>
+    </ul>
+
+    <h2>Public mirror (fallback)</h2>
     <ul>
       <li>
-        Open viewer: <a href="http://vowl.visualdataweb.org/webvowl.html" target="_blank" rel="noopener">webvowl.html</a>.
-        Then use "Open from URL" and paste:
+        Viewer: <a href="https://vowl.visualdataweb.org/webvowl.html" target="_blank" rel="noopener">webvowl.html</a> → use "Open from URL" with
         <br><code>https://biosyncare.github.io/rdf/docs/webvowl/bsc.json</code>
       </li>
       <li>
-        Open viewer: <a href="http://vowl.visualdataweb.org/webvowl.html" target="_blank" rel="noopener">webvowl.html</a>.
-        Then use "Open from URL" and paste:
+        Viewer: <a href="https://vowl.visualdataweb.org/webvowl.html" target="_blank" rel="noopener">webvowl.html</a> → use "Open from URL" with
         <br><code>https://biosyncare.github.io/rdf/docs/webvowl/sso.json</code>
       </li>
     </ul>
