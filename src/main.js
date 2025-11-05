@@ -913,6 +913,28 @@ const getPresetParams = (preset) => {
   return typeof params === 'function' ? params() : params || [];
 };
 
+// Helper function to create Martigli modulation depth parameter
+// Returns a single slider that starts at 0 (no modulation)
+// When depth = 0, modulation is off. When depth > 0, parameter follows breathing
+const createMartigliDepthParam = (paramId, paramLabel, depthMax, unit = '') => {
+  const step = depthMax > 100 ? 1 : (depthMax > 10 ? 0.1 : 0.01);
+  return {
+    id: `martigliDepth_${paramId}`,
+    label: `🫁 ${paramLabel} breathing depth`,
+    type: 'range',
+    min: 0,
+    max: depthMax,
+    step,
+    unit,
+    default: 0,
+    live: true,
+    formatValue: (value) => {
+      if (value === 0) return 'Off';
+      return `±${value.toFixed(step >= 1 ? 0 : (step >= 0.1 ? 1 : 2))}${unit}`;
+    },
+  };
+};
+
 // Helper functions to get parameter ranges based on extended settings
 const getBeatFreqRange = () => ({
   min: 0.5,
@@ -2295,7 +2317,7 @@ const audioPresets = {
     params: [
       {
         id: 'frequency',
-        label: 'Base frequency',
+        label: 'Frequency',
         type: 'range',
         min: 40,
         max: 2000,
@@ -2304,26 +2326,7 @@ const audioPresets = {
         default: 440,
         live: true,
       },
-      {
-        id: 'martigliModulateFreq',
-        label: 'Martigli modulate frequency',
-        type: 'checkbox',
-        default: false,
-        live: true,
-        triggersLayout: true,
-      },
-      {
-        id: 'martigliFreqAmplitude',
-        label: 'Frequency modulation depth',
-        type: 'range',
-        min: 0,
-        max: 500,
-        step: 1,
-        unit: 'Hz',
-        default: 100,
-        live: true,
-        isVisible: (state) => state.martigliModulateFreq === true,
-      },
+      createMartigliDepthParam('frequency', 'Frequency', 500, 'Hz'),
       {
         id: 'gain',
         label: 'Gain',
@@ -2334,6 +2337,7 @@ const audioPresets = {
         default: 0.2,
         live: true,
       },
+      createMartigliDepthParam('gain', 'Gain', 0.5, ''),
       {
         id: 'pan',
         label: 'Stereo pan',
@@ -2351,62 +2355,93 @@ const audioPresets = {
             : `Left ${Math.abs(value).toFixed(2)}`;
         },
       },
+      createMartigliDepthParam('pan', 'Pan', 1, ''),
     ],
     start: (params = {}) => {
       const frequency = Number(params.frequency ?? 440);
       const gain = Number(params.gain ?? 0.2);
       const pan = Number(params.pan ?? 0);
-      const martigliModulateFreq = params.martigliModulateFreq ?? false;
-      const martigliFreqAmplitude = Number(params.martigliFreqAmplitude ?? 100);
+
+      // Martigli modulation config - depth of 0 means off
+      const martigliConfig = {
+        frequency: {
+          enabled: Number(params.martigliDepth_frequency ?? 0) > 0,
+          depth: Number(params.martigliDepth_frequency ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+        pan: {
+          enabled: Number(params.martigliDepth_pan ?? 0) > 0,
+          depth: Number(params.martigliDepth_pan ?? 0),
+        },
+      };
 
       const nodeId = audioEngine.playWaveform({
         type: 'sine',
         freq: frequency,
         gain,
         pan,
-        martigliModulateFreq,
-        martigliFreqAmplitude,
+        martigliConfig,
       });
-      const parameters = {
-        frequency,
-        gain,
-        pan,
-        martigliModulateFreq,
-        martigliFreqAmplitude,
-      };
-      const modulationText = martigliModulateFreq ? ` • Martigli ±${martigliFreqAmplitude}Hz` : '';
+
+      const modTexts = [];
+      if (martigliConfig.frequency.enabled) modTexts.push(`Freq ±${martigliConfig.frequency.depth}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      if (martigliConfig.pan.enabled) modTexts.push(`Pan ±${martigliConfig.pan.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
       return {
         nodeId,
         detail: `${frequency.toFixed(1)} Hz${modulationText} · gain ${gain.toFixed(2)}`,
-        parameters,
+        parameters: { ...params },
         meta: {
           type: 'waveform',
           wave: 'sine',
           frequency,
           gain,
           pan,
-          martigliModulateFreq,
-          martigliFreqAmplitude,
+          martigliConfig,
         },
       };
     },
     update: (track, params = {}) => {
+      const martigliConfig = {
+        frequency: {
+          enabled: Number(params.martigliDepth_frequency ?? 0) > 0,
+          depth: Number(params.martigliDepth_frequency ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+        pan: {
+          enabled: Number(params.martigliDepth_pan ?? 0) > 0,
+          depth: Number(params.martigliDepth_pan ?? 0),
+        },
+      };
+
       audioEngine.updateWaveform(track.nodeId, {
         freq: params.frequency,
         gain: params.gain,
         pan: params.pan,
-        martigliModulateFreq: params.martigliModulateFreq,
-        martigliFreqAmplitude: params.martigliFreqAmplitude,
+        martigliConfig,
       });
-      const modulationText = params.martigliModulateFreq ? ` • Martigli ±${params.martigliFreqAmplitude}Hz` : '';
+
+      const modTexts = [];
+      if (martigliConfig.frequency.enabled) modTexts.push(`Freq ±${martigliConfig.frequency.depth}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      if (martigliConfig.pan.enabled) modTexts.push(`Pan ±${martigliConfig.pan.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
       return {
         detail: `${params.frequency.toFixed(1)} Hz${modulationText} · gain ${params.gain.toFixed(2)}`,
         meta: {
           frequency: params.frequency,
           gain: params.gain,
           pan: params.pan,
-          martigliModulateFreq: params.martigliModulateFreq,
-          martigliFreqAmplitude: params.martigliFreqAmplitude,
+          martigliConfig,
         },
       };
     },

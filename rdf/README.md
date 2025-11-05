@@ -1,10 +1,27 @@
 # RDF area
 
-This folder contains BioSynCare RDF assets (OWL, SKOS, and datasets). It is intentionally isolated from the web app code to minimize conflicts between agents.
+This folder contains BioSynCare RDF assets (OWL, SKOS, datasets) organized for clarity and safe collaboration. It is intentionally isolated from web app code.
 
 Ownership and scope:
 - Owned by: RDF/ontology workflow
 - Affects only files under `rdf/` and `scripts/rdf/`
+
+## Layout
+
+- core/
+	- bsc-owl.ttl — minimal core ontology (OWL)
+	- bsc-skos.ttl — SKOS vocabulary for techniques/outcomes
+- datasets/
+	- history/
+		- history-YYYY-MM-DD.ttl — date-stamped triplifications of docs/history.md
+- external/
+	- sso/
+		- sso-ontology.ttl — SSO ontology (TTL form)
+		- sso-ontology-extended.ttl — Extended SSO TTL
+		- sso-initial.owl — SSO initial (RDF/XML)
+		- sso-updated.owl — SSO updated (RDF/XML)
+	- onc/
+		- onc-ontology-attachment-2.ttl — ONC attachment 2 (TTL)
 
 ## Quick start
 
@@ -19,11 +36,6 @@ make rdf-setup
 ```
 make rdf-validate
 ```
-
-## Files
-- `bsc-owl.ttl` — minimal core ontology (OWL)
-- `bsc-skos.ttl` — SKOS vocabulary for techniques/outcomes
-- `historyYYYYMMDD.ttl` — date-stamped triplifications of docs/history.md
 
 ## Notes
 - The Python tooling uses `rdflib` and is kept in `scripts/rdf/`.

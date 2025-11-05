@@ -29,7 +29,7 @@ def main() -> int:
         print(f"No rdf directory found at {rdf_dir}")
         return 1
 
-    ttl_files = sorted(rdf_dir.glob("*.ttl"))
+    ttl_files = sorted(rdf_dir.rglob("*.ttl"))
     if not ttl_files:
         print("No .ttl files found in rdf/")
         return 0

@@ -591,8 +591,7 @@ export class AudioEngine {
       pan = 0,
       fadeIn = 0.05,
       fadeOut = 0.05,
-      martigliModulateFreq = false,
-      martigliFreqAmplitude = 100,
+      martigliConfig = {},
     } = opts;
 
     const osc = this.ctx.createOscillator();
@@ -617,32 +616,56 @@ export class AudioEngine {
 
     const nodeId = `waveform_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
-    // Set up Martigli modulation if enabled
+    // Set up Martigli modulation if any parameter has depth > 0
     let intervalId = null;
-    if (martigliModulateFreq) {
-      const updateFrequency = () => {
+    const hasMartigliModulation =
+      (martigliConfig.frequency?.enabled) ||
+      (martigliConfig.gain?.enabled) ||
+      (martigliConfig.pan?.enabled);
+
+    if (hasMartigliModulation) {
+      const updateModulation = () => {
         if (!this.nodes.has(nodeId)) {
           clearInterval(intervalId);
           return;
         }
         const node = this.nodes.get(nodeId);
-        if (!node || !node.osc) {
+        if (!node) {
           clearInterval(intervalId);
           return;
         }
 
+        // Get current Martigli value [-1, 1]
         let martigliValue = 0;
         if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
           martigliValue = window.martigliController.getValue();
         }
 
-        const targetFreq = node._baseFreq + (node._martigliFreqAmplitude * martigliValue);
-        const clampedFreq = clamp(targetFreq, 20, 20000);
         const now = this.ctx.currentTime;
-        node.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+
+        // Modulate frequency: freq = baseFreq + (depth × martigliValue)
+        if (node._martigliConfig?.frequency?.enabled && node.osc?.frequency) {
+          const targetFreq = node._baseFreq + (node._martigliConfig.frequency.depth * martigliValue);
+          const clampedFreq = clamp(targetFreq, 20, 20000);
+          node.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+        }
+
+        // Modulate gain: gain = baseGain + (depth × martigliValue)
+        if (node._martigliConfig?.gain?.enabled && node.gainNode?.gain) {
+          const targetGain = node._baseGain + (node._martigliConfig.gain.depth * martigliValue);
+          const clampedGain = clamp(targetGain, 0, 1);
+          node.gainNode.gain.setTargetAtTime(clampedGain, now, 0.02);
+        }
+
+        // Modulate pan: pan = basePan + (depth × martigliValue)
+        if (node._martigliConfig?.pan?.enabled && node.panner?.pan) {
+          const targetPan = node._basePan + (node._martigliConfig.pan.depth * martigliValue);
+          const clampedPan = clamp(targetPan, -1, 1);
+          node.panner.pan.setTargetAtTime(clampedPan, now, 0.02);
+        }
       };
 
-      intervalId = setInterval(updateFrequency, 50);
+      intervalId = setInterval(updateModulation, 50);
     }
 
     this.nodes.set(nodeId, {
@@ -651,10 +674,11 @@ export class AudioEngine {
       panner,
       _baseFreq: freq,
       _freq: freq,
+      _baseGain: gain,
       _gain: gain,
+      _basePan: pan,
       _pan: pan,
-      _martigliModulateFreq: martigliModulateFreq,
-      _martigliFreqAmplitude: martigliFreqAmplitude,
+      _martigliConfig: martigliConfig,
       _martigliInterval: intervalId,
     });
 
@@ -1017,45 +1041,63 @@ export class AudioEngine {
     if (!node) return false;
     const now = this.ctx.currentTime;
 
+    // Update base values
     if (params.freq !== undefined && node.osc?.frequency) {
       const freq = clamp(params.freq, 1, 20000);
       node._baseFreq = freq;
       node._freq = freq;
-      // If not using Martigli modulation, update frequency directly
-      if (!node._martigliModulateFreq) {
+      // If not using frequency modulation, update directly
+      if (!node._martigliConfig?.frequency?.enabled) {
         node.osc.frequency.setTargetAtTime(freq, now, 0.05);
       }
     }
 
     if (params.gain !== undefined && node.gainNode?.gain) {
       const gain = clamp(params.gain, 0, 1);
-      node.gainNode.gain.setTargetAtTime(gain, now, 0.05);
+      node._baseGain = gain;
       node._gain = gain;
+      // If not using gain modulation, update directly
+      if (!node._martigliConfig?.gain?.enabled) {
+        node.gainNode.gain.setTargetAtTime(gain, now, 0.05);
+      }
     }
 
     if (params.pan !== undefined && node.panner?.pan) {
       const pan = clamp(params.pan, -1, 1);
-      node.panner.pan.setTargetAtTime(pan, now, 0.05);
+      node._basePan = pan;
       node._pan = pan;
+      // If not using pan modulation, update directly
+      if (!node._martigliConfig?.pan?.enabled) {
+        node.panner.pan.setTargetAtTime(pan, now, 0.05);
+      }
     }
 
-    // Handle Martigli modulation updates
-    if (params.martigliModulateFreq !== undefined) {
-      const wasModulating = node._martigliModulateFreq;
-      const shouldModulate = params.martigliModulateFreq;
+    // Handle Martigli config updates
+    if (params.martigliConfig !== undefined) {
+      const oldConfig = node._martigliConfig || {};
+      const newConfig = params.martigliConfig;
+      node._martigliConfig = newConfig;
 
-      node._martigliModulateFreq = shouldModulate;
+      const hadModulation =
+        oldConfig.frequency?.enabled ||
+        oldConfig.gain?.enabled ||
+        oldConfig.pan?.enabled;
 
-      // Start or stop modulation interval
-      if (shouldModulate && !wasModulating) {
+      const hasModulation =
+        newConfig.frequency?.enabled ||
+        newConfig.gain?.enabled ||
+        newConfig.pan?.enabled;
+
+      // If modulation status changed, start or stop interval
+      if (hasModulation && !hadModulation) {
         // Start modulation
-        const updateFrequency = () => {
+        const updateModulation = () => {
           if (!this.nodes.has(nodeId)) {
             clearInterval(node._martigliInterval);
             return;
           }
           const n = this.nodes.get(nodeId);
-          if (!n || !n.osc) {
+          if (!n) {
             clearInterval(node._martigliInterval);
             return;
           }
@@ -1065,26 +1107,39 @@ export class AudioEngine {
             martigliValue = window.martigliController.getValue();
           }
 
-          const targetFreq = n._baseFreq + (n._martigliFreqAmplitude * martigliValue);
-          const clampedFreq = clamp(targetFreq, 20, 20000);
           const now = this.ctx.currentTime;
-          n.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+
+          if (n._martigliConfig?.frequency?.enabled && n.osc?.frequency) {
+            const targetFreq = n._baseFreq + (n._martigliConfig.frequency.depth * martigliValue);
+            const clampedFreq = clamp(targetFreq, 20, 20000);
+            n.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+          }
+
+          if (n._martigliConfig?.gain?.enabled && n.gainNode?.gain) {
+            const targetGain = n._baseGain + (n._martigliConfig.gain.depth * martigliValue);
+            const clampedGain = clamp(targetGain, 0, 1);
+            n.gainNode.gain.setTargetAtTime(clampedGain, now, 0.02);
+          }
+
+          if (n._martigliConfig?.pan?.enabled && n.panner?.pan) {
+            const targetPan = n._basePan + (n._martigliConfig.pan.depth * martigliValue);
+            const clampedPan = clamp(targetPan, -1, 1);
+            n.panner.pan.setTargetAtTime(clampedPan, now, 0.02);
+          }
         };
 
-        node._martigliInterval = setInterval(updateFrequency, 50);
-      } else if (!shouldModulate && wasModulating) {
+        node._martigliInterval = setInterval(updateModulation, 50);
+      } else if (!hasModulation && hadModulation) {
         // Stop modulation
         if (node._martigliInterval) {
           clearInterval(node._martigliInterval);
           node._martigliInterval = null;
         }
-        // Reset to base frequency
-        node.osc.frequency.setTargetAtTime(node._baseFreq, now, 0.05);
+        // Reset to base values
+        if (node.osc?.frequency) node.osc.frequency.setTargetAtTime(node._baseFreq, now, 0.05);
+        if (node.gainNode?.gain) node.gainNode.gain.setTargetAtTime(node._baseGain, now, 0.05);
+        if (node.panner?.pan) node.panner.pan.setTargetAtTime(node._basePan, now, 0.05);
       }
-    }
-
-    if (params.martigliFreqAmplitude !== undefined) {
-      node._martigliFreqAmplitude = clamp(params.martigliFreqAmplitude, 0, 1000);
     }
 
     return true;
