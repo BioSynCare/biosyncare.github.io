@@ -9,19 +9,19 @@ Ownership and scope:
 ## Layout
 
 - core/
-	- bsc-owl.ttl — minimal core ontology (OWL)
-	- bsc-skos.ttl — SKOS vocabulary for techniques/outcomes
+	- bsc-owl.ttl — Core OWL ontology: classes (Project, Protocol, Technique, Session, Outcome, Report, ParticipantGroup) and core properties.
+	- bsc-skos.ttl — SKOS ConceptScheme for techniques and outcomes; suitable for tagging and UI vocabularies.
 - datasets/
 	- history/
-		- history-YYYY-MM-DD.ttl — date-stamped triplifications of docs/history.md
+		- history-YYYY-MM-DD.ttl — Dated triplifications of docs/history.md, including provenance and session/protocol examples.
 - external/
 	- sso/
-		- sso-ontology.ttl — SSO ontology (TTL form)
-		- sso-ontology-extended.ttl — Extended SSO TTL
+		- sso-ontology.ttl — SSO ontology (TTL) using namespace https://biosyncare.github.io/ont/sso#
+		- sso-ontology-extended.ttl — Extended SSO TTL with additional terms
 		- sso-initial.owl — SSO initial (RDF/XML)
 		- sso-updated.owl — SSO updated (RDF/XML)
 	- onc/
-		- onc-ontology-attachment-2.ttl — ONC attachment 2 (TTL)
+		- onc-ontology-attachment-2.ttl — ONC attachment 2 (TTL) aligned for cross-reference
 
 ## Quick start
 

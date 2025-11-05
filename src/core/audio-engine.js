@@ -329,6 +329,7 @@ export class AudioEngine {
       crossfadeHold = 90,
       crossfadeDuration = 15,
       panBaseOffset = 0,
+      martigliConfig = {},
     } = options;
 
     const resolved = this._resolveBinauralFrequencies({
@@ -386,6 +387,75 @@ export class AudioEngine {
       panBaseOffset,
     });
 
+    // Set up Martigli modulation if any parameter has depth > 0
+    let intervalId = null;
+    const hasMartigliModulation =
+      (martigliConfig.base?.enabled) ||
+      (martigliConfig.beat?.enabled) ||
+      (martigliConfig.gain?.enabled);
+
+    if (hasMartigliModulation) {
+      const updateModulation = () => {
+        if (!this.nodes.has(id)) {
+          clearInterval(intervalId);
+          return;
+        }
+        const node = this.nodes.get(id);
+        if (!node) {
+          clearInterval(intervalId);
+          return;
+        }
+
+        // Get current Martigli value [-1, 1]
+        let martigliValue = 0;
+        if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+          martigliValue = window.martigliController.getValue();
+        }
+
+        const now = this.ctx.currentTime;
+
+        // Modulate base carrier frequency
+        if (node._martigliConfig?.base?.enabled) {
+          const targetBase = node._baseBase + (node._martigliConfig.base.depth * martigliValue);
+          const clampedBase = clamp(targetBase, 20, 20000);
+
+          // Recalculate left/right frequencies with modulated base
+          const halfBeat = node._baseBeat / 2;
+          const newLeft = clampedBase - halfBeat;
+          const newRight = clampedBase + halfBeat;
+
+          if (node.oscLeft?.frequency) node.oscLeft.frequency.setTargetAtTime(newLeft, now, 0.02);
+          if (node.oscRight?.frequency) node.oscRight.frequency.setTargetAtTime(newRight, now, 0.02);
+        }
+
+        // Modulate beat frequency
+        if (node._martigliConfig?.beat?.enabled) {
+          const targetBeat = node._baseBeat + (node._martigliConfig.beat.depth * martigliValue);
+          const clampedBeat = clamp(targetBeat, 0.1, 100);
+
+          // Recalculate left/right frequencies with modulated beat
+          const currentBase = node._martigliConfig?.base?.enabled
+            ? node._baseBase + (node._martigliConfig.base.depth * martigliValue)
+            : node._baseBase;
+          const halfBeat = clampedBeat / 2;
+          const newLeft = currentBase - halfBeat;
+          const newRight = currentBase + halfBeat;
+
+          if (node.oscLeft?.frequency) node.oscLeft.frequency.setTargetAtTime(newLeft, now, 0.02);
+          if (node.oscRight?.frequency) node.oscRight.frequency.setTargetAtTime(newRight, now, 0.02);
+        }
+
+        // Modulate gain
+        if (node._martigliConfig?.gain?.enabled && node.masterOut?.gain) {
+          const targetGain = node._baseGain + (node._martigliConfig.gain.depth * martigliValue);
+          const clampedGain = clamp(targetGain, 0, 1);
+          node.masterOut.gain.setTargetAtTime(clampedGain, now, 0.02);
+        }
+      };
+
+      intervalId = setInterval(updateModulation, 50);
+    }
+
     const nodeData = {
       type: 'binaural',
       oscLeft,
@@ -405,11 +475,16 @@ export class AudioEngine {
       crossfadeHold,
       crossfadeDuration,
       panBaseOffset,
+      _baseBase: resolved.base,
+      _baseBeat: resolved.beat,
       _base: resolved.base,
       _beat: resolved.beat,
       _leftFrequency: resolved.left,
       _rightFrequency: resolved.right,
+      _baseGain: clamp(toNumberOr(gain, 0.4), 0, 1),
       _gain: clamp(toNumberOr(gain, 0.4), 0, 1),
+      _martigliConfig: martigliConfig,
+      _martigliInterval: intervalId,
     };
 
     this.nodes.set(id, nodeData);
@@ -427,6 +502,7 @@ export class AudioEngine {
       setTimeout(() => {
         const stored = this.nodes.get(id);
         stored?.panAutomation?.dispose?.();
+        if (intervalId) clearInterval(intervalId);
         this.nodes.delete(id);
       }, duration * 1000 + 100);
     }
@@ -977,6 +1053,7 @@ export class AudioEngine {
       gain = 0.25,
       fadeIn = 0.1,
       fadeOut = 0.1,
+      martigliConfig = {},
     } = opts;
 
     const osc = this.ctx.createOscillator();
@@ -1008,7 +1085,15 @@ export class AudioEngine {
     lfo.start(now);
 
     const nodeId = `isochronic_${Date.now()}`;
-    this.nodes.set(nodeId, {
+
+    // Set up Martigli modulation
+    let intervalId = null;
+    const hasMartigliModulation =
+      (martigliConfig.freq?.enabled) ||
+      (martigliConfig.pulseFreq?.enabled) ||
+      (martigliConfig.gain?.enabled);
+
+    const nodeData = {
       osc,
       lfo,
       carrierGain,
@@ -1016,7 +1101,55 @@ export class AudioEngine {
       _freq: freq,
       _pulseFreq: pulseFreq,
       _gain: gain,
-    });
+      _baseFreq: freq,
+      _basePulseFreq: pulseFreq,
+      _baseGain: gain,
+      _martigliConfig: martigliConfig,
+      _martigliInterval: null,
+    };
+
+    this.nodes.set(nodeId, nodeData);
+
+    if (hasMartigliModulation) {
+      const updateModulation = () => {
+        const node = this.nodes.get(nodeId);
+        if (!node) {
+          if (intervalId) clearInterval(intervalId);
+          return;
+        }
+
+        let martigliValue = 0;
+        if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+          martigliValue = window.martigliController.getValue();
+        }
+
+        const now = this.ctx.currentTime;
+
+        // Modulate carrier frequency
+        if (node._martigliConfig?.freq?.enabled && node.osc?.frequency) {
+          const targetFreq = node._baseFreq + (node._martigliConfig.freq.depth * martigliValue);
+          const clampedFreq = clamp(targetFreq, 20, 20000);
+          node.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+        }
+
+        // Modulate pulse frequency
+        if (node._martigliConfig?.pulseFreq?.enabled && node.lfo?.frequency) {
+          const targetPulseFreq = node._basePulseFreq + (node._martigliConfig.pulseFreq.depth * martigliValue);
+          const clampedPulseFreq = clamp(targetPulseFreq, 0.1, 100);
+          node.lfo.frequency.setTargetAtTime(clampedPulseFreq, now, 0.02);
+        }
+
+        // Modulate gain
+        if (node._martigliConfig?.gain?.enabled && node.carrierGain?.gain) {
+          const targetGain = node._baseGain + (node._martigliConfig.gain.depth * martigliValue);
+          const clampedGain = clamp(targetGain, 0, 1);
+          node.carrierGain.gain.setTargetAtTime(clampedGain, now, 0.02);
+        }
+      };
+
+      intervalId = setInterval(updateModulation, 50);
+      nodeData._martigliInterval = intervalId;
+    }
 
     if (duration !== null) {
       const stopTime = now + duration;
@@ -1027,6 +1160,7 @@ export class AudioEngine {
 
       setTimeout(
         () => {
+          if (intervalId) clearInterval(intervalId);
           this.nodes.delete(nodeId);
         },
         duration * 1000 + 100
@@ -1171,9 +1305,9 @@ export class AudioEngine {
     const frequencyMode = params.frequencyMode || node.frequencyMode || 'carrier-beat';
 
     const baseInput =
-      params.base !== undefined ? toNumberOr(params.base, node._base ?? 200) : node._base ?? 200;
+      params.base !== undefined ? toNumberOr(params.base, node._baseBase ?? 200) : node._baseBase ?? 200;
     const beatInput =
-      params.beat !== undefined ? toNumberOr(params.beat, node._beat ?? 10) : node._beat ?? 10;
+      params.beat !== undefined ? toNumberOr(params.beat, node._baseBeat ?? 10) : node._baseBeat ?? 10;
     const leftInput =
       params.leftFrequency !== undefined
         ? toNumberOr(params.leftFrequency, node._leftFrequency ?? baseInput - beatInput / 2)
@@ -1191,6 +1325,79 @@ export class AudioEngine {
       rightFrequency: rightInput,
     });
 
+    // Update martigliConfig if provided
+    if (params.martigliConfig !== undefined) {
+      // Clear old interval
+      if (node._martigliInterval) {
+        clearInterval(node._martigliInterval);
+        node._martigliInterval = null;
+      }
+
+      node._martigliConfig = params.martigliConfig;
+
+      // Set up new modulation if any parameter is enabled
+      const hasMartigliModulation =
+        (params.martigliConfig.base?.enabled) ||
+        (params.martigliConfig.beat?.enabled) ||
+        (params.martigliConfig.gain?.enabled);
+
+      if (hasMartigliModulation) {
+        const updateModulation = () => {
+          let martigliValue = 0;
+          if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+            martigliValue = window.martigliController.getValue();
+          }
+
+          const now = this.ctx.currentTime;
+
+          // Modulate base carrier frequency
+          if (node._martigliConfig?.base?.enabled) {
+            const targetBase = node._baseBase + (node._martigliConfig.base.depth * martigliValue);
+            const clampedBase = clamp(targetBase, 20, 20000);
+            const halfBeat = node._baseBeat / 2;
+            const newLeft = clampedBase - halfBeat;
+            const newRight = clampedBase + halfBeat;
+            node.oscLeft.frequency.setTargetAtTime(newLeft, now, 0.02);
+            node.oscRight.frequency.setTargetAtTime(newRight, now, 0.02);
+          }
+
+          // Modulate beat frequency
+          if (node._martigliConfig?.beat?.enabled) {
+            const targetBeat = node._baseBeat + (node._martigliConfig.beat.depth * martigliValue);
+            const clampedBeat = clamp(targetBeat, 0.1, 100);
+            const currentBase = node._martigliConfig?.base?.enabled
+              ? node._baseBase + (node._martigliConfig.base.depth * martigliValue)
+              : node._baseBase;
+            const halfBeat = clampedBeat / 2;
+            const newLeft = currentBase - halfBeat;
+            const newRight = currentBase + halfBeat;
+            node.oscLeft.frequency.setTargetAtTime(newLeft, now, 0.02);
+            node.oscRight.frequency.setTargetAtTime(newRight, now, 0.02);
+          }
+
+          // Modulate gain
+          if (node._martigliConfig?.gain?.enabled && node.masterOut?.gain) {
+            const targetGain = node._baseGain + (node._martigliConfig.gain.depth * martigliValue);
+            const clampedGain = clamp(targetGain, 0, 1);
+            node.masterOut.gain.setTargetAtTime(clampedGain, now, 0.02);
+          }
+        };
+
+        node._martigliInterval = setInterval(updateModulation, 50);
+      }
+    }
+
+    // Update base values (used for modulation)
+    if (params.base !== undefined) {
+      node._baseBase = resolved.base;
+    }
+    if (params.beat !== undefined) {
+      node._baseBeat = resolved.beat;
+    }
+    if (params.gain !== undefined) {
+      node._baseGain = clamp(toNumberOr(params.gain, node._baseGain ?? 0.3), 0, 1);
+    }
+
     if (node.oscLeft?.frequency) {
       node.oscLeft.frequency.setTargetAtTime(resolved.left, now, 0.1);
     }
@@ -1198,9 +1405,8 @@ export class AudioEngine {
       node.oscRight.frequency.setTargetAtTime(resolved.right, now, 0.1);
     }
     if (params.gain !== undefined && node.masterOut?.gain) {
-      const nextGain = clamp(toNumberOr(params.gain, node._gain ?? 0.3), 0, 1);
+      const nextGain = clamp(toNumberOr(params.gain, node._baseGain ?? 0.3), 0, 1);
       node.masterOut.gain.setTargetAtTime(nextGain, now, 0.05);
-      node._gain = nextGain;
     }
 
     node._base = resolved.base;
@@ -1265,20 +1471,90 @@ export class AudioEngine {
     const node = this.nodes.get(nodeId);
     if (!node) return false;
     const now = this.ctx.currentTime;
-    if (params.freq !== undefined && node.osc?.frequency) {
+
+    // Update martigliConfig if provided
+    if (params.martigliConfig !== undefined) {
+      // Clear old interval
+      if (node._martigliInterval) {
+        clearInterval(node._martigliInterval);
+        node._martigliInterval = null;
+      }
+
+      node._martigliConfig = params.martigliConfig;
+
+      // Set up new modulation if any parameter is enabled
+      const hasMartigliModulation =
+        (params.martigliConfig.freq?.enabled) ||
+        (params.martigliConfig.pulseFreq?.enabled) ||
+        (params.martigliConfig.gain?.enabled);
+
+      if (hasMartigliModulation) {
+        const updateModulation = () => {
+          const node = this.nodes.get(nodeId);
+          if (!node) {
+            return;
+          }
+
+          let martigliValue = 0;
+          if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+            martigliValue = window.martigliController.getValue();
+          }
+
+          const now = this.ctx.currentTime;
+
+          // Modulate carrier frequency
+          if (node._martigliConfig?.freq?.enabled && node.osc?.frequency) {
+            const targetFreq = node._baseFreq + (node._martigliConfig.freq.depth * martigliValue);
+            const clampedFreq = clamp(targetFreq, 20, 20000);
+            node.osc.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+          }
+
+          // Modulate pulse frequency
+          if (node._martigliConfig?.pulseFreq?.enabled && node.lfo?.frequency) {
+            const targetPulseFreq = node._basePulseFreq + (node._martigliConfig.pulseFreq.depth * martigliValue);
+            const clampedPulseFreq = clamp(targetPulseFreq, 0.1, 100);
+            node.lfo.frequency.setTargetAtTime(clampedPulseFreq, now, 0.02);
+          }
+
+          // Modulate gain
+          if (node._martigliConfig?.gain?.enabled && node.carrierGain?.gain) {
+            const targetGain = node._baseGain + (node._martigliConfig.gain.depth * martigliValue);
+            const clampedGain = clamp(targetGain, 0, 1);
+            node.carrierGain.gain.setTargetAtTime(clampedGain, now, 0.02);
+          }
+        };
+
+        node._martigliInterval = setInterval(updateModulation, 50);
+      }
+    }
+
+    // Update base values (used for modulation)
+    if (params.freq !== undefined) {
       const freq = clamp(params.freq, 20, 4000);
-      node.osc.frequency.setTargetAtTime(freq, now, 0.05);
+      node._baseFreq = freq;
       node._freq = freq;
+      // Only update directly if not using modulation
+      if (!node._martigliConfig?.freq?.enabled && node.osc?.frequency) {
+        node.osc.frequency.setTargetAtTime(freq, now, 0.05);
+      }
     }
-    if (params.pulseFreq !== undefined && node.lfo?.frequency) {
+    if (params.pulseFreq !== undefined) {
       const pulseFreq = clamp(params.pulseFreq, 0.1, 100);
-      node.lfo.frequency.setTargetAtTime(pulseFreq, now, 0.05);
+      node._basePulseFreq = pulseFreq;
       node._pulseFreq = pulseFreq;
+      // Only update directly if not using modulation
+      if (!node._martigliConfig?.pulseFreq?.enabled && node.lfo?.frequency) {
+        node.lfo.frequency.setTargetAtTime(pulseFreq, now, 0.05);
+      }
     }
-    if (params.gain !== undefined && node.carrierGain?.gain) {
+    if (params.gain !== undefined) {
       const gain = clamp(params.gain, 0, 1);
-      node.carrierGain.gain.setTargetAtTime(gain, now, 0.05);
+      node._baseGain = gain;
       node._gain = gain;
+      // Only update directly if not using modulation
+      if (!node._martigliConfig?.gain?.enabled && node.carrierGain?.gain) {
+        node.carrierGain.gain.setTargetAtTime(gain, now, 0.05);
+      }
     }
     return true;
   }
