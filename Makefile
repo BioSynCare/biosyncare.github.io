@@ -97,11 +97,15 @@ rdf-webvowl: rdf-webvowl-setup
 
 rdf-webvowl-viewer:
 	mkdir -p scripts/rdf/tools rdf/docs/webvowl/app
-	@echo "Fetching WebVOWL gh-pages archive..."
-	@rm -f scripts/rdf/tools/webvowl-gh-pages.zip
-	@curl -L -A "biosyncare-webvowl-fetch" -o scripts/rdf/tools/webvowl-gh-pages.zip https://codeload.github.com/VisualDataWeb/WebVOWL/zip/refs/heads/gh-pages
-	@rm -rf scripts/rdf/tools/WebVOWL-gh-pages
-	@unzip -q -o scripts/rdf/tools/webvowl-gh-pages.zip -d scripts/rdf/tools
-	@# Copy viewer assets into site folder
-	@cp -R scripts/rdf/tools/WebVOWL-gh-pages/* rdf/docs/webvowl/app/ || true
-	@echo "WebVOWL viewer assets installed under rdf/docs/webvowl/app/"
+	@if [ ! -d scripts/rdf/tools/WebVOWL-build-page ]; then \
+		echo "Cloning WebVOWL build/page (shallow)..."; \
+		git clone --depth 1 --branch build/page https://github.com/VisualDataWeb/WebVOWL.git scripts/rdf/tools/WebVOWL-build-page; \
+	else \
+		echo "Updating existing WebVOWL build/page clone..."; \
+		git -C scripts/rdf/tools/WebVOWL-build-page fetch origin build/page; \
+		git -C scripts/rdf/tools/WebVOWL-build-page reset --hard origin/build/page; \
+	fi
+	@# Copy static viewer from src/ into site folder
+	@rm -rf rdf/docs/webvowl/app/*
+	@cp -R scripts/rdf/tools/WebVOWL-build-page/src/* rdf/docs/webvowl/app/ || true
+	@echo "WebVOWL viewer assets installed under rdf/docs/webvowl/app/ (entry: index.html)"

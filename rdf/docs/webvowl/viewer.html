@@ -25,7 +25,7 @@
       <div class="bar">
         <button id="openBsc">Open bsc.json</button>
   <button id="openSso" class="secondary">Open sso.json</button>
-  <a id="openApp" class="btn secondary" href="/rdf/docs/webvowl/app/webvowl.html">Open local app</a>
+  <a id="openApp" class="btn secondary" href="/rdf/docs/webvowl/app/index.html">Open local app</a>
         <label><input type="checkbox" id="useLive"> Use live site URLs (biosyncare.github.io)</label>
         <span class="info">Tip: Generate JSON first with <code>make rdf-webvowl</code>. JSON is expected at <code>/rdf/docs/webvowl/*.json</code>.</span>
         <a class="btn secondary" href="/rdf/">Back to RDF index</a>
@@ -47,7 +47,7 @@
       const useLive = document.getElementById('useLive');
 
   // Use ONLY the self-hosted WebVOWL viewer
-  const appViewer = '/rdf/docs/webvowl/app/webvowl.html';
+  const appViewer = '/rdf/docs/webvowl/app/index.html';
   // Expose a direct link to verify the app exists
   document.getElementById('openApp').setAttribute('href', appViewer);
 

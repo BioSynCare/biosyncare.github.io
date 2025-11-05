@@ -15,19 +15,20 @@ Two components are involved:
     Requires Java (JRE). Outputs land in this folder.
 
 - WebVOWL viewer (static HTML/JS app)
-  - Self-hosted under `app/` so GitHub Pages can serve it without iframes or external dependencies.
-  - Install (vendor) the viewer assets locally:
+  - Self-hosted under `app/` so GitHub Pages can serve it without iframes or external dependencies (entry: `index.html`).
+  - Install (vendor) the viewer assets locally by cloning from Git:
 
     ```bash
-    make rdf-webvowl-viewer
+  make rdf-webvowl-viewer
     ```
 
-    This downloads the WebVOWL `gh-pages` branch and copies the static files into `rdf/docs/webvowl/app/`.
+  This clones the `build/page` branch of WebVOWL and copies the static app from `src/` into `rdf/docs/webvowl/app/`.
 
 If the auto-install fails (e.g., network restrictions), manually download the archive:
 
-1. Download https://github.com/VisualDataWeb/WebVOWL/archive/refs/heads/gh-pages.zip
-2. Unzip and copy its contents into `rdf/docs/webvowl/app/`
+1. Clone the repo and check out `build/page`:
+  git clone --depth 1 --branch build/page https://github.com/VisualDataWeb/WebVOWL.git /tmp/WebVOWL
+2. Copy `/tmp/WebVOWL/src/*` into `rdf/docs/webvowl/app/`
 
 Once both the JSON and the viewer are present, open:
 
