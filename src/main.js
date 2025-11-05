@@ -2132,6 +2132,10 @@ renderActivityFeeds();
 renderMartigliTrajectory();
 updateMartigliUI();
 
+// Auto-start Martigli controller on page load
+martigliController.start();
+updateMartigliUI();
+
 // Update Martigli values and visualization in real-time
 setInterval(() => {
   if (martigliController.active) {

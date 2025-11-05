@@ -568,6 +568,12 @@ export class AudioEngine {
     };
 
     try {
+      // Clear Martigli modulation interval if it exists
+      if (node._martigliInterval) {
+        clearInterval(node._martigliInterval);
+        node._martigliInterval = null;
+      }
+
       safeStop(node.osc);
       safeStop(node.oscLeft);
       safeStop(node.oscRight);

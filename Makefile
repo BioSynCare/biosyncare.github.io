@@ -13,6 +13,7 @@ help:
 	@printf "  open-console    Open the Firebase console for $(PROJECT)\n"
 	@printf "  rdf-setup       Create Python venv and install RDF tooling\n"
 	@printf "  rdf-validate    Validate all Turtle files in rdf/ using rdflib\n"
+	@printf "  rdf-report      Generate HTML summary of classes and properties\n"
 
 deploy-rules:
 	firebase deploy --only firestore:rules --project $(PROJECT)
@@ -55,3 +56,6 @@ rdf-setup:
 
 rdf-validate:
 	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) scripts/rdf/validate_rdf.py
+
+rdf-report:
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) scripts/rdf/inspect_rdf.py
