@@ -1,0 +1,6097 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Ontospy > file:///Users/renatofabbri/rep/sleek/biosyncare/rdf/external/sso/sso-ontology.ttl</title>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+
+  <style type="text/css" media="screen">
+
+
+  body {
+	  margin-left: 6em;
+	  margin-right: 12em;
+	  text-align: justify;
+    padding: 2em 1em 2em 70px;
+    margin: 0;
+    font-family: sans-serif;
+    color: black;
+    background: white;
+    background-position: top left;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+  }
+
+  :link { color: #00C; background: transparent }
+  :visited { color: #00C; background: transparent }
+  a:active { color: #C00; background: transparent }
+
+  a:link img, a:visited img { border-style: none } /* no border on img links */
+
+  a:hover {color: white; background: #00C; }
+  a.backlink:hover {color: white; background: grey; }
+  a.greylink:hover {color: white; background: grey; }
+
+  .margintop {
+  	 margin-top: 40px;
+  }
+
+
+  dt, dd { margin-top: 10px; margin-bottom: 0 } /* opera 3.50 */
+  dt { font-weight: bold }
+
+
+  h1, h2, h3, h4, h5, h6 { text-align: left }
+  /* background should be transparent, but WebTV has a bug */
+  h1, h2, h3, h4, h5 { color: #005A9C; background: white }
+  h1.title { font: 200% sans-serif }
+  h1 { font: 170% sans-serif }
+  h2 { font: 140% sans-serif }
+  h3 { font: 120% sans-serif }
+  h4 { font: bold 100% sans-serif }
+  h5 { font: italic 100% sans-serif }
+  h6 { font: small-caps 100% sans-serif }
+
+  .hide { display: none }
+
+
+  pre { margin-left: 2em }
+
+  pre, code { font-family: monospace } /* navigator 4 requires this */
+
+
+  .implementation {
+  	background: aliceblue;
+	padding: 10px;
+	margin-top: 5px;
+  }
+
+  fieldset {
+	  margin-top: 20px;
+	  padding: 13px;
+      text-align: left;
+  }
+
+  legend {
+	  text-transform: uppercase;
+  }
+
+  .entity-div {
+	  margin: 55px 10px 30px 10px;
+  }
+
+  .entity-section {
+	  margin-bottom: 0px;
+  }
+
+
+  a.backlink {
+	  font-size: 80%;
+	  color: grey;
+  }
+
+  a.greylink {
+	  color: grey;
+  }
+
+
+   .implementation_title {
+
+       font-weight: bold;
+       font-size: 100%;
+   }
+
+.section-desc {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+
+
+
+        .tree-container {
+            width: 3000em;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+		.tree {margin: 10px 0px 30px -20px; padding: 0; display: inline-block;}
+
+		.tree ul {
+			padding-top: 20px; position: relative;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		.tree li {
+			float: left; text-align: center;
+			list-style-type: none;
+			position: relative;
+			padding: 20px 5px 0 5px;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		/*We will use ::before and ::after to draw the connectors*/
+
+		.tree li::before, .tree li::after{
+			content: '';
+			position: absolute; top: 0; right: 50%;
+			border-top: 1px solid #ccc;
+			width: 50%; height: 20px;
+		}
+		.tree li::after{
+			right: auto; left: 50%;
+			border-left: 1px solid #ccc;
+		}
+
+		/*We need to remove left-right connectors from elements without
+		any siblings*/
+		.tree li:only-child::after, .tree li:only-child::before {
+			display: none;
+		}
+
+		/*Remove space from the top of single children*/
+		.tree li:only-child{ padding-top: 0;}
+
+		/*Remove left connector from first child and
+		right connector from last child*/
+		.tree li:first-child::before, .tree li:last-child::after{
+			border: 0 none;
+		}
+		/*Adding back the vertical connector to the last nodes*/
+		.tree li:last-child::before{
+			border-right: 1px solid #ccc;
+			border-radius: 0 5px 0 0;
+			-webkit-border-radius: 0 5px 0 0;
+			-moz-border-radius: 0 5px 0 0;
+		}
+		.tree li:first-child::after{
+			border-radius: 5px 0 0 0;
+			-webkit-border-radius: 5px 0 0 0;
+			-moz-border-radius: 5px 0 0 0;
+		}
+
+		/*Time to add downward connectors from parents*/
+		.tree ul ul::before{
+			content: '';
+			position: absolute; top: 0; left: 50%;
+			border-left: 1px solid #ccc;
+			width: 0; height: 20px;
+		}
+
+		.tree li a{
+			border: 1px solid #ccc;
+			padding: 5px 10px;
+			text-decoration: none;
+			color: #666;
+			font-family: arial, verdana, tahoma;
+			font-size: 11px;
+			display: inline-block;
+
+			border-radius: 5px;
+			-webkit-border-radius: 5px;
+			-moz-border-radius: 5px;
+
+			transition: all 0.5s;
+			-webkit-transition: all 0.5s;
+			-moz-transition: all 0.5s;
+		}
+
+		/*Time for some hover effects*/
+		/*We will apply the hover effect the the lineage of the element also*/
+		.tree li a:hover, .tree li a:hover+ul li a {
+			background: #c8e4f8; color: #000; border: 1px solid #94a0b4;
+		}
+		/*Connector styles on hover*/
+		.tree li a:hover+ul li::after,
+		.tree li a:hover+ul li::before,
+		.tree li a:hover+ul::before,
+		.tree li a:hover+ul ul::before{
+			border-color:  #94a0b4;
+		}
+
+		/*Thats all. I hope you enjoyed it.
+		Thanks :)*/
+
+
+  </style>
+
+
+</head>
+
+
+<body>
+
+	
+	
+		
+			<h1 class="title"><a href="" target="_blank">file:///Users/renatofabbri/rep/sleek/biosyncare/rdf/external/sso/sso-ontology.ttl</a></h1>
+			<h3></h3>
+		
+
+	
+		
+		
+
+
+	<p><small>Ontology documentation automatically generated by <a class="greylink" href="http://lambdamusic.github.io/Ontospy/">Ontospy</a> on Wed, 05 Nov 2025 17:38:09</small></p>
+
+
+
+	
+
+
+	<hr class="margintop">
+
+	<h1><a name="toc">&nbsp;</a>Table of Content</h1>
+
+	<ul>
+		<li><a href="#ontologies">Ontologies</a></li>
+		<li><a href="#a-z">A-Z of Terms</a></li>
+		<li><a href="#classes">Classes</a></li>
+		<li><a href="#objproperties">Object Properties</a></li>
+		
+		
+		<li><a href="#skosconcepts">SKOS Concepts</a></li>
+		
+	</ul>
+
+
+
+	
+
+	
+
+	<hr class="margintop">
+
+	<h1><a name="ontologies"></a>Ontologies</h1>
+
+		
+
+
+			<fieldset> <legend><h3><a href="file:///Users/renatofabbri/rep/sleek/biosyncare/rdf/external/sso/sso-ontology.ttl" target="_blank">file:///Users/renatofabbri/rep/sleek/biosyncare/rdf/external/sso/sso-ontology.ttl</a></h3></legend>
+
+			<h4 style="margin-top: -20px;"></h4>
+
+			
+			
+				
+					<dt>dct:created</dt>
+				  
+			
+			<dd><p>2025-11-05</p></dd>
+			
+			
+				</dl>
+					<dt>dct:title</dt>
+				  
+			
+			<dd><p>SSO Ontology (BioSynCare mirror)</p></dd>
+			
+			
+				</dl>
+					<dt>owl:versionInfo</dt>
+				  
+			
+			<dd><p>snapshot</p></dd>
+			
+			
+				</dl>
+					<dt>rdf:type</dt>
+				  
+			
+			<dd><p>http://www.w3.org/2002/07/owl#Ontology</p></dd>
+			
+
+			</fieldset>
+
+		
+
+	
+
+
+
+	
+
+	<hr class="margintop">
+	<h1><a  name="a-z">&nbsp;</a>A-Z of terms</h1>
+
+	<div id="azterms">
+
+	This is a complete alphabetical A-Z index of all terms, by main logical type.
+
+	
+		<fieldset> <legend>Classes (36)</legend>
+			<span><a href="#sso:AudioStimulation">sso:AudioStimulation</a></span>
+			|
+			<span><a href="#sso:AudioTechniques">sso:AudioTechniques</a></span>
+			|
+			<span><a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a></span>
+			|
+			<span><a href="#sso:BinauralBeats">sso:BinauralBeats</a></span>
+			|
+			<span><a href="#sso:BrainStimulation">sso:BrainStimulation</a></span>
+			|
+			<span><a href="#sso:BrainwaveEntrainment">sso:BrainwaveEntrainment</a></span>
+			|
+			<span><a href="#sso:ChemicalStimulation">sso:ChemicalStimulation</a></span>
+			|
+			<span><a href="#sso:Chromosound">sso:Chromosound</a></span>
+			|
+			<span><a href="#sso:CognitiveModulation">sso:CognitiveModulation</a></span>
+			|
+			<span><a href="#sso:Collaborator">sso:Collaborator</a></span>
+			|
+			<span><a href="#sso:ColorTherapy">sso:ColorTherapy</a></span>
+			|
+			<span><a href="#sso:Company">sso:Company</a></span>
+			|
+			<span><a href="#sso:Context">sso:Context</a></span>
+			|
+			<span><a href="#sso:DeepBrainStimulation">sso:DeepBrainStimulation</a></span>
+			|
+			<span><a href="#sso:Device">sso:Device</a></span>
+			|
+			<span><a href="#sso:ElectricalStimulation">sso:ElectricalStimulation</a></span>
+			|
+			<span><a href="#sso:Expert">sso:Expert</a></span>
+			|
+			<span><a href="#sso:Flickering">sso:Flickering</a></span>
+			|
+			<span><a href="#sso:GeneralPurposeDevice">sso:GeneralPurposeDevice</a></span>
+			|
+			<span><a href="#sso:GroupSession">sso:GroupSession</a></span>
+			|
+			<span><a href="#sso:GuidingStimulation">sso:GuidingStimulation</a></span>
+			|
+			<span><a href="#sso:IndividualSession">sso:IndividualSession</a></span>
+			|
+			<span><a href="#sso:IsochronousSounds">sso:IsochronousSounds</a></span>
+			|
+			<span><a href="#sso:Language">sso:Language</a></span>
+			|
+			<span><a href="#sso:MonauralBeats">sso:MonauralBeats</a></span>
+			|
+			<span><a href="#sso:Neuromodulation">sso:Neuromodulation</a></span>
+			|
+			<span><a href="#sso:SensoryStimulation">sso:SensoryStimulation</a></span>
+			|
+			<span><a href="#sso:Session">sso:Session</a></span>
+			|
+			<span><a href="#sso:SpecialistPerson">sso:SpecialistPerson</a></span>
+			|
+			<span><a href="#sso:SpecializedNeuromodulationDevice">sso:SpecializedNeuromodulationDevice</a></span>
+			|
+			<span><a href="#sso:TactileStimulation">sso:TactileStimulation</a></span>
+			|
+			<span><a href="#sso:Technique">sso:Technique</a></span>
+			|
+			<span><a href="#sso:TranscranialMagneticStimulation">sso:TranscranialMagneticStimulation</a></span>
+			|
+			<span><a href="#sso:TranscranialStimulation">sso:TranscranialStimulation</a></span>
+			|
+			<span><a href="#sso:VisualStimulation">sso:VisualStimulation</a></span>
+			|
+			<span><a href="#sso:VisualTechniques">sso:VisualTechniques</a></span>
+			
+			
+		</fieldset>
+	
+
+	
+
+	<fieldset> <legend>Object Properties (9)</legend>
+		&nbsp;<a href="#sso:administeredBy">sso:administeredBy</a>
+		|  <a href="#sso:appliesTechnique">sso:appliesTechnique</a>
+		|  <a href="#sso:employsTechnique">sso:employsTechnique</a>
+		|  <a href="#sso:enhances">sso:enhances</a>
+		|  <a href="#sso:isPotentialCollaborator">sso:isPotentialCollaborator</a>
+		|  <a href="#sso:providedBy">sso:providedBy</a>
+		|  <a href="#sso:recommendsTechnique">sso:recommendsTechnique</a>
+		|  <a href="#sso:supportsDevice">sso:supportsDevice</a>
+		|  <a href="#sso:usesDevice">sso:usesDevice</a>
+		  
+	</fieldset>
+
+	
+
+	
+
+	
+
+	
+
+		<fieldset> <legend>SKOS Concepts (36)</legend>
+			&nbsp;<a href="#sso:AudioStimulationConcept">sso:AudioStimulationConcept</a>
+			|  <a href="#sso:AudioTechniquesConcept">sso:AudioTechniquesConcept</a>
+			|  <a href="#sso:AudiovisualStimulationConcept">sso:AudiovisualStimulationConcept</a>
+			|  <a href="#sso:BinauralBeatsConcept">sso:BinauralBeatsConcept</a>
+			|  <a href="#sso:BrainStimulationConcept">sso:BrainStimulationConcept</a>
+			|  <a href="#sso:BrainwaveEntrainmentConcept">sso:BrainwaveEntrainmentConcept</a>
+			|  <a href="#sso:ChemicalStimulationConcept">sso:ChemicalStimulationConcept</a>
+			|  <a href="#sso:ChromosoundConcept">sso:ChromosoundConcept</a>
+			|  <a href="#sso:CognitiveModulationConcept">sso:CognitiveModulationConcept</a>
+			|  <a href="#sso:CollaboratorConcept">sso:CollaboratorConcept</a>
+			|  <a href="#sso:ColorTherapyConcept">sso:ColorTherapyConcept</a>
+			|  <a href="#sso:CompanyConcept">sso:CompanyConcept</a>
+			|  <a href="#sso:ContextConcept">sso:ContextConcept</a>
+			|  <a href="#sso:DeepBrainStimulationConcept">sso:DeepBrainStimulationConcept</a>
+			|  <a href="#sso:DeviceConcept">sso:DeviceConcept</a>
+			|  <a href="#sso:ElectricalStimulationConcept">sso:ElectricalStimulationConcept</a>
+			|  <a href="#sso:ExpertConcept">sso:ExpertConcept</a>
+			|  <a href="#sso:FlickeringConcept">sso:FlickeringConcept</a>
+			|  <a href="#sso:GeneralPurposeDeviceConcept">sso:GeneralPurposeDeviceConcept</a>
+			|  <a href="#sso:GroupSessionConcept">sso:GroupSessionConcept</a>
+			|  <a href="#sso:GuidingStimulationConcept">sso:GuidingStimulationConcept</a>
+			|  <a href="#sso:IndividualSessionConcept">sso:IndividualSessionConcept</a>
+			|  <a href="#sso:IsochronousSoundsConcept">sso:IsochronousSoundsConcept</a>
+			|  <a href="#sso:LanguageConcept">sso:LanguageConcept</a>
+			|  <a href="#sso:MonauralBeatsConcept">sso:MonauralBeatsConcept</a>
+			|  <a href="#sso:NeuromodulationConcept">sso:NeuromodulationConcept</a>
+			|  <a href="#sso:SensoryStimulationConcept">sso:SensoryStimulationConcept</a>
+			|  <a href="#sso:SessionConcept">sso:SessionConcept</a>
+			|  <a href="#sso:SpecialistPersonConcept">sso:SpecialistPersonConcept</a>
+			|  <a href="#sso:SpecializedNeuromodulationDeviceConcept">sso:SpecializedNeuromodulationDeviceConcept</a>
+			|  <a href="#sso:TactileStimulationConcept">sso:TactileStimulationConcept</a>
+			|  <a href="#sso:TechniqueConcept">sso:TechniqueConcept</a>
+			|  <a href="#sso:TranscranialMagneticStimulationConcept">sso:TranscranialMagneticStimulationConcept</a>
+			|  <a href="#sso:TranscranialStimulationConcept">sso:TranscranialStimulationConcept</a>
+			|  <a href="#sso:VisualStimulationConcept">sso:VisualStimulationConcept</a>
+			|  <a href="#sso:VisualTechniquesConcept">sso:VisualTechniquesConcept</a>
+			  
+		</fieldset>
+
+	
+
+	
+
+	</div>
+
+
+
+	
+
+
+	
+
+		<hr class="margintop">
+		<h1 class="margintop" ><a name="classes">&nbsp;</a>Classes</h1>
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:AudioStimulation" href="#sso:AudioStimulation">sso:AudioStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:AudioStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:AudioStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using audio signals like isochronic or binaural beats.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(3)</small>:</b>
+                        <br />
+                        <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a> | <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudioStimulation a owl:Class ;<br>
+    rdfs:label &#34;AudioStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation using audio signals like isochronic or binaural beats.&#34; ;<br>
+    rdfs:subClassOf sso:AudiovisualStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:AudioTechniques" href="#sso:AudioTechniques">sso:AudioTechniques</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Technique">sso:Technique</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:AudioTechniques</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:BinauralBeats">sso:BinauralBeats</a></li><li><a href="#sso:IsochronousSounds">sso:IsochronousSounds</a></li><li><a href="#sso:MonauralBeats">sso:MonauralBeats</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Audio-based modulation techniques for brain and sensory stimulation.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudioTechniques a owl:Class ;<br>
+    rdfs:label &#34;AudioTechniques&#34; ;<br>
+    rdfs:comment &#34;Audio-based modulation techniques for brain and sensory stimulation.&#34; ;<br>
+    rdfs:subClassOf sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:AudiovisualStimulation" href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:AudiovisualStimulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:AudioStimulation">sso:AudioStimulation</a></li><li><a href="#sso:Chromosound">sso:Chromosound</a></li><li><a href="#sso:VisualStimulation">sso:VisualStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using both audio and visual cues together.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudiovisualStimulation a owl:Class ;<br>
+    rdfs:label &#34;AudiovisualStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation using both audio and visual cues together.&#34; ;<br>
+    rdfs:subClassOf sso:SensoryStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:BinauralBeats" href="#sso:BinauralBeats">sso:BinauralBeats</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudioTechniques">sso:AudioTechniques</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:BinauralBeats</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:BinauralBeats is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Dual-tone auditory beats used to create a perceived third beat for entrainment.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:AudioTechniques">sso:AudioTechniques</a> | <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BinauralBeats a owl:Class ;<br>
+    rdfs:label &#34;BinauralBeats&#34; ;<br>
+    rdfs:comment &#34;Dual-tone auditory beats used to create a perceived third beat for entrainment.&#34; ;<br>
+    rdfs:subClassOf sso:AudioTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:BrainStimulation" href="#sso:BrainStimulation">sso:BrainStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Neuromodulation">sso:Neuromodulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:BrainStimulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:ElectricalStimulation">sso:ElectricalStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Direct stimulation targeted at brain regions for therapeutic effects.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BrainStimulation a owl:Class ;<br>
+    rdfs:label &#34;BrainStimulation&#34; ;<br>
+    rdfs:comment &#34;Direct stimulation targeted at brain regions for therapeutic effects.&#34; ;<br>
+    rdfs:subClassOf sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:BrainwaveEntrainment" href="#sso:BrainwaveEntrainment">sso:BrainwaveEntrainment</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Technique">sso:Technique</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:BrainwaveEntrainment</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:BrainwaveEntrainment is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques aligning brainwave frequencies with external rhythms.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BrainwaveEntrainment a owl:Class ;<br>
+    rdfs:label &#34;BrainwaveEntrainment&#34; ;<br>
+    rdfs:comment &#34;Techniques aligning brainwave frequencies with external rhythms.&#34; ;<br>
+    rdfs:subClassOf sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:ChemicalStimulation" href="#sso:ChemicalStimulation">sso:ChemicalStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Neuromodulation">sso:Neuromodulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:ChemicalStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ChemicalStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using chemical agents or drugs.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ChemicalStimulation a owl:Class ;<br>
+    rdfs:label &#34;ChemicalStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation using chemical agents or drugs.&#34; ;<br>
+    rdfs:subClassOf sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Chromosound" href="#sso:Chromosound">sso:Chromosound</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:Chromosound</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Chromosound is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A specific type of audiovisual stimulation involving coordinated sound and color.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(3)</small>:</b>
+                        <br />
+                        <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a> | <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Chromosound a owl:Class ;<br>
+    rdfs:label &#34;Chromosound&#34; ;<br>
+    rdfs:comment &#34;A specific type of audiovisual stimulation involving coordinated sound and color.&#34; ;<br>
+    rdfs:subClassOf sso:AudiovisualStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:CognitiveModulation" href="#sso:CognitiveModulation">sso:CognitiveModulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Neuromodulation">sso:Neuromodulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:CognitiveModulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:Context">sso:Context</a></li><li><a href="#sso:Language">sso:Language</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Modulation techniques that affect cognitive functions and states.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:enhances">sso:enhances</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:CognitiveModulation a owl:Class ;<br>
+    rdfs:label &#34;CognitiveModulation&#34; ;<br>
+    rdfs:comment &#34;Modulation techniques that affect cognitive functions and states.&#34; ;<br>
+    rdfs:subClassOf sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Collaborator" href="#sso:Collaborator">sso:Collaborator</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Collaborator</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Collaborator is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Potential collaborators for the SSO project, including experts and organizations.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:recommendsTechnique">sso:recommendsTechnique</a>  
+                    </p>
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:isPotentialCollaborator">sso:isPotentialCollaborator</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Collaborator a owl:Class ;<br>
+    rdfs:label &#34;Collaborator&#34; ;<br>
+    rdfs:comment &#34;Potential collaborators for the SSO project, including experts and organizations.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:ColorTherapy" href="#sso:ColorTherapy">sso:ColorTherapy</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:VisualTechniques">sso:VisualTechniques</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:ColorTherapy</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ColorTherapy is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Therapy using color exposure to influence mental and physical health.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:VisualTechniques">sso:VisualTechniques</a> | <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ColorTherapy a owl:Class ;<br>
+    rdfs:label &#34;ColorTherapy&#34; ;<br>
+    rdfs:comment &#34;Therapy using color exposure to influence mental and physical health.&#34; ;<br>
+    rdfs:subClassOf sso:VisualTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Company" href="#sso:Company">sso:Company</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Expert">sso:Expert</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:Company</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Company is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>An organization providing neuromodulation devices or services.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Expert">sso:Expert</a>  
+                    </p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:supportsDevice">sso:supportsDevice</a>  
+                    </p>
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:providedBy">sso:providedBy</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Company a owl:Class ;<br>
+    rdfs:label &#34;Company&#34; ;<br>
+    rdfs:comment &#34;An organization providing neuromodulation devices or services.&#34; ;<br>
+    rdfs:subClassOf sso:Expert .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Context" href="#sso:Context">sso:Context</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:CognitiveModulation">sso:CognitiveModulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:Context</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Context is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Context in which stimulation is administered, impacting efficacy.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:CognitiveModulation">sso:CognitiveModulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Context a owl:Class ;<br>
+    rdfs:label &#34;Context&#34; ;<br>
+    rdfs:comment &#34;Context in which stimulation is administered, impacting efficacy.&#34; ;<br>
+    rdfs:subClassOf sso:CognitiveModulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:DeepBrainStimulation" href="#sso:DeepBrainStimulation">sso:DeepBrainStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:ElectricalStimulation">sso:ElectricalStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:DeepBrainStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:DeepBrainStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation of deep brain structures using implanted electrodes.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(3)</small>:</b>
+                        <br />
+                        <a href="#sso:ElectricalStimulation">sso:ElectricalStimulation</a> | <a href="#sso:BrainStimulation">sso:BrainStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:DeepBrainStimulation a owl:Class ;<br>
+    rdfs:label &#34;DeepBrainStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation of deep brain structures using implanted electrodes.&#34; ;<br>
+    rdfs:subClassOf sso:ElectricalStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Device" href="#sso:Device">sso:Device</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Device</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:GeneralPurposeDevice">sso:GeneralPurposeDevice</a></li><li><a href="#sso:SpecializedNeuromodulationDevice">sso:SpecializedNeuromodulationDevice</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Device used for various stimulation techniques.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:usesDevice">sso:usesDevice</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Device a owl:Class ;<br>
+    rdfs:label &#34;Device&#34; ;<br>
+    rdfs:comment &#34;Device used for various stimulation techniques.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:ElectricalStimulation" href="#sso:ElectricalStimulation">sso:ElectricalStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:BrainStimulation">sso:BrainStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:ElectricalStimulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:DeepBrainStimulation">sso:DeepBrainStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation via low-level electrical currents.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:BrainStimulation">sso:BrainStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ElectricalStimulation a owl:Class ;<br>
+    rdfs:label &#34;ElectricalStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation via low-level electrical currents.&#34; ;<br>
+    rdfs:subClassOf sso:BrainStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Expert" href="#sso:Expert">sso:Expert</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Expert</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:Company">sso:Company</a></li><li><a href="#sso:SpecialistPerson">sso:SpecialistPerson</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>An expert in neuromodulation, could be a person or a company.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:appliesTechnique">sso:appliesTechnique</a> | <a href="#sso:isPotentialCollaborator">sso:isPotentialCollaborator</a>  
+                    </p>
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:administeredBy">sso:administeredBy</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Expert a owl:Class ;<br>
+    rdfs:label &#34;Expert&#34; ;<br>
+    rdfs:comment &#34;An expert in neuromodulation, could be a person or a company.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Flickering" href="#sso:Flickering">sso:Flickering</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:VisualTechniques">sso:VisualTechniques</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:Flickering</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Flickering is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Visual technique using flickering lights to stimulate the brain.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:VisualTechniques">sso:VisualTechniques</a> | <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Flickering a owl:Class ;<br>
+    rdfs:label &#34;Flickering&#34; ;<br>
+    rdfs:comment &#34;Visual technique using flickering lights to stimulate the brain.&#34; ;<br>
+    rdfs:subClassOf sso:VisualTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:GeneralPurposeDevice" href="#sso:GeneralPurposeDevice">sso:GeneralPurposeDevice</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Device">sso:Device</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:GeneralPurposeDevice</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GeneralPurposeDevice is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Devices like smartphones and laptops that can run software for stimulation.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Device">sso:Device</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GeneralPurposeDevice a owl:Class ;<br>
+    rdfs:label &#34;GeneralPurposeDevice&#34; ;<br>
+    rdfs:comment &#34;Devices like smartphones and laptops that can run software for stimulation.&#34; ;<br>
+    rdfs:subClassOf sso:Device .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:GroupSession" href="#sso:GroupSession">sso:GroupSession</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Session">sso:Session</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:GroupSession</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GroupSession is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A session involving multiple users undergoing the same stimulation protocol.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Session">sso:Session</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GroupSession a owl:Class ;<br>
+    rdfs:label &#34;GroupSession&#34; ;<br>
+    rdfs:comment &#34;A session involving multiple users undergoing the same stimulation protocol.&#34; ;<br>
+    rdfs:subClassOf sso:Session .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:GuidingStimulation" href="#sso:GuidingStimulation">sso:GuidingStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:GuidingStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GuidingStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation guided by rhythms or cycles, such as breathing cycles.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GuidingStimulation a owl:Class ;<br>
+    rdfs:label &#34;GuidingStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation guided by rhythms or cycles, such as breathing cycles.&#34; ;<br>
+    rdfs:subClassOf sso:SensoryStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:IndividualSession" href="#sso:IndividualSession">sso:IndividualSession</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Session">sso:Session</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:IndividualSession</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:IndividualSession is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A single-user session of neuromodulation or stimulation.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Session">sso:Session</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:IndividualSession a owl:Class ;<br>
+    rdfs:label &#34;IndividualSession&#34; ;<br>
+    rdfs:comment &#34;A single-user session of neuromodulation or stimulation.&#34; ;<br>
+    rdfs:subClassOf sso:Session .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:IsochronousSounds" href="#sso:IsochronousSounds">sso:IsochronousSounds</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudioTechniques">sso:AudioTechniques</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:IsochronousSounds</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:IsochronousSounds is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Sounds with equal intervals, often used for entrainment.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:AudioTechniques">sso:AudioTechniques</a> | <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:IsochronousSounds a owl:Class ;<br>
+    rdfs:label &#34;IsochronousSounds&#34; ;<br>
+    rdfs:comment &#34;Sounds with equal intervals, often used for entrainment.&#34; ;<br>
+    rdfs:subClassOf sso:AudioTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Language" href="#sso:Language">sso:Language</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:CognitiveModulation">sso:CognitiveModulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:Language</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:Language is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation involving human language.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:CognitiveModulation">sso:CognitiveModulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Language a owl:Class ;<br>
+    rdfs:label &#34;Language&#34; ;<br>
+    rdfs:comment &#34;Stimulation involving human language.&#34; ;<br>
+    rdfs:subClassOf sso:CognitiveModulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:MonauralBeats" href="#sso:MonauralBeats">sso:MonauralBeats</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudioTechniques">sso:AudioTechniques</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:MonauralBeats</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:MonauralBeats is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Single-tone auditory beats used for stimulation.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:AudioTechniques">sso:AudioTechniques</a> | <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:MonauralBeats a owl:Class ;<br>
+    rdfs:label &#34;MonauralBeats&#34; ;<br>
+    rdfs:comment &#34;Single-tone auditory beats used for stimulation.&#34; ;<br>
+    rdfs:subClassOf sso:AudioTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Neuromodulation" href="#sso:Neuromodulation">sso:Neuromodulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Neuromodulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:BrainStimulation">sso:BrainStimulation</a></li><li><a href="#sso:ChemicalStimulation">sso:ChemicalStimulation</a></li><li><a href="#sso:CognitiveModulation">sso:CognitiveModulation</a></li><li><a href="#sso:SensoryStimulation">sso:SensoryStimulation</a></li><li><a href="#sso:TranscranialStimulation">sso:TranscranialStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques to alter brain activity through various forms of stimulation.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:employsTechnique">sso:employsTechnique</a>  
+                    </p>
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Neuromodulation a owl:Class ;<br>
+    rdfs:label &#34;Neuromodulation&#34; ;<br>
+    rdfs:comment &#34;Techniques to alter brain activity through various forms of stimulation.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:SensoryStimulation" href="#sso:SensoryStimulation">sso:SensoryStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Neuromodulation">sso:Neuromodulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:SensoryStimulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a></li><li><a href="#sso:GuidingStimulation">sso:GuidingStimulation</a></li><li><a href="#sso:TactileStimulation">sso:TactileStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation via sensory inputs such as audio, visual, and tactile cues.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SensoryStimulation a owl:Class ;<br>
+    rdfs:label &#34;SensoryStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation via sensory inputs such as audio, visual, and tactile cues.&#34; ;<br>
+    rdfs:subClassOf sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Session" href="#sso:Session">sso:Session</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Session</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:GroupSession">sso:GroupSession</a></li><li><a href="#sso:IndividualSession">sso:IndividualSession</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A session instance involving stimulation, either guided or unguided.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:administeredBy">sso:administeredBy</a> | <a href="#sso:usesDevice">sso:usesDevice</a>  
+                    </p>
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Session a owl:Class ;<br>
+    rdfs:label &#34;Session&#34; ;<br>
+    rdfs:comment &#34;A session instance involving stimulation, either guided or unguided.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:SpecialistPerson" href="#sso:SpecialistPerson">sso:SpecialistPerson</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Expert">sso:Expert</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:SpecialistPerson</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SpecialistPerson is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A human specialist in neuromodulation techniques.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Expert">sso:Expert</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SpecialistPerson a owl:Class ;<br>
+    rdfs:label &#34;SpecialistPerson&#34; ;<br>
+    rdfs:comment &#34;A human specialist in neuromodulation techniques.&#34; ;<br>
+    rdfs:subClassOf sso:Expert .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:SpecializedNeuromodulationDevice" href="#sso:SpecializedNeuromodulationDevice">sso:SpecializedNeuromodulationDevice</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Device">sso:Device</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:SpecializedNeuromodulationDevice</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SpecializedNeuromodulationDevice is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Devices specifically built for neuromodulation, like MindAlive devices.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Device">sso:Device</a>  
+                    </p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:providedBy">sso:providedBy</a>  
+                    </p>
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:supportsDevice">sso:supportsDevice</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SpecializedNeuromodulationDevice a owl:Class ;<br>
+    rdfs:label &#34;SpecializedNeuromodulationDevice&#34; ;<br>
+    rdfs:comment &#34;Devices specifically built for neuromodulation, like MindAlive devices.&#34; ;<br>
+    rdfs:subClassOf sso:Device .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:TactileStimulation" href="#sso:TactileStimulation">sso:TactileStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:TactileStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TactileStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation through tactile feedback, using vibrations or touch.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TactileStimulation a owl:Class ;<br>
+    rdfs:label &#34;TactileStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation through tactile feedback, using vibrations or touch.&#34; ;<br>
+    rdfs:subClassOf sso:SensoryStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:Technique" href="#sso:Technique">sso:Technique</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>owl:Thing</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:Technique</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:AudioTechniques">sso:AudioTechniques</a></li><li><a href="#sso:BrainwaveEntrainment">sso:BrainwaveEntrainment</a></li><li><a href="#sso:VisualTechniques">sso:VisualTechniques</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques used for neuromodulation.</p>
+                </p>
+
+                
+                    <p class="section-desc"><b>Inherits from:</b> <br />owl:Thing</p>
+				
+
+
+
+				
+					<p class="section-desc"><b>Property Domain of:</b>
+                        <br>
+                        <a href="#sso:enhances">sso:enhances</a>  
+                    </p>
+				
+
+				
+					<p class="section-desc"><b>Property Range of:</b>
+                        <br>
+                        <a href="#sso:appliesTechnique">sso:appliesTechnique</a> | <a href="#sso:employsTechnique">sso:employsTechnique</a> | <a href="#sso:recommendsTechnique">sso:recommendsTechnique</a>  
+                    </p>
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:Technique a owl:Class ;<br>
+    rdfs:label &#34;Technique&#34; ;<br>
+    rdfs:comment &#34;Techniques used for neuromodulation.&#34; .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:TranscranialMagneticStimulation" href="#sso:TranscranialMagneticStimulation">sso:TranscranialMagneticStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:TranscranialStimulation">sso:TranscranialStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:TranscranialMagneticStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TranscranialMagneticStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Magnetic stimulation applied to the brain non-invasively.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(2)</small>:</b>
+                        <br />
+                        <a href="#sso:TranscranialStimulation">sso:TranscranialStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TranscranialMagneticStimulation a owl:Class ;<br>
+    rdfs:label &#34;TranscranialMagneticStimulation&#34; ;<br>
+    rdfs:comment &#34;Magnetic stimulation applied to the brain non-invasively.&#34; ;<br>
+    rdfs:subClassOf sso:TranscranialStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:TranscranialStimulation" href="#sso:TranscranialStimulation">sso:TranscranialStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Neuromodulation">sso:Neuromodulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:TranscranialStimulation</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:TranscranialMagneticStimulation">sso:TranscranialMagneticStimulation</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques applied directly to the skull or scalp.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TranscranialStimulation a owl:Class ;<br>
+    rdfs:label &#34;TranscranialStimulation&#34; ;<br>
+    rdfs:comment &#34;Techniques applied directly to the skull or scalp.&#34; ;<br>
+    rdfs:subClassOf sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:VisualStimulation" href="#sso:VisualStimulation">sso:VisualStimulation</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:VisualStimulation</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:VisualStimulation is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using visual signals, including flickering lights and color.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(3)</small>:</b>
+                        <br />
+                        <a href="#sso:AudiovisualStimulation">sso:AudiovisualStimulation</a> | <a href="#sso:SensoryStimulation">sso:SensoryStimulation</a> | <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:VisualStimulation a owl:Class ;<br>
+    rdfs:label &#34;VisualStimulation&#34; ;<br>
+    rdfs:comment &#34;Stimulation using visual signals, including flickering lights and color.&#34; ;<br>
+    rdfs:subClassOf sso:AudiovisualStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+			<div class="entity-div">
+
+
+
+				<h3 class="entity-section">Class: <a name="sso:VisualTechniques" href="#sso:VisualTechniques">sso:VisualTechniques</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+
+                <div class="tree-container">
+                <div class="tree">
+                    <ul>
+                        
+                            <li> <a href="#sso:Technique">sso:Technique</a>
+
+                            <ul>
+
+                              <li><a style="font-weight: bold;">sso:VisualTechniques</a>
+
+                              
+                                  <ul>
+                                    <li><a href="#sso:ColorTherapy">sso:ColorTherapy</a></li><li><a href="#sso:Flickering">sso:Flickering</a></li>
+                                  </ul>
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                            
+
+                        
+
+                    </ul>
+                </div>
+                </div>
+
+
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Visual-based modulation techniques for stimulation.</p>
+                </p>
+
+                
+					<p class="section-desc"><b>Inherits from <small>(1)</small>:</b>
+                        <br />
+                        <a href="#sso:Technique">sso:Technique</a>  
+                    </p>
+				
+
+
+
+				
+
+				
+
+
+				
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:VisualTechniques a owl:Class ;<br>
+    rdfs:label &#34;VisualTechniques&#34; ;<br>
+    rdfs:comment &#34;Visual-based modulation techniques for stimulation.&#34; ;<br>
+    rdfs:subClassOf sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+
+			
+
+	
+
+
+
+	
+
+	
+
+		<hr class="margintop">
+		<h1 class="margintop"><a name="objproperties">&nbsp;</a>Object Properties</h1>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:administeredBy" href="#sso:administeredBy">sso:administeredBy</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:administeredBy is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Session is administered by a specialist or organization.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Session">sso:Session</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Expert">sso:Expert</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:administeredBy a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Session is administered by a specialist or organization.&#34; ;<br>
+    rdfs:domain sso:Session ;<br>
+    rdfs:range sso:Expert .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:appliesTechnique" href="#sso:appliesTechnique">sso:appliesTechnique</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:appliesTechnique is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Technique applied by an expert.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Expert">sso:Expert</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Technique">sso:Technique</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:appliesTechnique a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Technique applied by an expert.&#34; ;<br>
+    rdfs:domain sso:Expert ;<br>
+    rdfs:range sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:employsTechnique" href="#sso:employsTechnique">sso:employsTechnique</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:employsTechnique is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Neuromodulation employs specific techniques.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Neuromodulation">sso:Neuromodulation</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Technique">sso:Technique</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:employsTechnique a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Neuromodulation employs specific techniques.&#34; ;<br>
+    rdfs:domain sso:Neuromodulation ;<br>
+    rdfs:range sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:enhances" href="#sso:enhances">sso:enhances</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:enhances is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Technique that enhances cognitive functions.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Technique">sso:Technique</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:CognitiveModulation">sso:CognitiveModulation</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:enhances a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Technique that enhances cognitive functions.&#34; ;<br>
+    rdfs:domain sso:Technique ;<br>
+    rdfs:range sso:CognitiveModulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:isPotentialCollaborator" href="#sso:isPotentialCollaborator">sso:isPotentialCollaborator</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:isPotentialCollaborator is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Potential collaboration between experts and SSO.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Expert">sso:Expert</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Collaborator">sso:Collaborator</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:isPotentialCollaborator a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Potential collaboration between experts and SSO.&#34; ;<br>
+    rdfs:domain sso:Expert ;<br>
+    rdfs:range sso:Collaborator .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:providedBy" href="#sso:providedBy">sso:providedBy</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:providedBy is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Device provided by a company for neuromodulation.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:SpecializedNeuromodulationDevice">sso:SpecializedNeuromodulationDevice</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Company">sso:Company</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:providedBy a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Device provided by a company for neuromodulation.&#34; ;<br>
+    rdfs:domain sso:SpecializedNeuromodulationDevice ;<br>
+    rdfs:range sso:Company .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:recommendsTechnique" href="#sso:recommendsTechnique">sso:recommendsTechnique</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:recommendsTechnique is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Technique recommended by a collaborator.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Collaborator">sso:Collaborator</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Technique">sso:Technique</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:recommendsTechnique a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Technique recommended by a collaborator.&#34; ;<br>
+    rdfs:domain sso:Collaborator ;<br>
+    rdfs:range sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:supportsDevice" href="#sso:supportsDevice">sso:supportsDevice</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:supportsDevice is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Device supported by the company.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Company">sso:Company</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:SpecializedNeuromodulationDevice">sso:SpecializedNeuromodulationDevice</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:supportsDevice a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Device supported by the company.&#34; ;<br>
+    rdfs:domain sso:Company ;<br>
+    rdfs:range sso:SpecializedNeuromodulationDevice .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Object Property: <a name="sso:usesDevice" href="#sso:usesDevice">sso:usesDevice</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:usesDevice is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Session uses a specific device for stimulation.</p>
+                </p>
+
+                
+
+				
+
+
+
+				
+
+				
+
+				
+					<p class="section-desc"><b>Class Domain for:</b>
+                        <br>
+                        <a href="#sso:Session">sso:Session</a>  </p>
+				
+
+				
+					<p class="section-desc"><b>Class Range for:</b>
+                        <br>
+                        <a href="#sso:Device">sso:Device</a>  </p>
+				
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .<br>
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:usesDevice a owl:ObjectProperty ;<br>
+    rdfs:comment &#34;Session uses a specific device for stimulation.&#34; ;<br>
+    rdfs:domain sso:Session ;<br>
+    rdfs:range sso:Device .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+	
+
+
+
+
+
+
+
+	
+
+	
+
+
+
+
+
+
+
+	
+
+	
+
+
+
+
+	
+
+
+	
+
+
+		<hr class="margintop">
+		<h1 class="margintop"><a  name="skosconcepts">&nbsp;</a>SKOS Concepts</h1>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:AudioStimulationConcept" href="#sso:AudioStimulationConcept">sso:AudioStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:AudioStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:AudioStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using audio signals like isochronic or binaural beats.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudioStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation using audio signals like isochronic or binaural beats.&#34; ;<br>
+    skos:prefLabel &#34;AudioStimulation Concept&#34; ;<br>
+    skos:related sso:AudioStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:AudioTechniquesConcept" href="#sso:AudioTechniquesConcept">sso:AudioTechniquesConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:AudioTechniquesConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:AudioTechniquesConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Audio-based modulation techniques for brain and sensory stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudioTechniquesConcept a skos:Concept ;<br>
+    skos:definition &#34;Audio-based modulation techniques for brain and sensory stimulation.&#34; ;<br>
+    skos:prefLabel &#34;AudioTechniques Concept&#34; ;<br>
+    skos:related sso:AudioTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:AudiovisualStimulationConcept" href="#sso:AudiovisualStimulationConcept">sso:AudiovisualStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:AudiovisualStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:AudiovisualStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using both audio and visual cues together.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:AudiovisualStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation using both audio and visual cues together.&#34; ;<br>
+    skos:prefLabel &#34;AudiovisualStimulation Concept&#34; ;<br>
+    skos:related sso:AudiovisualStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:BinauralBeatsConcept" href="#sso:BinauralBeatsConcept">sso:BinauralBeatsConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:BinauralBeatsConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:BinauralBeatsConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Dual-tone auditory beats used to create a perceived third beat for entrainment.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BinauralBeatsConcept a skos:Concept ;<br>
+    skos:definition &#34;Dual-tone auditory beats used to create a perceived third beat for entrainment.&#34; ;<br>
+    skos:prefLabel &#34;BinauralBeats Concept&#34; ;<br>
+    skos:related sso:BinauralBeats .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:BrainStimulationConcept" href="#sso:BrainStimulationConcept">sso:BrainStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:BrainStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:BrainStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Direct stimulation targeted at brain regions for therapeutic effects.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BrainStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Direct stimulation targeted at brain regions for therapeutic effects.&#34; ;<br>
+    skos:prefLabel &#34;BrainStimulation Concept&#34; ;<br>
+    skos:related sso:BrainStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:BrainwaveEntrainmentConcept" href="#sso:BrainwaveEntrainmentConcept">sso:BrainwaveEntrainmentConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:BrainwaveEntrainmentConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:BrainwaveEntrainmentConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques aligning brainwave frequencies with external rhythms.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:BrainwaveEntrainmentConcept a skos:Concept ;<br>
+    skos:definition &#34;Techniques aligning brainwave frequencies with external rhythms.&#34; ;<br>
+    skos:prefLabel &#34;BrainwaveEntrainment Concept&#34; ;<br>
+    skos:related sso:BrainwaveEntrainment .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ChemicalStimulationConcept" href="#sso:ChemicalStimulationConcept">sso:ChemicalStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ChemicalStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ChemicalStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using chemical agents or drugs.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ChemicalStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation using chemical agents or drugs.&#34; ;<br>
+    skos:prefLabel &#34;ChemicalStimulation Concept&#34; ;<br>
+    skos:related sso:ChemicalStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ChromosoundConcept" href="#sso:ChromosoundConcept">sso:ChromosoundConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ChromosoundConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ChromosoundConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A specific type of audiovisual stimulation involving coordinated sound and color.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ChromosoundConcept a skos:Concept ;<br>
+    skos:definition &#34;A specific type of audiovisual stimulation involving coordinated sound and color.&#34; ;<br>
+    skos:prefLabel &#34;Chromosound Concept&#34; ;<br>
+    skos:related sso:Chromosound .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:CognitiveModulationConcept" href="#sso:CognitiveModulationConcept">sso:CognitiveModulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:CognitiveModulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:CognitiveModulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Modulation techniques that affect cognitive functions and states.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:CognitiveModulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Modulation techniques that affect cognitive functions and states.&#34; ;<br>
+    skos:prefLabel &#34;CognitiveModulation Concept&#34; ;<br>
+    skos:related sso:CognitiveModulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:CollaboratorConcept" href="#sso:CollaboratorConcept">sso:CollaboratorConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:CollaboratorConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:CollaboratorConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Potential collaborators for the SSO project, including experts and organizations.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:CollaboratorConcept a skos:Concept ;<br>
+    skos:definition &#34;Potential collaborators for the SSO project, including experts and organizations.&#34; ;<br>
+    skos:prefLabel &#34;Collaborator Concept&#34; ;<br>
+    skos:related sso:Collaborator .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ColorTherapyConcept" href="#sso:ColorTherapyConcept">sso:ColorTherapyConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ColorTherapyConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ColorTherapyConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Therapy using color exposure to influence mental and physical health.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ColorTherapyConcept a skos:Concept ;<br>
+    skos:definition &#34;Therapy using color exposure to influence mental and physical health.&#34; ;<br>
+    skos:prefLabel &#34;ColorTherapy Concept&#34; ;<br>
+    skos:related sso:ColorTherapy .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:CompanyConcept" href="#sso:CompanyConcept">sso:CompanyConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:CompanyConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:CompanyConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>An organization providing neuromodulation devices or services.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:CompanyConcept a skos:Concept ;<br>
+    skos:definition &#34;An organization providing neuromodulation devices or services.&#34; ;<br>
+    skos:prefLabel &#34;Company Concept&#34; ;<br>
+    skos:related sso:Company .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ContextConcept" href="#sso:ContextConcept">sso:ContextConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ContextConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ContextConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Context in which stimulation is administered, impacting efficacy.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ContextConcept a skos:Concept ;<br>
+    skos:definition &#34;Context in which stimulation is administered, impacting efficacy.&#34; ;<br>
+    skos:prefLabel &#34;Context Concept&#34; ;<br>
+    skos:related sso:Context .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:DeepBrainStimulationConcept" href="#sso:DeepBrainStimulationConcept">sso:DeepBrainStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:DeepBrainStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:DeepBrainStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation of deep brain structures using implanted electrodes.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:DeepBrainStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation of deep brain structures using implanted electrodes.&#34; ;<br>
+    skos:prefLabel &#34;DeepBrainStimulation Concept&#34; ;<br>
+    skos:related sso:DeepBrainStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:DeviceConcept" href="#sso:DeviceConcept">sso:DeviceConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:DeviceConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:DeviceConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Device used for various stimulation techniques.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:DeviceConcept a skos:Concept ;<br>
+    skos:definition &#34;Device used for various stimulation techniques.&#34; ;<br>
+    skos:prefLabel &#34;Device Concept&#34; ;<br>
+    skos:related sso:Device .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ElectricalStimulationConcept" href="#sso:ElectricalStimulationConcept">sso:ElectricalStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ElectricalStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ElectricalStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation via low-level electrical currents.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ElectricalStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation via low-level electrical currents.&#34; ;<br>
+    skos:prefLabel &#34;ElectricalStimulation Concept&#34; ;<br>
+    skos:related sso:ElectricalStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:ExpertConcept" href="#sso:ExpertConcept">sso:ExpertConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:ExpertConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:ExpertConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>An expert in neuromodulation, could be a person or a company.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:ExpertConcept a skos:Concept ;<br>
+    skos:definition &#34;An expert in neuromodulation, could be a person or a company.&#34; ;<br>
+    skos:prefLabel &#34;Expert Concept&#34; ;<br>
+    skos:related sso:Expert .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:FlickeringConcept" href="#sso:FlickeringConcept">sso:FlickeringConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:FlickeringConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:FlickeringConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Visual technique using flickering lights to stimulate the brain.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:FlickeringConcept a skos:Concept ;<br>
+    skos:definition &#34;Visual technique using flickering lights to stimulate the brain.&#34; ;<br>
+    skos:prefLabel &#34;Flickering Concept&#34; ;<br>
+    skos:related sso:Flickering .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:GeneralPurposeDeviceConcept" href="#sso:GeneralPurposeDeviceConcept">sso:GeneralPurposeDeviceConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:GeneralPurposeDeviceConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GeneralPurposeDeviceConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Devices like smartphones and laptops that can run software for stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GeneralPurposeDeviceConcept a skos:Concept ;<br>
+    skos:definition &#34;Devices like smartphones and laptops that can run software for stimulation.&#34; ;<br>
+    skos:prefLabel &#34;GeneralPurposeDevice Concept&#34; ;<br>
+    skos:related sso:GeneralPurposeDevice .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:GroupSessionConcept" href="#sso:GroupSessionConcept">sso:GroupSessionConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:GroupSessionConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GroupSessionConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A session involving multiple users undergoing the same stimulation protocol.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GroupSessionConcept a skos:Concept ;<br>
+    skos:definition &#34;A session involving multiple users undergoing the same stimulation protocol.&#34; ;<br>
+    skos:prefLabel &#34;GroupSession Concept&#34; ;<br>
+    skos:related sso:GroupSession .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:GuidingStimulationConcept" href="#sso:GuidingStimulationConcept">sso:GuidingStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:GuidingStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:GuidingStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation guided by rhythms or cycles, such as breathing cycles.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:GuidingStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation guided by rhythms or cycles, such as breathing cycles.&#34; ;<br>
+    skos:prefLabel &#34;GuidingStimulation Concept&#34; ;<br>
+    skos:related sso:GuidingStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:IndividualSessionConcept" href="#sso:IndividualSessionConcept">sso:IndividualSessionConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:IndividualSessionConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:IndividualSessionConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A single-user session of neuromodulation or stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:IndividualSessionConcept a skos:Concept ;<br>
+    skos:definition &#34;A single-user session of neuromodulation or stimulation.&#34; ;<br>
+    skos:prefLabel &#34;IndividualSession Concept&#34; ;<br>
+    skos:related sso:IndividualSession .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:IsochronousSoundsConcept" href="#sso:IsochronousSoundsConcept">sso:IsochronousSoundsConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:IsochronousSoundsConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:IsochronousSoundsConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Sounds with equal intervals, often used for entrainment.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:IsochronousSoundsConcept a skos:Concept ;<br>
+    skos:definition &#34;Sounds with equal intervals, often used for entrainment.&#34; ;<br>
+    skos:prefLabel &#34;IsochronousSounds Concept&#34; ;<br>
+    skos:related sso:IsochronousSounds .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:LanguageConcept" href="#sso:LanguageConcept">sso:LanguageConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:LanguageConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:LanguageConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation involving human language.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:LanguageConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation involving human language.&#34; ;<br>
+    skos:prefLabel &#34;Language Concept&#34; ;<br>
+    skos:related sso:Language .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:MonauralBeatsConcept" href="#sso:MonauralBeatsConcept">sso:MonauralBeatsConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:MonauralBeatsConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:MonauralBeatsConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Single-tone auditory beats used for stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:MonauralBeatsConcept a skos:Concept ;<br>
+    skos:definition &#34;Single-tone auditory beats used for stimulation.&#34; ;<br>
+    skos:prefLabel &#34;MonauralBeats Concept&#34; ;<br>
+    skos:related sso:MonauralBeats .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:NeuromodulationConcept" href="#sso:NeuromodulationConcept">sso:NeuromodulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:NeuromodulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:NeuromodulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques to alter brain activity through various forms of stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:NeuromodulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Techniques to alter brain activity through various forms of stimulation.&#34; ;<br>
+    skos:prefLabel &#34;Neuromodulation Concept&#34; ;<br>
+    skos:related sso:Neuromodulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:SensoryStimulationConcept" href="#sso:SensoryStimulationConcept">sso:SensoryStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:SensoryStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SensoryStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation via sensory inputs such as audio, visual, and tactile cues.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SensoryStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation via sensory inputs such as audio, visual, and tactile cues.&#34; ;<br>
+    skos:prefLabel &#34;SensoryStimulation Concept&#34; ;<br>
+    skos:related sso:SensoryStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:SessionConcept" href="#sso:SessionConcept">sso:SessionConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:SessionConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SessionConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A session instance involving stimulation, either guided or unguided.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SessionConcept a skos:Concept ;<br>
+    skos:definition &#34;A session instance involving stimulation, either guided or unguided.&#34; ;<br>
+    skos:prefLabel &#34;Session Concept&#34; ;<br>
+    skos:related sso:Session .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:SpecialistPersonConcept" href="#sso:SpecialistPersonConcept">sso:SpecialistPersonConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:SpecialistPersonConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SpecialistPersonConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>A human specialist in neuromodulation techniques.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SpecialistPersonConcept a skos:Concept ;<br>
+    skos:definition &#34;A human specialist in neuromodulation techniques.&#34; ;<br>
+    skos:prefLabel &#34;SpecialistPerson Concept&#34; ;<br>
+    skos:related sso:SpecialistPerson .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:SpecializedNeuromodulationDeviceConcept" href="#sso:SpecializedNeuromodulationDeviceConcept">sso:SpecializedNeuromodulationDeviceConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:SpecializedNeuromodulationDeviceConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:SpecializedNeuromodulationDeviceConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Devices specifically built for neuromodulation, like MindAlive devices.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:SpecializedNeuromodulationDeviceConcept a skos:Concept ;<br>
+    skos:definition &#34;Devices specifically built for neuromodulation, like MindAlive devices.&#34; ;<br>
+    skos:prefLabel &#34;SpecializedNeuromodulationDevice Concept&#34; ;<br>
+    skos:related sso:SpecializedNeuromodulationDevice .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:TactileStimulationConcept" href="#sso:TactileStimulationConcept">sso:TactileStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:TactileStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TactileStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation through tactile feedback, using vibrations or touch.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TactileStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation through tactile feedback, using vibrations or touch.&#34; ;<br>
+    skos:prefLabel &#34;TactileStimulation Concept&#34; ;<br>
+    skos:related sso:TactileStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:TechniqueConcept" href="#sso:TechniqueConcept">sso:TechniqueConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:TechniqueConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TechniqueConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques used for neuromodulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TechniqueConcept a skos:Concept ;<br>
+    skos:definition &#34;Techniques used for neuromodulation.&#34; ;<br>
+    skos:prefLabel &#34;Technique Concept&#34; ;<br>
+    skos:related sso:Technique .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:TranscranialMagneticStimulationConcept" href="#sso:TranscranialMagneticStimulationConcept">sso:TranscranialMagneticStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:TranscranialMagneticStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TranscranialMagneticStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Magnetic stimulation applied to the brain non-invasively.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TranscranialMagneticStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Magnetic stimulation applied to the brain non-invasively.&#34; ;<br>
+    skos:prefLabel &#34;TranscranialMagneticStimulation Concept&#34; ;<br>
+    skos:related sso:TranscranialMagneticStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:TranscranialStimulationConcept" href="#sso:TranscranialStimulationConcept">sso:TranscranialStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:TranscranialStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:TranscranialStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Techniques applied directly to the skull or scalp.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:TranscranialStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Techniques applied directly to the skull or scalp.&#34; ;<br>
+    skos:prefLabel &#34;TranscranialStimulation Concept&#34; ;<br>
+    skos:related sso:TranscranialStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:VisualStimulationConcept" href="#sso:VisualStimulationConcept">sso:VisualStimulationConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:VisualStimulationConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:VisualStimulationConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Stimulation using visual signals, including flickering lights and color.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:VisualStimulationConcept a skos:Concept ;<br>
+    skos:definition &#34;Stimulation using visual signals, including flickering lights and color.&#34; ;<br>
+    skos:prefLabel &#34;VisualStimulation Concept&#34; ;<br>
+    skos:related sso:VisualStimulation .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+			<div class="entity-div">
+
+				<h3 class="entity-section">Concept: <a name="sso:VisualTechniquesConcept" href="#sso:VisualTechniquesConcept">sso:VisualTechniquesConcept</a>
+					<small>&nbsp;&nbsp;<a href="#a-z" class="backlink">back to top</a></small>
+				</h3>
+				<hr>
+
+                <div class="tree">
+                    <ul>
+                        
+
+                            <li href="#"><a>skos:Concept</a>
+
+                            <ul>
+                              <li><a style="font-weight: bold;">sso:VisualTechniquesConcept</a>
+
+                              
+                                </li>
+
+                            </ul>
+
+                            </li>
+                        
+
+                    </ul>
+                </div>
+
+
+                
+                <p class="section-desc">
+                    <small>NOTE</small> sso:VisualTechniquesConcept is a leaf node.</p>
+                
+
+				<p class="section-desc"><b>Description</b>
+                    <br>
+                    <p>Visual-based modulation techniques for stimulation.</p>
+                </p>
+
+                
+
+
+                <small class="implementation_title">Implementation:</small>
+				<div class="implementation">
+					<code><p>@prefix skos: &lt;http://www.w3.org/2004/02/skos/core#&gt; .<br>
+@prefix sso: &lt;https://biosyncare.github.io/ont/sso#&gt; .</p>
+
+<p>sso:VisualTechniquesConcept a skos:Concept ;<br>
+    skos:definition &#34;Visual-based modulation techniques for stimulation.&#34; ;<br>
+    skos:prefLabel &#34;VisualTechniques Concept&#34; ;<br>
+    skos:related sso:VisualTechniques .</p>
+
+<p></p></code>
+				</div>
+
+			</div>
+
+			
+
+	
+
+
+
+
+
+
+
+
+	
+
+
+	
+
+
+
+
+
+	<hr>
+	<small>Ontology documentation automatically generated by <a class="greylink"  href="http://lambdamusic.github.io/Ontospy/">Ontospy</a> v2.1.1 on Wed, 05 Nov 2025 17:38:09</small>
+
+
+</body>
+</html>

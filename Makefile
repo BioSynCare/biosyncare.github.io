@@ -74,5 +74,5 @@ rdf-docs-pylode:
 
 rdf-docs-ontospy:
 	mkdir -p rdf/docs/ontospy/bsc rdf/docs/ontospy/sso
-	. $(VENV_RDF)/bin/activate; ontospy gendocs -o rdf/docs/ontospy/bsc rdf/core/bsc-owl.ttl
-	. $(VENV_RDF)/bin/activate; ontospy gendocs -o rdf/docs/ontospy/sso rdf/external/sso/sso-ontology.ttl
+	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/bsc rdf/core/bsc-owl.ttl || true
+	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/sso rdf/external/sso/sso-ontology.ttl || true

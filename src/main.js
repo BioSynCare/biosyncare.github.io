@@ -109,11 +109,14 @@ const EXTENDED_RANGE_STORAGE_KEY = 'biosyncare_extended_ranges';
 
 // Martigli/Breathing Controller - Global shared breathing oscillation
 const martigliController = {
+  DEBUG: true,
   active: false,
   startTime: null,
   endTime: null,
   _startPerfTime: null,
   _perfOffsetMs: null,
+  _phase: 0,
+  _lastPhaseTimestampMs: null,
   waveform: 'sine', // 'sine', 'triangle', 'sawtooth', 'square'
   inhaleRatio: 0.5, // 0.5 = equal inhale/exhale
   trajectory: [
@@ -129,6 +132,24 @@ const martigliController = {
     if (this._perfOffsetMs === null && this._hasPerformance()) {
       this._perfOffsetMs = Date.now() - performance.now();
     }
+  },
+
+  _toMonotonicMs(timeValue) {
+    const hasPerf = this._hasPerformance();
+    if (timeValue === undefined) {
+      return hasPerf ? performance.now() : Date.now();
+    }
+    if (typeof timeValue !== 'number' || Number.isNaN(timeValue)) {
+      return hasPerf ? performance.now() : Date.now();
+    }
+    if (timeValue < 1e12) {
+      // Likely performance-based timestamp
+      return timeValue;
+    }
+    if (hasPerf && this._perfOffsetMs !== null) {
+      return timeValue - this._perfOffsetMs;
+    }
+    return timeValue;
   },
 
   _toWallClockMs(timeValue) {
@@ -180,6 +201,36 @@ const martigliController = {
 
   getElapsedSeconds(timeValue) {
     return this.getElapsedMilliseconds(timeValue) / 1000;
+  },
+
+  _updatePhase(timeReference) {
+    if (!this.active) {
+      return this._phase;
+    }
+
+    const nowMonotonic = this._toMonotonicMs(timeReference);
+    if (this._lastPhaseTimestampMs === null) {
+      this._lastPhaseTimestampMs = nowMonotonic;
+      return this._phase;
+    }
+
+    let deltaMs = nowMonotonic - this._lastPhaseTimestampMs;
+    if (!Number.isFinite(deltaMs) || deltaMs < 0) {
+      deltaMs = 0;
+    }
+
+    const deltaSec = deltaMs / 1000;
+    const elapsedSec = this.getElapsedSeconds(timeReference);
+    const period = Math.max(0.01, this.getCurrentPeriod(elapsedSec));
+    const phaseIncrement = deltaSec / period;
+
+    this._phase = (this._phase + phaseIncrement) % 1;
+    this._lastPhaseTimestampMs = nowMonotonic;
+    return this._phase;
+  },
+
+  getPhase() {
+    return this._phase;
   },
 
   // Calculate current breathing period based on trajectory
@@ -241,9 +292,13 @@ const martigliController = {
       return 0;
     }
 
-    const period = this.getCurrentPeriod(elapsedSec);
-    const safePeriod = Number.isFinite(period) && period > 0 ? period : 1;
-    const cyclePosition = (elapsedSec % safePeriod) / safePeriod; // 0 to 1 over the full period
+    this._updatePhase(timeReference);
+    const period = Math.max(0.01, this.getCurrentPeriod(elapsedSec));
+    let cyclePosition = this._phase;
+    if (elapsedSec >= period) {
+      cyclePosition = (elapsedSec % period) / period;
+      this._phase = cyclePosition;
+    }
 
     // Apply waveform to the full cycle position
     return this.applyWaveform(cyclePosition);
@@ -317,6 +372,8 @@ const martigliController = {
         this._startPerfTime = null;
       }
       this.endTime = durationMs ? this.startTime + durationMs : null;
+      this._phase = 0;
+      this._lastPhaseTimestampMs = this._hasPerformance() ? this._startPerfTime : this.startTime;
     } else {
       // When already active we still refresh time base to avoid drift
       if (this._hasPerformance()) {
@@ -333,6 +390,8 @@ const martigliController = {
     this.startTime = null;
     this.endTime = null;
     this._startPerfTime = null;
+    this._phase = 0;
+    this._lastPhaseTimestampMs = null;
   },
 
   // Reset to default configuration
@@ -353,6 +412,9 @@ const MARTIGLI_STORAGE_KEY = 'biosyncare_martigli_config';
 if (typeof window !== 'undefined') {
   window.martigliController = martigliController;
 }
+
+let martigliLastValueLogTime = 0;
+let martigliLastRenderLogTime = 0;
 
 // --- Identity UI ---
 const authStatusEl = document.getElementById('auth-status');
@@ -883,7 +945,7 @@ const updateMartigliValues = () => {
   const elapsedSec = martigliController.getElapsedSeconds(now);
   const period = martigliController.getCurrentPeriod(elapsedSec);
   const value = martigliController.getValue(now);
-  const cyclePosition = (elapsedSec % period) / period;
+  const cyclePosition = martigliController.getPhase();
 
   martigliCurrentPeriod.textContent = period.toFixed(1);
   martigliCurrentValue.textContent = value.toFixed(3);
@@ -892,6 +954,20 @@ const updateMartigliValues = () => {
     martigliCurrentPhase.textContent = 'Inhale';
   } else {
     martigliCurrentPhase.textContent = 'Exhale';
+  }
+
+  if (martigliController.DEBUG) {
+    const logNow = Date.now();
+    if (!martigliLastValueLogTime || logNow - martigliLastValueLogTime >= 250) {
+      console.log(
+        '[Martigli][Values]',
+        `elapsed=${elapsedSec.toFixed(2)}s`,
+        `period=${period.toFixed(2)}s`,
+        `value=${value.toFixed(3)}`,
+        `cycle=${cyclePosition.toFixed(3)}`
+      );
+      martigliLastValueLogTime = logNow;
+    }
   }
 
   // Update initial/final period displays
@@ -969,7 +1045,7 @@ const renderMartigliVisualization = () => {
     const now = Date.now();
     const elapsedSec = martigliController.getElapsedSeconds(now);
     const period = martigliController.getCurrentPeriod(elapsedSec);
-    const cycleProgress = (elapsedSec % period) / period;
+    const cycleProgress = martigliController.getPhase();
     const currentX = cycleProgress * width;
     const currentValue = martigliController.getValue(now);
     const currentY = centerY - currentValue * (height * 0.4);
@@ -1006,6 +1082,19 @@ const renderMartigliVisualization = () => {
     ctx.font = '10px sans-serif';
     ctx.fillText('Inhale', 10, 15);
     ctx.fillText('Exhale', boundaryX + 10, 15);
+    if (martigliController.DEBUG) {
+      const logNow = Date.now();
+      if (!martigliLastRenderLogTime || logNow - martigliLastRenderLogTime >= 250) {
+        console.log(
+          '[Martigli][Render]',
+          `elapsed=${elapsedSec.toFixed(2)}s`,
+          `period=${period.toFixed(2)}s`,
+          `cycle=${cycleProgress.toFixed(3)}`,
+          `value=${currentValue.toFixed(3)}`
+        );
+        martigliLastRenderLogTime = logNow;
+      }
+    }
   }
 };
 
