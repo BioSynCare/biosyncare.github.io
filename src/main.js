@@ -237,6 +237,11 @@ const martigliController = {
 
 const MARTIGLI_STORAGE_KEY = 'biosyncare_martigli_config';
 
+// Expose martigliController globally for audio engine access
+if (typeof window !== 'undefined') {
+  window.martigliController = martigliController;
+}
+
 // --- Identity UI ---
 const authStatusEl = document.getElementById('auth-status');
 const authIdentityEl = document.getElementById('auth-identity');
@@ -2357,7 +2362,7 @@ const audioPresets = {
         },
         {
           id: 'martigliFrequency',
-          label: 'Martigli/breath frequency',
+          label: 'Martigli frequency (fallback)',
           type: 'range',
           min: 0.02,
           max: 0.6,
@@ -2366,6 +2371,10 @@ const audioPresets = {
           default: 0.1,
           live: true,
           isVisible: (state) => state.panMode === 'martigli',
+          formatValue: (value) => {
+            const usingGlobal = martigliController.active;
+            return usingGlobal ? 'Using global controller' : `${value.toFixed(2)} Hz`;
+          },
         },
         {
           id: 'crossfadeHold',
@@ -2604,7 +2613,7 @@ const audioPresets = {
         },
         {
           id: 'martigliFrequency',
-          label: 'Martigli/breath frequency',
+          label: 'Martigli frequency (fallback)',
           type: 'range',
           min: 0.02,
           max: 0.6,
@@ -2613,6 +2622,10 @@ const audioPresets = {
           default: 0.1,
           live: true,
           isVisible: (state) => state.panMode === 'martigli',
+          formatValue: (value) => {
+            const usingGlobal = martigliController.active;
+            return usingGlobal ? 'Using global controller' : `${value.toFixed(2)} Hz`;
+          },
         },
         {
           id: 'crossfadeHold',

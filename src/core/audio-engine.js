@@ -125,15 +125,32 @@ const createPanAutomation = ({ ctx, mixMode = 'dichotic', leftPanner, rightPanne
           break;
         }
         case 'martigli': {
-          if (config.panDepth <= 0 || config.martigliFrequency <= 0) {
-            clearTimer();
-            applyOrientation(mixMode === 'monaural' ? 0 : -1);
-            break;
+          // Use global martigliController if available, otherwise fall back to config
+          const useGlobalController =
+            typeof window !== 'undefined' &&
+            window.martigliController &&
+            window.martigliController.active;
+
+          if (useGlobalController) {
+            // Use global breathing controller
+            const phaseOffset = mixMode === 'monaural' ? 0 : -Math.PI / 2;
+            startLoop(() => {
+              const value = window.martigliController.getValue();
+              // Apply phase offset for monaural vs binaural
+              return phaseOffset === 0 ? value : Math.sin(Math.asin(value) + phaseOffset);
+            });
+          } else {
+            // Fall back to per-track frequency
+            if (config.panDepth <= 0 || config.martigliFrequency <= 0) {
+              clearTimer();
+              applyOrientation(mixMode === 'monaural' ? 0 : -1);
+              break;
+            }
+            const phaseOffset = mixMode === 'monaural' ? 0 : -Math.PI / 2;
+            startLoop((elapsed) =>
+              Math.sin(TWO_PI * config.martigliFrequency * elapsed + phaseOffset)
+            );
           }
-          const phaseOffset = mixMode === 'monaural' ? 0 : -Math.PI / 2;
-          startLoop((elapsed) =>
-            Math.sin(TWO_PI * config.martigliFrequency * elapsed + phaseOffset)
-          );
           break;
         }
         case 'crossfade': {
