@@ -2514,6 +2514,21 @@ const getStepPrecision = (step = 1) => {
 };
 
 const normalizeParameterValue = (field, rawValue) => {
+  if (!field) return rawValue;
+  if (field.type === 'select') {
+    const options = Array.isArray(field.options) ? field.options : [];
+    const fallback =
+      options.find((option) => option.value === field.default) ?? options[0] ?? null;
+    if (options.length > 0) {
+      const current =
+        options.find((option) => option.value === rawValue) ??
+        options.find((option) => option.value === String(rawValue)) ??
+        fallback;
+      return current ? current.value : fallback?.value ?? '';
+    }
+    return rawValue ?? field.default ?? '';
+  }
+
   let value = Number(rawValue);
   if (!Number.isFinite(value)) {
     value = Number(field.default ?? field.min ?? 0);
@@ -2531,6 +2546,39 @@ const normalizeParameterValue = (field, rawValue) => {
     }
   }
   return Number.isFinite(value) ? value : 0;
+};
+
+const coerceFrequencyParameters = (preset, targetState, mode) => {
+  if (!preset?.params || !targetState) return;
+  const baseField = preset.params.find((field) => field.id === 'base');
+  const beatField = preset.params.find((field) => field.id === 'beat');
+  const leftField = preset.params.find((field) => field.id === 'leftFrequency');
+  const rightField = preset.params.find((field) => field.id === 'rightFrequency');
+  if (!baseField || !beatField || !leftField || !rightField) return;
+
+  const baseValue = normalizeParameterValue(baseField, targetState.base);
+  const beatValue = normalizeParameterValue(beatField, targetState.beat);
+  const leftValue = normalizeParameterValue(leftField, targetState.leftFrequency);
+  const rightValue = normalizeParameterValue(rightField, targetState.rightFrequency);
+
+  if (mode === 'absolute') {
+    const nextLeft = normalizeParameterValue(leftField, baseValue - beatValue / 2);
+    const nextRight = normalizeParameterValue(rightField, baseValue + beatValue / 2);
+    targetState.base = baseValue;
+    targetState.beat = beatValue;
+    targetState.leftFrequency = nextLeft;
+    targetState.rightFrequency = nextRight;
+    return;
+  }
+
+  const averageBase = (leftValue + rightValue) / 2;
+  const difference = Math.abs(rightValue - leftValue);
+  const nextBase = normalizeParameterValue(baseField, averageBase);
+  const nextBeat = normalizeParameterValue(beatField, difference);
+  targetState.base = nextBase;
+  targetState.beat = nextBeat;
+  targetState.leftFrequency = leftValue;
+  targetState.rightFrequency = rightValue;
 };
 
 const formatParameterValue = (field, value) => {
@@ -2739,6 +2787,9 @@ const renderAudioParameterForm = () => {
       context: 'form',
       onInput: (nextValue) => {
         state[field.id] = nextValue;
+        if (field.id === 'frequencyMode') {
+          coerceFrequencyParameters(preset, state, nextValue);
+        }
         if (field.triggersLayout) {
           renderAudioParameterForm();
         } else {
@@ -2894,6 +2945,9 @@ const handleAudioTrackParameterChange = (trackId, field, value, detailElement) =
     ...(track.parameters || {}),
     [field.id]: value,
   };
+  if (field.id === 'frequencyMode') {
+    coerceFrequencyParameters(preset, nextParams, value);
+  }
 
   try {
     const updateOutcome = preset.update({ ...track }, nextParams);
