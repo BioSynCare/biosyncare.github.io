@@ -450,6 +450,10 @@ const martigliCurrentValues = document.getElementById('martigli-current-values')
 const martigliCurrentPeriod = document.getElementById('martigli-current-period');
 const martigliCurrentPhase = document.getElementById('martigli-current-phase');
 const martigliCurrentValue = document.getElementById('martigli-current-value');
+const martigliInitialPeriod = document.getElementById('martigli-initial-period');
+const martigliFinalPeriod = document.getElementById('martigli-final-period');
+const martigliWaveDisplay = document.getElementById('martigli-wave-display');
+const martigliVisualization = document.getElementById('martigli-visualization');
 const myActivityTab = document.getElementById('tab-my-activity');
 const publicActivityTab = document.getElementById('tab-public-activity');
 const refreshActivityBtn = document.getElementById('btn-refresh-activity');
@@ -776,6 +780,129 @@ const updateMartigliValues = () => {
     martigliCurrentPhase.textContent = 'Inhale';
   } else {
     martigliCurrentPhase.textContent = 'Exhale';
+  }
+
+  // Update initial/final period displays
+  if (martigliInitialPeriod && martigliController.trajectory.length > 0) {
+    martigliInitialPeriod.textContent = `${martigliController.trajectory[0].period.toFixed(1)}s`;
+  }
+  if (martigliFinalPeriod && martigliController.trajectory.length > 0) {
+    const lastPoint = martigliController.trajectory[martigliController.trajectory.length - 1];
+    martigliFinalPeriod.textContent = `${lastPoint.period.toFixed(1)}s`;
+  }
+  if (martigliWaveDisplay) {
+    martigliWaveDisplay.textContent = martigliController.waveform.substring(0, 4).toUpperCase();
+  }
+};
+
+// Render Martigli oscillation visualization on canvas
+const renderMartigliVisualization = () => {
+  if (!martigliVisualization) return;
+
+  const canvas = martigliVisualization;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const width = canvas.width;
+  const height = canvas.height;
+  const centerY = height / 2;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, width, height);
+
+  // Draw background grid
+  ctx.strokeStyle = '#e0f2f1';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = (height / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+
+  // Draw center line
+  ctx.strokeStyle = '#b2dfdb';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(0, centerY);
+  ctx.lineTo(width, centerY);
+  ctx.stroke();
+
+  // Draw waveform
+  const points = 200;
+  ctx.strokeStyle = '#00897b';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+
+  for (let i = 0; i <= points; i++) {
+    const progress = i / points;
+    const x = progress * width;
+
+    // Simulate waveform through one cycle
+    let yValue;
+    if (progress < martigliController.inhaleRatio) {
+      // Inhale phase
+      const inhaleProgress = progress / martigliController.inhaleRatio;
+      yValue = martigliController.applyWaveform(inhaleProgress, true);
+    } else {
+      // Exhale phase
+      const exhaleProgress = (progress - martigliController.inhaleRatio) / (1 - martigliController.inhaleRatio);
+      yValue = martigliController.applyWaveform(exhaleProgress, false);
+    }
+
+    const y = centerY - yValue * (height * 0.4);
+
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  }
+  ctx.stroke();
+
+  // Draw current position indicator if active
+  if (martigliController.active && martigliController.startTime) {
+    const now = Date.now();
+    const elapsedSec = (now - martigliController.startTime) / 1000;
+    const period = martigliController.getCurrentPeriod(elapsedSec);
+    const cycleProgress = (elapsedSec % period) / period;
+    const currentX = cycleProgress * width;
+    const currentValue = martigliController.getValue(now);
+    const currentY = centerY - currentValue * (height * 0.4);
+
+    // Draw vertical line at current position
+    ctx.strokeStyle = '#d81b60';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 3]);
+    ctx.beginPath();
+    ctx.moveTo(currentX, 0);
+    ctx.lineTo(currentX, height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Draw current point
+    ctx.fillStyle = '#d81b60';
+    ctx.beginPath();
+    ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Draw inhale/exhale boundary
+    const boundaryX = martigliController.inhaleRatio * width;
+    ctx.strokeStyle = '#9e9e9e';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(boundaryX, 0);
+    ctx.lineTo(boundaryX, height);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Labels
+    ctx.fillStyle = '#546e7a';
+    ctx.font = '10px sans-serif';
+    ctx.fillText('Inhale', 10, 15);
+    ctx.fillText('Exhale', boundaryX + 10, 15);
   }
 };
 
@@ -1912,6 +2039,7 @@ martigliStopBtn?.addEventListener('click', () => {
 martigliWaveformSelect?.addEventListener('change', (event) => {
   martigliController.waveform = event.target.value;
   saveMartigliConfig();
+  renderMartigliVisualization();
 });
 
 martigliInhaleRatioInput?.addEventListener('input', (event) => {
@@ -1921,6 +2049,7 @@ martigliInhaleRatioInput?.addEventListener('input', (event) => {
     martigliInhaleRatioValue.textContent = `${Math.round(value * 100)}%`;
   }
   saveMartigliConfig();
+  renderMartigliVisualization();
 });
 
 btnAddTrajectoryPoint?.addEventListener('click', () => {
@@ -1981,12 +2110,16 @@ renderActivityFeeds();
 renderMartigliTrajectory();
 updateMartigliUI();
 
-// Update Martigli values in real-time
+// Update Martigli values and visualization in real-time
 setInterval(() => {
   if (martigliController.active) {
     updateMartigliValues();
+    renderMartigliVisualization();
   }
 }, 100);
+
+// Initial visualization render
+renderMartigliVisualization();
 
 window.addEventListener('storage', (event) => {
   if (event.key === 'biosyncare_user_profile') {

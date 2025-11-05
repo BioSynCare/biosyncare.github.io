@@ -761,6 +761,130 @@
 
     <main class="max-w-7xl mx-auto px-4 py-8">
       <div id="workspace-stimulation" class="workspace">
+        <!-- Martigli / Breathing Panel - Top Position -->
+        <section class="panel control-panel mb-6" id="martigli-panel">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <h2 class="text-xl font-bold">Martigli / Breathing</h2>
+              <div class="flex items-center gap-2">
+                <div id="martigli-indicator" class="w-2.5 h-2.5 rounded-full bg-gray-400"></div>
+                <span id="martigli-status-text" class="text-xs font-medium text-gray-600">Inactive</span>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button
+                id="btn-martigli-start"
+                class="text-xs px-3 py-1 rounded bg-green-600 text-white hover:bg-green-700 font-medium"
+                type="button"
+              >
+                Start
+              </button>
+              <button
+                id="btn-martigli-stop"
+                class="text-xs px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700 font-medium"
+                type="button"
+                disabled
+              >
+                Stop
+              </button>
+            </div>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-4">
+            <!-- Left: Visualization -->
+            <div class="space-y-3">
+              <div class="bg-gradient-to-br from-teal-50 to-blue-50 rounded-lg border border-teal-200 p-4">
+                <canvas
+                  id="martigli-visualization"
+                  width="400"
+                  height="200"
+                  class="w-full h-auto rounded"
+                  style="max-height: 200px;"
+                ></canvas>
+              </div>
+              <div id="martigli-current-values" class="grid grid-cols-6 gap-2 text-xs hidden">
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Value</div>
+                  <div class="font-bold text-teal-700" id="martigli-current-value">—</div>
+                </div>
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Phase</div>
+                  <div class="font-bold text-teal-700" id="martigli-current-phase">—</div>
+                </div>
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Period</div>
+                  <div class="font-bold text-teal-700"><span id="martigli-current-period">—</span>s</div>
+                </div>
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Initial</div>
+                  <div class="font-bold text-gray-600" id="martigli-initial-period">—</div>
+                </div>
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Final</div>
+                  <div class="font-bold text-gray-600" id="martigli-final-period">—</div>
+                </div>
+                <div class="text-center p-2 bg-white rounded border">
+                  <div class="text-gray-500 mb-1">Wave</div>
+                  <div class="font-bold text-gray-600 text-[0.65rem]" id="martigli-wave-display">—</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Controls -->
+            <div class="space-y-3">
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Waveform
+                  </label>
+                  <select
+                    id="martigli-waveform"
+                    class="w-full rounded border border-gray-300 bg-white px-2 py-1.5 text-xs focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-200"
+                  >
+                    <option value="sine">Sine</option>
+                    <option value="triangle">Triangle</option>
+                    <option value="sawtooth">Sawtooth</option>
+                    <option value="square">Square</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-700 mb-1">
+                    Inhale Ratio
+                    <span id="martigli-inhale-ratio-value" class="text-gray-500 font-normal">50%</span>
+                  </label>
+                  <input
+                    type="range"
+                    id="martigli-inhale-ratio"
+                    min="0.1"
+                    max="0.9"
+                    step="0.05"
+                    value="0.5"
+                    class="w-full h-1.5"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-medium text-gray-700">
+                    Breathing Trajectory
+                  </label>
+                  <button
+                    id="btn-add-trajectory-point"
+                    class="text-[0.65rem] px-2 py-0.5 rounded bg-teal-600 text-white hover:bg-teal-700"
+                    type="button"
+                  >
+                    + Add
+                  </button>
+                </div>
+                <div id="martigli-trajectory-list" class="space-y-1.5 max-h-32 overflow-y-auto">
+                  <!-- Trajectory points will be rendered here -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section class="control-grid">
           <div class="panel control-panel" id="audio-panel">
             <div class="flex items-center justify-between mb-2">
@@ -888,114 +1012,6 @@
                 No visual layers running. Add a cue to illuminate the panel.
               </div>
               <div id="visual-active-list" class="track-list"></div>
-            </div>
-          </div>
-        </section>
-        <section class="panel control-panel" id="martigli-panel">
-          <div class="flex items-center justify-between mb-2">
-            <h2 class="text-2xl font-bold">Martigli / Breathing</h2>
-            <span class="text-[0.65rem] font-semibold uppercase tracking-widest text-teal-500">
-              Global Oscillator
-            </span>
-          </div>
-          <p class="text-gray-600 mb-4">
-            Centralized breathing oscillation for synchronizing audio and visual tracks.
-          </p>
-          <div class="space-y-6">
-            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-200">
-              <div class="flex items-center gap-3">
-                <div id="martigli-indicator" class="w-3 h-3 rounded-full bg-gray-400"></div>
-                <span id="martigli-status-text" class="text-sm font-medium text-gray-700">Inactive</span>
-              </div>
-              <div class="flex gap-2">
-                <button
-                  id="btn-martigli-start"
-                  class="text-xs px-3 py-1.5 rounded bg-green-600 text-white hover:bg-green-700 font-medium"
-                  type="button"
-                >
-                  Start
-                </button>
-                <button
-                  id="btn-martigli-stop"
-                  class="text-xs px-3 py-1.5 rounded bg-red-600 text-white hover:bg-red-700 font-medium"
-                  type="button"
-                  disabled
-                >
-                  Stop
-                </button>
-              </div>
-            </div>
-            <div id="martigli-current-values" class="p-3 bg-blue-50 rounded border border-blue-200 hidden">
-              <div class="grid grid-cols-3 gap-4 text-center text-sm">
-                <div>
-                  <div class="text-xs text-gray-600 mb-1">Period</div>
-                  <div class="font-bold text-blue-700"><span id="martigli-current-period">—</span>s</div>
-                </div>
-                <div>
-                  <div class="text-xs text-gray-600 mb-1">Phase</div>
-                  <div class="font-bold text-blue-700" id="martigli-current-phase">—</div>
-                </div>
-                <div>
-                  <div class="text-xs text-gray-600 mb-1">Value</div>
-                  <div class="font-bold text-blue-700" id="martigli-current-value">—</div>
-                </div>
-              </div>
-            </div>
-            <div class="space-y-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Waveform
-                </label>
-                <select
-                  id="martigli-waveform"
-                  class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring focus:ring-blue-200"
-                >
-                  <option value="sine">Sine (smooth breathing)</option>
-                  <option value="triangle">Triangle (linear)</option>
-                  <option value="sawtooth">Sawtooth (asymmetric)</option>
-                  <option value="square">Square (hold/switch)</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                  Inhale Ratio
-                  <span id="martigli-inhale-ratio-value" class="text-gray-500 font-normal">50%</span>
-                </label>
-                <input
-                  type="range"
-                  id="martigli-inhale-ratio"
-                  min="0.1"
-                  max="0.9"
-                  step="0.05"
-                  value="0.5"
-                  class="w-full"
-                />
-                <div class="flex justify-between text-xs text-gray-500 mt-1">
-                  <span>Short inhale</span>
-                  <span>Equal</span>
-                  <span>Long inhale</span>
-                </div>
-              </div>
-              <div>
-                <div class="flex items-center justify-between mb-2">
-                  <label class="text-sm font-medium text-gray-700">
-                    Breathing Trajectory
-                  </label>
-                  <button
-                    id="btn-add-trajectory-point"
-                    class="text-xs px-2 py-1 rounded bg-blue-600 text-white hover:bg-blue-700"
-                    type="button"
-                  >
-                    + Add Transition
-                  </button>
-                </div>
-                <p class="text-xs text-gray-500 mb-2">
-                  Define breathing period transitions over time.
-                </p>
-                <div id="martigli-trajectory-list" class="space-y-2">
-                  <!-- Trajectory points will be rendered here -->
-                </div>
-              </div>
             </div>
           </div>
         </section>
