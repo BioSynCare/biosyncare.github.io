@@ -145,14 +145,16 @@ const VALID_USAGE_SCOPES = new Set(['session', 'user', 'global']);
 const USAGE_SCOPE_DESCRIPTIONS = {
   session: 'Showing metrics collected in the current neurosensory session only.',
   user: 'Showing lifetime activity for this BioSynCare Lab identity.',
-  global: 'Showing community-wide activity across all public sessions (never less than your own totals).',
+  global:
+    'Showing community-wide activity across all public sessions (never less than your own totals).',
 };
 let activeUsageScope = 'user';
 let communityTotalsCache = { eventsRef: null, totals: null };
 const CHIP_MAX_TRACKS_LISTED = 4;
 
 const setActiveWorkspace = (target) => {
-  if (!workspaceStimulation || !workspaceIdentity || !chipStimulation || !chipIdentity) return;
+  if (!workspaceStimulation || !workspaceIdentity || !chipStimulation || !chipIdentity)
+    return;
   const next =
     target === WORKSPACES.IDENTITY ? WORKSPACES.IDENTITY : WORKSPACES.STIMULATION;
   if (activeWorkspace === next) return;
@@ -170,9 +172,7 @@ const summarizeLabels = (labels, prefix) => {
   if (!labels.length) return '';
   const limited = labels.slice(0, CHIP_MAX_TRACKS_LISTED);
   const remaining = labels.length - limited.length;
-  const items = limited
-    .map((label) => `<li>${prefix} ${label}</li>`)
-    .join('');
+  const items = limited.map((label) => `<li>${prefix} ${label}</li>`).join('');
   const overflow = remaining > 0 ? `<li>… ${remaining} more</li>` : '';
   return items + overflow;
 };
@@ -231,7 +231,9 @@ const updateIdentityHeaderSummary = () => {
   const isSignedIn = Boolean(user) && !isAnonymousUser(user);
   const isAnon = Boolean(user) && isAnonymousUser(user);
   const myEvents = activityState.myEvents || [];
-  const sessionCount = myEvents.filter((event) => event?.eventType === 'session_stop').length;
+  const sessionCount = myEvents.filter(
+    (event) => event?.eventType === 'session_stop'
+  ).length;
   const activityEntries = myEvents.length;
 
   let summaryText = 'Guest session';
@@ -764,8 +766,16 @@ const getUsageTotalsForScope = (scope, snapshot) => {
       totalNeuroMs:
         usageStats.totalNeuroMs + snapshot.activeAudioMs + snapshot.activeVisualMs,
       sessionTimeMs: snapshot.sessionTimeMs,
-      audioDurations: mergeDurationMaps({}, usageStats.audioDurations, snapshot.activeAudio),
-      visualDurations: mergeDurationMaps({}, usageStats.visualDurations, snapshot.activeVisual),
+      audioDurations: mergeDurationMaps(
+        {},
+        usageStats.audioDurations,
+        snapshot.activeAudio
+      ),
+      visualDurations: mergeDurationMaps(
+        {},
+        usageStats.visualDurations,
+        snapshot.activeVisual
+      ),
     };
   }
 
@@ -838,9 +848,13 @@ const updateUsageView = () => {
   }
 
   const audioEmptyMessage =
-    activeUsageScope === 'global' ? 'No public audio activity yet.' : 'No audio tracks yet.';
+    activeUsageScope === 'global'
+      ? 'No public audio activity yet.'
+      : 'No audio tracks yet.';
   const visualEmptyMessage =
-    activeUsageScope === 'global' ? 'No public visual activity yet.' : 'No visual cues yet.';
+    activeUsageScope === 'global'
+      ? 'No public visual activity yet.'
+      : 'No visual cues yet.';
 
   updateDurationList(statAudioDurationList, totals.audioDurations, audioEmptyMessage);
   updateDurationList(statVisualDurationList, totals.visualDurations, visualEmptyMessage);
@@ -1663,7 +1677,9 @@ const audioPresets = {
         formatValue: (value) => {
           if (!Number.isFinite(value)) return '0';
           if (Math.abs(value) < 0.01) return 'Center';
-          return value > 0 ? `Right ${value.toFixed(2)}` : `Left ${Math.abs(value).toFixed(2)}`;
+          return value > 0
+            ? `Right ${value.toFixed(2)}`
+            : `Left ${Math.abs(value).toFixed(2)}`;
         },
       },
     ],
@@ -1790,14 +1806,12 @@ const audioPresets = {
         default: 'static',
         triggersLayout: true,
         formatValue: (value) =>
-          (
-            {
-              static: 'Static channels',
-              lfo: 'Oscillating sine',
-              martigli: 'Sync with Martigli',
-              crossfade: 'Timed crossfade',
-            }[value] || value
-          ),
+          ({
+            static: 'Static channels',
+            lfo: 'Oscillating sine',
+            martigli: 'Sync with Martigli',
+            crossfade: 'Timed crossfade',
+          })[value] || value,
       },
       {
         id: 'panDepth',
@@ -1953,7 +1967,8 @@ const audioPresets = {
   },
   monaural: {
     label: 'Monaural beat • Theta 6Hz',
-    description: 'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
+    description:
+      'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
     params: [
       {
         id: 'frequencyMode',
@@ -2029,14 +2044,12 @@ const audioPresets = {
         default: 'static',
         triggersLayout: true,
         formatValue: (value) =>
-          (
-            {
-              static: 'Static mix',
-              lfo: 'Oscillating sine',
-              martigli: 'Sync with Martigli',
-              crossfade: 'Timed crossfade',
-            }[value] || value
-          ),
+          ({
+            static: 'Static mix',
+            lfo: 'Oscillating sine',
+            martigli: 'Sync with Martigli',
+            crossfade: 'Timed crossfade',
+          })[value] || value,
       },
       {
         id: 'panDepth',
@@ -2260,11 +2273,13 @@ const audioPresets = {
         },
       };
     },
-    describe: (params = {}) => `${Math.round(params.freq ?? 180)} Hz • ${Number(params.pulseFreq ?? 12).toFixed(1)} Hz`,
+    describe: (params = {}) =>
+      `${Math.round(params.freq ?? 180)} Hz • ${Number(params.pulseFreq ?? 12).toFixed(1)} Hz`,
   },
   martigli: {
     label: 'Martigli harmonics',
-    description: 'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
+    description:
+      'Layered harmonic ratios inspired by Martigli sequences for rich texture.',
     params: [
       {
         id: 'fundamental',
@@ -2497,7 +2512,6 @@ const audioPresets = {
   },
 };
 
-
 const audioParameterState = new Map();
 let audioParameterPreviewEl = null;
 
@@ -2524,7 +2538,7 @@ const normalizeParameterValue = (field, rawValue) => {
         options.find((option) => option.value === rawValue) ??
         options.find((option) => option.value === String(rawValue)) ??
         fallback;
-      return current ? current.value : fallback?.value ?? '';
+      return current ? current.value : (fallback?.value ?? '');
     }
     return rawValue ?? field.default ?? '';
   }
@@ -2635,7 +2649,8 @@ const createParameterControl = (field, value, { context = 'form', onInput } = {}
   inputs.className = context === 'track' ? 'track-parameter-inputs' : 'parameter-inputs';
 
   const valueDisplay = document.createElement('span');
-  valueDisplay.className = context === 'track' ? 'track-parameter-value' : 'parameter-value';
+  valueDisplay.className =
+    context === 'track' ? 'track-parameter-value' : 'parameter-value';
 
   const inputId = `${context}-param-${field.id}-${Math.random().toString(36).slice(2, 8)}`;
   label.htmlFor = inputId;
@@ -2680,7 +2695,8 @@ const createParameterControl = (field, value, { context = 'form', onInput } = {}
 
       numberInput = document.createElement('input');
       numberInput.type = 'number';
-      numberInput.className = context === 'track' ? 'track-parameter-number' : 'parameter-number';
+      numberInput.className =
+        context === 'track' ? 'track-parameter-number' : 'parameter-number';
       if (field.min !== undefined) numberInput.min = field.min;
       if (field.max !== undefined) numberInput.max = field.max;
       if (field.step !== undefined) numberInput.step = field.step;
@@ -2697,7 +2713,8 @@ const createParameterControl = (field, value, { context = 'form', onInput } = {}
     case 'select': {
       const select = document.createElement('select');
       select.id = inputId;
-      select.className = context === 'track' ? 'track-parameter-select' : 'parameter-select';
+      select.className =
+        context === 'track' ? 'track-parameter-select' : 'parameter-select';
       (field.options || []).forEach((option) => {
         const opt = document.createElement('option');
         opt.value = option.value;
