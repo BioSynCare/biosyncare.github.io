@@ -43,7 +43,7 @@ export function isMobile() {
   );
 }
 
-export async function hasGoodGPU() {
+export function hasGoodGPU() {
   try {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
@@ -71,12 +71,12 @@ export async function hasGoodGPU() {
     const renderTime = performance.now() - startTime;
 
     return renderTime < 16;
-  } catch (e) {
+  } catch {
     return false;
   }
 }
 
-export async function getGPUScore() {
+export function getGPUScore() {
   try {
     const canvas = document.createElement('canvas');
     const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
@@ -150,7 +150,7 @@ export async function getGPUScore() {
       score: Math.min(100, Math.max(0, finalScore)),
       details: `Render: ${renderTime.toFixed(1)}ms, Texture: ${textureTime.toFixed(1)}ms`,
     };
-  } catch (e) {
+  } catch {
     return { score: 0, details: 'Erro na detecção' };
   }
 }
@@ -185,12 +185,12 @@ export function getRAMInfo() {
         details: `~${estimatedRAM.available} MB (estimado)`,
       };
     }
-  } catch (e) {
+  } catch {
     return { availablePercent: 50, details: 'Não disponível' };
   }
 }
 
-export async function getRefreshRate() {
+export function getRefreshRate() {
   return new Promise((resolve) => {
     const startTime = performance.now();
     let frameCount = 0;
@@ -373,14 +373,14 @@ export async function getAudioInfo() {
           outputs: audioOutputs.map((d) => d.label || 'Unnamed output'),
         };
       }
-    } catch (e) {
-      info.deviceEnumError = e.message;
+    } catch (error) {
+      info.deviceEnumError = error.message;
     }
 
     ctx.close();
     return info;
-  } catch (e) {
-    return { supported: false, error: e.message };
+  } catch (error) {
+    return { supported: false, error: error.message };
   }
 }
 
@@ -497,7 +497,7 @@ export async function getBatteryInfo() {
           battery.dischargingTime === Infinity ? 'N/A' : battery.dischargingTime,
       };
     }
-  } catch (e) {
+  } catch {
     // Battery API not supported
   }
   return { supported: false };
@@ -806,8 +806,8 @@ export async function gatherDiagnostics() {
       gpuDetails.maxRenderbufferSize = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
       gpuDetails.maxVertexAttribs = gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
     }
-  } catch (e) {
-    gpuDetails.error = e.message;
+  } catch (error) {
+    gpuDetails.error = error.message;
   }
 
   return {

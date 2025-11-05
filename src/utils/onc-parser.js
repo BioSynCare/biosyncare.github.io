@@ -50,11 +50,9 @@ export class ONCParser {
   /**
    * Simple TTL parser (basic implementation)
    * For production, consider using a library like rdflib.js or N3.js
-   */
+  */
   _parse() {
     const lines = this.raw.split('\n');
-    const currentSubject = null;
-    const currentPredicate = null;
 
     for (let line of lines) {
       line = line.trim();

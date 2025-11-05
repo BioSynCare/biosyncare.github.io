@@ -34,7 +34,6 @@ const FIREBASE_AUTH_URL = `${FIREBASE_BASE_URL}/firebase-auth.js`;
 // Lazy loaded Firebase singletons
 let firebaseApp = null;
 let firestore = null;
-let analytics = null;
 let auth = null;
 
 // Cached module references so we do not re-import on every call
@@ -61,7 +60,7 @@ async function initFirebase() {
   firestore = firestoreModule.getFirestore(firebaseApp);
 
   try {
-    analytics = analyticsImport.getAnalytics(firebaseApp);
+    analyticsImport.getAnalytics(firebaseApp);
   } catch (error) {
     console.info('[Firebase] Analytics unavailable in this environment:', error);
   }
@@ -271,14 +270,14 @@ export function isAnonymousUser(user) {
 /**
  * Google sign-in (popup)
  */
-export async function signInWithGoogle(options = {}) {
+export function signInWithGoogle(options = {}) {
   return authenticateWithProvider('google', options);
 }
 
 /**
  * GitHub sign-in (popup)
  */
-export async function signInWithGitHub(options = {}) {
+export function signInWithGitHub(options = {}) {
   return authenticateWithProvider('github', options);
 }
 

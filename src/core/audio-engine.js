@@ -43,7 +43,7 @@ export class AudioEngine {
    * Initialize Web Audio Context
    * Call this on user interaction (autoplay policy)
    */
-  async init() {
+  init() {
     if (this.initialized) return;
 
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -280,14 +280,14 @@ export class AudioEngine {
         if (typeof osc.stop === 'function') {
           osc.stop();
         }
-      } catch (e) {
+      } catch {
         // noop - oscillator might already be stopped
       }
       try {
         if (typeof osc.disconnect === 'function') {
           osc.disconnect();
         }
-      } catch (e) {
+      } catch {
         // noop - node might already be disconnected
       }
     };
@@ -298,7 +298,7 @@ export class AudioEngine {
         if (typeof audioNode.disconnect === 'function') {
           audioNode.disconnect();
         }
-      } catch (e) {
+      } catch {
         // noop
       }
     };
@@ -334,7 +334,7 @@ export class AudioEngine {
       if (Array.isArray(node.gainNodes)) {
         node.gainNodes.forEach(safeDisconnect);
       }
-    } catch (e) {
+    } catch {
       // Already stopped
     }
 
@@ -728,7 +728,7 @@ export class AudioEngine {
     lfoGain.gain.value = 0.5; // Modulation depth
 
     const carrierGain = this.ctx.createGain();
-    carrierGain.gain.value = gain;
+    carrierGain.gain.value = 0;
 
     lfo.connect(lfoGain);
     lfoGain.connect(carrierGain.gain);
@@ -737,6 +737,9 @@ export class AudioEngine {
     carrierGain.connect(this.masterGain);
 
     const now = this.ctx.currentTime;
+    carrierGain.gain.setValueAtTime(0, now);
+    carrierGain.gain.linearRampToValueAtTime(gain, now + fadeIn);
+
     osc.start(now);
     lfo.start(now);
 
@@ -753,6 +756,8 @@ export class AudioEngine {
 
     if (duration !== null) {
       const stopTime = now + duration;
+      carrierGain.gain.setValueAtTime(gain, stopTime - fadeOut);
+      carrierGain.gain.linearRampToValueAtTime(0, stopTime);
       osc.stop(stopTime);
       lfo.stop(stopTime);
 

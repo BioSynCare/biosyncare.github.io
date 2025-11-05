@@ -9,7 +9,7 @@ const audioEngines = {
     description: 'Native Web Audio implementation',
     category: 'native',
     available: () => typeof AudioContext !== 'undefined',
-    async create() {
+    create() {
       return new AudioEngine();
     },
   },
@@ -149,7 +149,7 @@ export function getHapticEngineOptions() {
   }));
 }
 
-export async function createAudioEngine(selection = getEngineSelection()) {
+export function createAudioEngine(selection = getEngineSelection()) {
   const key = selection.audio;
   const provider = audioEngines[key] || audioEngines.webaudio;
   if (!provider.available()) {
