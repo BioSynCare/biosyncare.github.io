@@ -97,6 +97,16 @@ let audioEngineInitPromise = null;
 const userSettings = getDefaultPrivacySettings();
 const SETTINGS_STORAGE_BASE_KEY = 'biosyncare_user_settings';
 
+// Extended range settings - separate from privacy settings
+const extendedRangeSettings = {
+  allowExtendedBeatFreq: false,
+  allowExtendedCarrierFreq: false,
+  allowExtendedLRFreq: false,
+  allowExtendedPanFreq: false,
+  allowExtendedCrossfade: false,
+};
+const EXTENDED_RANGE_STORAGE_KEY = 'biosyncare_extended_ranges';
+
 // --- Identity UI ---
 const authStatusEl = document.getElementById('auth-status');
 const authIdentityEl = document.getElementById('auth-identity');
@@ -287,6 +297,11 @@ const includeCommunityToggle = document.getElementById('toggle-include-community
 const toggleCollectWrapper = document.getElementById('toggle-collect-wrapper');
 const toggleShareWrapper = document.getElementById('toggle-share-wrapper');
 const toggleCommunityWrapper = document.getElementById('toggle-community-wrapper');
+const extendedBeatFreqToggle = document.getElementById('toggle-extended-beat-freq');
+const extendedCarrierFreqToggle = document.getElementById('toggle-extended-carrier-freq');
+const extendedLRFreqToggle = document.getElementById('toggle-extended-lr-freq');
+const extendedPanFreqToggle = document.getElementById('toggle-extended-pan-freq');
+const extendedCrossfadeToggle = document.getElementById('toggle-extended-crossfade');
 const myActivityTab = document.getElementById('tab-my-activity');
 const publicActivityTab = document.getElementById('tab-public-activity');
 const refreshActivityBtn = document.getElementById('btn-refresh-activity');
@@ -438,6 +453,108 @@ const saveSettingsToLocal = (uid, settings) => {
   }
 };
 
+const loadExtendedRangeSettings = () => {
+  try {
+    const raw = localStorage.getItem(EXTENDED_RANGE_STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === 'object') {
+      Object.assign(extendedRangeSettings, parsed);
+    }
+  } catch (error) {
+    console.warn('[Settings] Failed to parse extended range settings', error);
+  }
+};
+
+const saveExtendedRangeSettings = () => {
+  try {
+    const payload = JSON.stringify(extendedRangeSettings);
+    localStorage.setItem(EXTENDED_RANGE_STORAGE_KEY, payload);
+  } catch (error) {
+    console.warn('[Settings] Failed to save extended range settings', error);
+  }
+};
+
+// Helper to get params from preset (handles both function and array forms)
+const getPresetParams = (preset) => {
+  if (!preset) return [];
+  const params = preset.params;
+  return typeof params === 'function' ? params() : params || [];
+};
+
+// Helper functions to get parameter ranges based on extended settings
+const getBeatFreqRange = () => ({
+  min: 0.5,
+  max: extendedRangeSettings.allowExtendedBeatFreq ? 200 : 40,
+});
+
+const getCarrierFreqRange = () => ({
+  min: extendedRangeSettings.allowExtendedCarrierFreq ? 20 : 60,
+  max: extendedRangeSettings.allowExtendedCarrierFreq ? 4000 : 1200,
+});
+
+const getLRFreqRange = () => ({
+  min: extendedRangeSettings.allowExtendedLRFreq ? 20 : 60,
+  max: extendedRangeSettings.allowExtendedLRFreq ? 8000 : 2000,
+});
+
+const getPanFreqRange = () => ({
+  min: extendedRangeSettings.allowExtendedPanFreq ? 0.001 : 0.01,
+  max: extendedRangeSettings.allowExtendedPanFreq ? 20 : 5,
+});
+
+const getCrossfadeHoldRange = () => ({
+  min: 1,
+  max: extendedRangeSettings.allowExtendedCrossfade ? 3600 : 300,
+});
+
+const getCrossfadeDurationRange = () => ({
+  min: 0.5,
+  max: extendedRangeSettings.allowExtendedCrossfade ? 600 : 60,
+});
+
+// Function to update range inputs in active track controls when extended settings change
+const updateActiveTrackRanges = () => {
+  // Find all range inputs in the track controls and update their min/max attributes
+  const trackControls = document.querySelectorAll('.track-controls');
+  trackControls.forEach((control) => {
+    const rangeInputs = control.querySelectorAll('input[type="range"]');
+    rangeInputs.forEach((input) => {
+      const paramId = input.dataset.paramId;
+      if (!paramId) return;
+
+      let range = null;
+      if (paramId === 'beat') {
+        range = getBeatFreqRange();
+      } else if (paramId === 'base') {
+        range = getCarrierFreqRange();
+      } else if (paramId === 'leftFrequency' || paramId === 'rightFrequency') {
+        range = getLRFreqRange();
+      } else if (paramId === 'panFrequency') {
+        range = getPanFreqRange();
+      } else if (paramId === 'crossfadeHold') {
+        range = getCrossfadeHoldRange();
+      } else if (paramId === 'crossfadeDuration') {
+        range = getCrossfadeDurationRange();
+      }
+
+      if (range) {
+        input.min = range.min;
+        input.max = range.max;
+        // Clamp current value if it's outside new range
+        const currentValue = parseFloat(input.value);
+        if (currentValue < range.min) {
+          input.value = range.min;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        } else if (currentValue > range.max) {
+          input.value = range.max;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      }
+    });
+  });
+};
+
 const applySettingsToUI = () => {
   if (collectDataToggle) {
     collectDataToggle.checked = Boolean(userSettings.collectData);
@@ -458,6 +575,24 @@ const applySettingsToUI = () => {
     toggleCommunityWrapper?.classList.toggle('disabled', includeCommunityToggle.disabled);
   }
   toggleCollectWrapper?.classList.toggle('disabled', false);
+
+  // Apply extended range settings to UI
+  if (extendedBeatFreqToggle) {
+    extendedBeatFreqToggle.checked = Boolean(extendedRangeSettings.allowExtendedBeatFreq);
+  }
+  if (extendedCarrierFreqToggle) {
+    extendedCarrierFreqToggle.checked = Boolean(extendedRangeSettings.allowExtendedCarrierFreq);
+  }
+  if (extendedLRFreqToggle) {
+    extendedLRFreqToggle.checked = Boolean(extendedRangeSettings.allowExtendedLRFreq);
+  }
+  if (extendedPanFreqToggle) {
+    extendedPanFreqToggle.checked = Boolean(extendedRangeSettings.allowExtendedPanFreq);
+  }
+  if (extendedCrossfadeToggle) {
+    extendedCrossfadeToggle.checked = Boolean(extendedRangeSettings.allowExtendedCrossfade);
+  }
+
   updatePublicNote();
 };
 
@@ -1428,6 +1563,36 @@ includeCommunityToggle?.addEventListener('change', (event) => {
   });
 });
 
+extendedBeatFreqToggle?.addEventListener('change', (event) => {
+  extendedRangeSettings.allowExtendedBeatFreq = Boolean(event.target.checked);
+  saveExtendedRangeSettings();
+  updateActiveTrackRanges();
+});
+
+extendedCarrierFreqToggle?.addEventListener('change', (event) => {
+  extendedRangeSettings.allowExtendedCarrierFreq = Boolean(event.target.checked);
+  saveExtendedRangeSettings();
+  updateActiveTrackRanges();
+});
+
+extendedLRFreqToggle?.addEventListener('change', (event) => {
+  extendedRangeSettings.allowExtendedLRFreq = Boolean(event.target.checked);
+  saveExtendedRangeSettings();
+  updateActiveTrackRanges();
+});
+
+extendedPanFreqToggle?.addEventListener('change', (event) => {
+  extendedRangeSettings.allowExtendedPanFreq = Boolean(event.target.checked);
+  saveExtendedRangeSettings();
+  updateActiveTrackRanges();
+});
+
+extendedCrossfadeToggle?.addEventListener('change', (event) => {
+  extendedRangeSettings.allowExtendedCrossfade = Boolean(event.target.checked);
+  saveExtendedRangeSettings();
+  updateActiveTrackRanges();
+});
+
 audioEngineSelect?.addEventListener('change', async (event) => {
   const value = event.target.value;
   setEngineSelection({ audio: value });
@@ -1465,6 +1630,7 @@ refreshActivityBtn?.addEventListener('click', () => {
 });
 
 // Initial render after functions are defined
+loadExtendedRangeSettings();
 initDiagnostics();
 populateEngineSelects();
 updateProfileSummary();
@@ -1731,168 +1897,177 @@ const audioPresets = {
   binaural: {
     label: 'Binaural beat • Alpha 10Hz',
     description: 'Stereo carriers offset by 10Hz promote relaxed alpha entrainment.',
-    params: [
-      {
-        id: 'frequencyMode',
-        label: 'Frequency control',
-        type: 'select',
-        options: [
-          { value: 'carrier-beat', label: 'Carrier & beat' },
-          { value: 'absolute', label: 'Explicit L/R' },
-        ],
-        default: 'carrier-beat',
-        triggersLayout: true,
-        formatValue: (value) =>
-          value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
-      },
-      {
-        id: 'base',
-        label: 'Carrier frequency',
-        type: 'range',
-        min: 60,
-        max: 1200,
-        step: 1,
-        unit: 'Hz',
-        default: 200,
-        live: true,
-        isVisible: (state) => state.frequencyMode !== 'absolute',
-      },
-      {
-        id: 'beat',
-        label: 'Beat frequency',
-        type: 'range',
-        min: 0.5,
-        max: 40,
-        step: 0.1,
-        unit: 'Hz',
-        default: 10,
-        live: true,
-        isVisible: (state) => state.frequencyMode !== 'absolute',
-      },
-      {
-        id: 'leftFrequency',
-        label: 'Left component',
-        type: 'range',
-        min: 60,
-        max: 2000,
-        step: 1,
-        unit: 'Hz',
-        default: 195,
-        live: true,
-        isVisible: (state) => state.frequencyMode === 'absolute',
-      },
-      {
-        id: 'rightFrequency',
-        label: 'Right component',
-        type: 'range',
-        min: 60,
-        max: 2000,
-        step: 1,
-        unit: 'Hz',
-        default: 205,
-        live: true,
-        isVisible: (state) => state.frequencyMode === 'absolute',
-      },
-      {
-        id: 'panMode',
-        label: 'Panning pattern',
-        type: 'select',
-        options: [
-          { value: 'static', label: 'Static channels' },
-          { value: 'lfo', label: 'Oscillating sine' },
-          { value: 'martigli', label: 'Sync with Martigli' },
-          { value: 'crossfade', label: 'Timed crossfade' },
-        ],
-        default: 'static',
-        triggersLayout: true,
-        formatValue: (value) =>
-          ({
-            static: 'Static channels',
-            lfo: 'Oscillating sine',
-            martigli: 'Sync with Martigli',
-            crossfade: 'Timed crossfade',
-          })[value] || value,
-      },
-      {
-        id: 'panDepth',
-        label: 'Pan depth',
-        type: 'range',
-        min: 0,
-        max: 1,
-        step: 0.01,
-        default: 1,
-        live: true,
-        isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
-      },
-      {
-        id: 'panFrequency',
-        label: 'Pan frequency',
-        type: 'range',
-        min: 0.01,
-        max: 5,
-        step: 0.01,
-        unit: 'Hz',
-        default: 0.2,
-        live: true,
-        isVisible: (state) => state.panMode === 'lfo',
-      },
-      {
-        id: 'martigliFrequency',
-        label: 'Martigli/breath frequency',
-        type: 'range',
-        min: 0.02,
-        max: 0.6,
-        step: 0.01,
-        unit: 'Hz',
-        default: 0.1,
-        live: true,
-        isVisible: (state) => state.panMode === 'martigli',
-      },
-      {
-        id: 'crossfadeHold',
-        label: 'Hold duration',
-        type: 'range',
-        min: 1,
-        max: 300,
-        step: 1,
-        unit: 's',
-        default: 120,
-        live: false,
-        isVisible: (state) => state.panMode === 'crossfade',
-      },
-      {
-        id: 'crossfadeDuration',
-        label: 'Crossfade time',
-        type: 'range',
-        min: 0.5,
-        max: 60,
-        step: 0.5,
-        unit: 's',
-        default: 20,
-        live: false,
-        isVisible: (state) => state.panMode === 'crossfade',
-      },
-      {
-        id: 'panBaseOffset',
-        label: 'Pan offset',
-        type: 'range',
-        min: -0.8,
-        max: 0.8,
-        step: 0.01,
-        default: 0,
-        live: true,
-      },
-      {
-        id: 'gain',
-        label: 'Gain',
-        type: 'range',
-        min: 0,
-        max: 1,
-        step: 0.01,
-        default: 0.25,
-        live: true,
-      },
-    ],
+    params: () => {
+      const carrierRange = getCarrierFreqRange();
+      const beatRange = getBeatFreqRange();
+      const lrRange = getLRFreqRange();
+      const panRange = getPanFreqRange();
+      const crossfadeHoldRange = getCrossfadeHoldRange();
+      const crossfadeDurRange = getCrossfadeDurationRange();
+
+      return [
+        {
+          id: 'frequencyMode',
+          label: 'Frequency control',
+          type: 'select',
+          options: [
+            { value: 'carrier-beat', label: 'Carrier & beat' },
+            { value: 'absolute', label: 'Explicit L/R' },
+          ],
+          default: 'carrier-beat',
+          triggersLayout: true,
+          formatValue: (value) =>
+            value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
+        },
+        {
+          id: 'base',
+          label: 'Carrier frequency',
+          type: 'range',
+          min: carrierRange.min,
+          max: carrierRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 200,
+          live: true,
+          isVisible: (state) => state.frequencyMode !== 'absolute',
+        },
+        {
+          id: 'beat',
+          label: 'Beat frequency',
+          type: 'range',
+          min: beatRange.min,
+          max: beatRange.max,
+          step: 0.1,
+          unit: 'Hz',
+          default: 10,
+          live: true,
+          isVisible: (state) => state.frequencyMode !== 'absolute',
+        },
+        {
+          id: 'leftFrequency',
+          label: 'Left component',
+          type: 'range',
+          min: lrRange.min,
+          max: lrRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 195,
+          live: true,
+          isVisible: (state) => state.frequencyMode === 'absolute',
+        },
+        {
+          id: 'rightFrequency',
+          label: 'Right component',
+          type: 'range',
+          min: lrRange.min,
+          max: lrRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 205,
+          live: true,
+          isVisible: (state) => state.frequencyMode === 'absolute',
+        },
+        {
+          id: 'panMode',
+          label: 'Panning pattern',
+          type: 'select',
+          options: [
+            { value: 'static', label: 'Static channels' },
+            { value: 'lfo', label: 'Oscillating sine' },
+            { value: 'martigli', label: 'Sync with Martigli' },
+            { value: 'crossfade', label: 'Timed crossfade' },
+          ],
+          default: 'static',
+          triggersLayout: true,
+          formatValue: (value) =>
+            ({
+              static: 'Static channels',
+              lfo: 'Oscillating sine',
+              martigli: 'Sync with Martigli',
+              crossfade: 'Timed crossfade',
+            })[value] || value,
+        },
+        {
+          id: 'panDepth',
+          label: 'Pan depth',
+          type: 'range',
+          min: 0,
+          max: 1,
+          step: 0.01,
+          default: 1,
+          live: true,
+          isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
+        },
+        {
+          id: 'panFrequency',
+          label: 'Pan frequency',
+          type: 'range',
+          min: panRange.min,
+          max: panRange.max,
+          step: 0.01,
+          unit: 'Hz',
+          default: 0.2,
+          live: true,
+          isVisible: (state) => state.panMode === 'lfo',
+        },
+        {
+          id: 'martigliFrequency',
+          label: 'Martigli/breath frequency',
+          type: 'range',
+          min: 0.02,
+          max: 0.6,
+          step: 0.01,
+          unit: 'Hz',
+          default: 0.1,
+          live: true,
+          isVisible: (state) => state.panMode === 'martigli',
+        },
+        {
+          id: 'crossfadeHold',
+          label: 'Hold duration',
+          type: 'range',
+          min: crossfadeHoldRange.min,
+          max: crossfadeHoldRange.max,
+          step: 1,
+          unit: 's',
+          default: 120,
+          live: false,
+          isVisible: (state) => state.panMode === 'crossfade',
+        },
+        {
+          id: 'crossfadeDuration',
+          label: 'Crossfade time',
+          type: 'range',
+          min: crossfadeDurRange.min,
+          max: crossfadeDurRange.max,
+          step: 0.5,
+          unit: 's',
+          default: 20,
+          live: false,
+          isVisible: (state) => state.panMode === 'crossfade',
+        },
+        {
+          id: 'panBaseOffset',
+          label: 'Pan offset',
+          type: 'range',
+          min: -0.8,
+          max: 0.8,
+          step: 0.01,
+          default: 0,
+          live: true,
+        },
+        {
+          id: 'gain',
+          label: 'Gain',
+          type: 'range',
+          min: 0,
+          max: 1,
+          step: 0.01,
+          default: 0.25,
+          live: true,
+        },
+      ];
+    },
     start(params = {}) {
       const values = { ...params };
       const nodeId = audioEngine.playBinaural({
@@ -1969,168 +2144,177 @@ const audioPresets = {
     label: 'Monaural beat • Theta 6Hz',
     description:
       'Summed dual-tone beat for headphones or speakers, aimed at theta relaxation.',
-    params: [
-      {
-        id: 'frequencyMode',
-        label: 'Frequency control',
-        type: 'select',
-        options: [
-          { value: 'carrier-beat', label: 'Carrier & beat' },
-          { value: 'absolute', label: 'Explicit L/R' },
-        ],
-        default: 'carrier-beat',
-        triggersLayout: true,
-        formatValue: (value) =>
-          value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
-      },
-      {
-        id: 'base',
-        label: 'Carrier frequency',
-        type: 'range',
-        min: 60,
-        max: 1200,
-        step: 1,
-        unit: 'Hz',
-        default: 210,
-        live: true,
-        isVisible: (state) => state.frequencyMode !== 'absolute',
-      },
-      {
-        id: 'beat',
-        label: 'Beat frequency',
-        type: 'range',
-        min: 0.5,
-        max: 40,
-        step: 0.1,
-        unit: 'Hz',
-        default: 6,
-        live: true,
-        isVisible: (state) => state.frequencyMode !== 'absolute',
-      },
-      {
-        id: 'leftFrequency',
-        label: 'Left component',
-        type: 'range',
-        min: 60,
-        max: 2000,
-        step: 1,
-        unit: 'Hz',
-        default: 207,
-        live: true,
-        isVisible: (state) => state.frequencyMode === 'absolute',
-      },
-      {
-        id: 'rightFrequency',
-        label: 'Right component',
-        type: 'range',
-        min: 60,
-        max: 2000,
-        step: 1,
-        unit: 'Hz',
-        default: 213,
-        live: true,
-        isVisible: (state) => state.frequencyMode === 'absolute',
-      },
-      {
-        id: 'panMode',
-        label: 'Panning pattern',
-        type: 'select',
-        options: [
-          { value: 'static', label: 'Static mix' },
-          { value: 'lfo', label: 'Oscillating sine' },
-          { value: 'martigli', label: 'Sync with Martigli' },
-          { value: 'crossfade', label: 'Timed crossfade' },
-        ],
-        default: 'static',
-        triggersLayout: true,
-        formatValue: (value) =>
-          ({
-            static: 'Static mix',
-            lfo: 'Oscillating sine',
-            martigli: 'Sync with Martigli',
-            crossfade: 'Timed crossfade',
-          })[value] || value,
-      },
-      {
-        id: 'panDepth',
-        label: 'Pan depth',
-        type: 'range',
-        min: 0,
-        max: 1,
-        step: 0.01,
-        default: 0.6,
-        live: true,
-        isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
-      },
-      {
-        id: 'panFrequency',
-        label: 'Pan frequency',
-        type: 'range',
-        min: 0.01,
-        max: 5,
-        step: 0.01,
-        unit: 'Hz',
-        default: 0.2,
-        live: true,
-        isVisible: (state) => state.panMode === 'lfo',
-      },
-      {
-        id: 'martigliFrequency',
-        label: 'Martigli/breath frequency',
-        type: 'range',
-        min: 0.02,
-        max: 0.6,
-        step: 0.01,
-        unit: 'Hz',
-        default: 0.1,
-        live: true,
-        isVisible: (state) => state.panMode === 'martigli',
-      },
-      {
-        id: 'crossfadeHold',
-        label: 'Hold duration',
-        type: 'range',
-        min: 1,
-        max: 300,
-        step: 1,
-        unit: 's',
-        default: 90,
-        live: false,
-        isVisible: (state) => state.panMode === 'crossfade',
-      },
-      {
-        id: 'crossfadeDuration',
-        label: 'Crossfade time',
-        type: 'range',
-        min: 0.5,
-        max: 60,
-        step: 0.5,
-        unit: 's',
-        default: 15,
-        live: false,
-        isVisible: (state) => state.panMode === 'crossfade',
-      },
-      {
-        id: 'panBaseOffset',
-        label: 'Pan offset',
-        type: 'range',
-        min: -0.5,
-        max: 0.5,
-        step: 0.01,
-        default: 0,
-        live: true,
-      },
-      {
-        id: 'gain',
-        label: 'Gain',
-        type: 'range',
-        min: 0,
-        max: 1,
-        step: 0.01,
-        default: 0.3,
-        live: true,
-      },
-    ],
+    params: () => {
+      const carrierRange = getCarrierFreqRange();
+      const beatRange = getBeatFreqRange();
+      const lrRange = getLRFreqRange();
+      const panRange = getPanFreqRange();
+      const crossfadeHoldRange = getCrossfadeHoldRange();
+      const crossfadeDurRange = getCrossfadeDurationRange();
+
+      return [
+        {
+          id: 'frequencyMode',
+          label: 'Frequency control',
+          type: 'select',
+          options: [
+            { value: 'carrier-beat', label: 'Carrier & beat' },
+            { value: 'absolute', label: 'Explicit L/R' },
+          ],
+          default: 'carrier-beat',
+          triggersLayout: true,
+          formatValue: (value) =>
+            value === 'absolute' ? 'Explicit L/R' : 'Carrier & beat',
+        },
+        {
+          id: 'base',
+          label: 'Carrier frequency',
+          type: 'range',
+          min: carrierRange.min,
+          max: carrierRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 210,
+          live: true,
+          isVisible: (state) => state.frequencyMode !== 'absolute',
+        },
+        {
+          id: 'beat',
+          label: 'Beat frequency',
+          type: 'range',
+          min: beatRange.min,
+          max: beatRange.max,
+          step: 0.1,
+          unit: 'Hz',
+          default: 6,
+          live: true,
+          isVisible: (state) => state.frequencyMode !== 'absolute',
+        },
+        {
+          id: 'leftFrequency',
+          label: 'Left component',
+          type: 'range',
+          min: lrRange.min,
+          max: lrRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 207,
+          live: true,
+          isVisible: (state) => state.frequencyMode === 'absolute',
+        },
+        {
+          id: 'rightFrequency',
+          label: 'Right component',
+          type: 'range',
+          min: lrRange.min,
+          max: lrRange.max,
+          step: 1,
+          unit: 'Hz',
+          default: 213,
+          live: true,
+          isVisible: (state) => state.frequencyMode === 'absolute',
+        },
+        {
+          id: 'panMode',
+          label: 'Panning pattern',
+          type: 'select',
+          options: [
+            { value: 'static', label: 'Static mix' },
+            { value: 'lfo', label: 'Oscillating sine' },
+            { value: 'martigli', label: 'Sync with Martigli' },
+            { value: 'crossfade', label: 'Timed crossfade' },
+          ],
+          default: 'static',
+          triggersLayout: true,
+          formatValue: (value) =>
+            ({
+              static: 'Static mix',
+              lfo: 'Oscillating sine',
+              martigli: 'Sync with Martigli',
+              crossfade: 'Timed crossfade',
+            })[value] || value,
+        },
+        {
+          id: 'panDepth',
+          label: 'Pan depth',
+          type: 'range',
+          min: 0,
+          max: 1,
+          step: 0.01,
+          default: 0.6,
+          live: true,
+          isVisible: (state) => state.panMode === 'lfo' || state.panMode === 'martigli',
+        },
+        {
+          id: 'panFrequency',
+          label: 'Pan frequency',
+          type: 'range',
+          min: panRange.min,
+          max: panRange.max,
+          step: 0.01,
+          unit: 'Hz',
+          default: 0.2,
+          live: true,
+          isVisible: (state) => state.panMode === 'lfo',
+        },
+        {
+          id: 'martigliFrequency',
+          label: 'Martigli/breath frequency',
+          type: 'range',
+          min: 0.02,
+          max: 0.6,
+          step: 0.01,
+          unit: 'Hz',
+          default: 0.1,
+          live: true,
+          isVisible: (state) => state.panMode === 'martigli',
+        },
+        {
+          id: 'crossfadeHold',
+          label: 'Hold duration',
+          type: 'range',
+          min: crossfadeHoldRange.min,
+          max: crossfadeHoldRange.max,
+          step: 1,
+          unit: 's',
+          default: 90,
+          live: false,
+          isVisible: (state) => state.panMode === 'crossfade',
+        },
+        {
+          id: 'crossfadeDuration',
+          label: 'Crossfade time',
+          type: 'range',
+          min: crossfadeDurRange.min,
+          max: crossfadeDurRange.max,
+          step: 0.5,
+          unit: 's',
+          default: 15,
+          live: false,
+          isVisible: (state) => state.panMode === 'crossfade',
+        },
+        {
+          id: 'panBaseOffset',
+          label: 'Pan offset',
+          type: 'range',
+          min: -0.5,
+          max: 0.5,
+          step: 0.01,
+          default: 0,
+          live: true,
+        },
+        {
+          id: 'gain',
+          label: 'Gain',
+          type: 'range',
+          min: 0,
+          max: 1,
+          step: 0.01,
+          default: 0.3,
+          live: true,
+        },
+      ];
+    },
     start(params = {}) {
       const values = { ...params };
       const nodeId = audioEngine.playBinaural({
@@ -2563,11 +2747,13 @@ const normalizeParameterValue = (field, rawValue) => {
 };
 
 const coerceFrequencyParameters = (preset, targetState, mode) => {
-  if (!preset?.params || !targetState) return;
-  const baseField = preset.params.find((field) => field.id === 'base');
-  const beatField = preset.params.find((field) => field.id === 'beat');
-  const leftField = preset.params.find((field) => field.id === 'leftFrequency');
-  const rightField = preset.params.find((field) => field.id === 'rightFrequency');
+  if (!preset || !targetState) return;
+  const params = getPresetParams(preset);
+  if (!params.length) return;
+  const baseField = params.find((field) => field.id === 'base');
+  const beatField = params.find((field) => field.id === 'beat');
+  const leftField = params.find((field) => field.id === 'leftFrequency');
+  const rightField = params.find((field) => field.id === 'rightFrequency');
   if (!baseField || !beatField || !leftField || !rightField) return;
 
   const baseValue = normalizeParameterValue(baseField, targetState.base);
@@ -2611,9 +2797,10 @@ const formatParameterValue = (field, value) => {
 
 const getPresetDefaults = (presetKey) => {
   const preset = audioPresets[presetKey];
-  if (!preset?.params) return {};
+  const params = getPresetParams(preset);
+  if (!params.length) return {};
   const defaults = {};
-  preset.params.forEach((field) => {
+  params.forEach((field) => {
     defaults[field.id] = normalizeParameterValue(field, field.default ?? field.min ?? 0);
   });
   return defaults;
@@ -2628,10 +2815,11 @@ const ensurePresetState = (presetKey) => {
 
 const getPresetParameterValues = (presetKey) => {
   const preset = audioPresets[presetKey];
-  if (!preset?.params) return {};
+  const params = getPresetParams(preset);
+  if (!params.length) return {};
   const state = ensurePresetState(presetKey);
   const values = {};
-  preset.params.forEach((field) => {
+  params.forEach((field) => {
     values[field.id] = normalizeParameterValue(field, state[field.id]);
   });
   return values;
@@ -2683,6 +2871,7 @@ const createParameterControl = (field, value, { context = 'form', onInput } = {}
       rangeInput = document.createElement('input');
       rangeInput.type = 'range';
       rangeInput.id = inputId;
+      rangeInput.dataset.paramId = field.id;
       if (field.min !== undefined) rangeInput.min = field.min;
       if (field.max !== undefined) rangeInput.max = field.max;
       if (field.step !== undefined) rangeInput.step = field.step;
@@ -2772,7 +2961,8 @@ const renderAudioParameterForm = () => {
   audioParameterPanel.innerHTML = '';
   audioParameterPreviewEl = null;
 
-  if (!preset?.params || preset.params.length === 0) {
+  const params = getPresetParams(preset);
+  if (!params.length) {
     audioParameterPanel.classList.add('hidden');
     updateAudioPresetSummary(presetKey, {});
     return;
@@ -2786,7 +2976,7 @@ const renderAudioParameterForm = () => {
   title.textContent = 'Preset parameters';
   audioParameterPanel.appendChild(title);
 
-  preset.params.forEach((field) => {
+  params.forEach((field) => {
     const value = normalizeParameterValue(field, state[field.id]);
     state[field.id] = value;
     let visible = true;

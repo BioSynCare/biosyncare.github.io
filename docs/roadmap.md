@@ -53,6 +53,10 @@ we should test BSCLab and update firebase if rules changed
 record ambience, analyse it to describe the sonic treatment received by the environment.
 and to propose complements.
 
+make track controls collapsable.
+
+Make the start audio button off, of make it start some nice audio. Make from it our panacea 1.
+
 ## Urgent
 
 - [ ] mobile iphone safari not working
