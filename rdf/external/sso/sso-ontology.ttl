@@ -3,6 +3,12 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix sso: <https://biosyncare.github.io/ont/sso#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+
+<> a owl:Ontology ;
+    dct:title "SSO Ontology (BioSynCare mirror)"@en ;
+    dct:created "2025-11-05"^^xsd:date ;
+    owl:versionInfo "snapshot" .
 
 sso:AudioStimulationConcept a skos:Concept ;
     skos:definition "Stimulation using audio signals like isochronic or binaural beats." ;

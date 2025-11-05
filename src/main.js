@@ -112,12 +112,75 @@ const martigliController = {
   active: false,
   startTime: null,
   endTime: null,
+  _startPerfTime: null,
+  _perfOffsetMs: null,
   waveform: 'sine', // 'sine', 'triangle', 'sawtooth', 'square'
   inhaleRatio: 0.5, // 0.5 = equal inhale/exhale
   trajectory: [
     { period: 10, duration: 0 }, // Start at 10s breathing period
     { period: 20, duration: 600 }, // Transition to 20s over 600 seconds
   ],
+
+  _hasPerformance() {
+    return typeof performance !== 'undefined' && typeof performance.now === 'function';
+  },
+
+  _ensureTimeBase() {
+    if (this._perfOffsetMs === null && this._hasPerformance()) {
+      this._perfOffsetMs = Date.now() - performance.now();
+    }
+  },
+
+  _toWallClockMs(timeValue) {
+    if (typeof timeValue === 'number') {
+      if (timeValue > 1e12) {
+        return timeValue;
+      }
+      if (this._perfOffsetMs !== null) {
+        return timeValue + this._perfOffsetMs;
+      }
+    }
+    return Date.now();
+  },
+
+  getElapsedMilliseconds(timeValue) {
+    if (!this.active || (!this.startTime && this._startPerfTime === null)) {
+      return 0;
+    }
+
+    const hasPerf = this._hasPerformance();
+
+    if (timeValue === undefined) {
+      if (hasPerf && this._startPerfTime !== null) {
+        return performance.now() - this._startPerfTime;
+      }
+      if (this.startTime) {
+        return Date.now() - this.startTime;
+      }
+      return 0;
+    }
+
+    if (typeof timeValue === 'number') {
+      if (timeValue > 1e12) {
+        if (this.startTime) {
+          return timeValue - this.startTime;
+        }
+        return 0;
+      }
+      if (hasPerf && this._startPerfTime !== null) {
+        return timeValue - this._startPerfTime;
+      }
+      if (this.startTime) {
+        return timeValue - this.startTime;
+      }
+    }
+
+    return 0;
+  },
+
+  getElapsedSeconds(timeValue) {
+    return this.getElapsedMilliseconds(timeValue) / 1000;
+  },
 
   // Calculate current breathing period based on trajectory
   getCurrentPeriod(elapsedTime) {
@@ -156,16 +219,31 @@ const martigliController = {
       return 0;
     }
 
-    const elapsedMs = currentTime - this.startTime;
+    this._ensureTimeBase();
+
+    let timeReference = currentTime;
+    const hasPerf = this._hasPerformance();
+    if (currentTime === undefined && hasPerf) {
+      timeReference = performance.now();
+    }
+
+    const elapsedMs = this.getElapsedMilliseconds(timeReference);
     const elapsedSec = elapsedMs / 1000;
 
     // Check if we've reached end time
-    if (this.endTime && currentTime >= this.endTime) {
+    const wallClockMs = this._toWallClockMs(timeReference);
+    if (this.endTime && wallClockMs >= this.endTime) {
+      this.stop();
+      return 0;
+    }
+
+    if (elapsedSec < 0) {
       return 0;
     }
 
     const period = this.getCurrentPeriod(elapsedSec);
-    const cyclePosition = (elapsedSec % period) / period; // 0 to 1 over the full period
+    const safePeriod = Number.isFinite(period) && period > 0 ? period : 1;
+    const cyclePosition = (elapsedSec % safePeriod) / safePeriod; // 0 to 1 over the full period
 
     // Apply waveform to the full cycle position
     return this.applyWaveform(cyclePosition);
@@ -228,9 +306,25 @@ const martigliController = {
 
   // Start breathing pattern
   start(durationMs = null) {
-    this.active = true;
-    this.startTime = Date.now();
-    this.endTime = durationMs ? this.startTime + durationMs : null;
+    // Only restart if not already active
+    if (!this.active) {
+      this._ensureTimeBase();
+      this.active = true;
+      this.startTime = Date.now();
+      if (this._hasPerformance()) {
+        this._startPerfTime = performance.now();
+      } else {
+        this._startPerfTime = null;
+      }
+      this.endTime = durationMs ? this.startTime + durationMs : null;
+    } else {
+      // When already active we still refresh time base to avoid drift
+      if (this._hasPerformance()) {
+        this._startPerfTime = performance.now();
+      }
+      this.startTime = Date.now();
+      this.endTime = durationMs ? this.startTime + durationMs : this.endTime;
+    }
   },
 
   // Stop breathing pattern
@@ -238,6 +332,7 @@ const martigliController = {
     this.active = false;
     this.startTime = null;
     this.endTime = null;
+    this._startPerfTime = null;
   },
 
   // Reset to default configuration
@@ -785,7 +880,7 @@ const updateMartigliValues = () => {
   if (!martigliController.active || !martigliCurrentPeriod) return;
 
   const now = Date.now();
-  const elapsedSec = (now - martigliController.startTime) / 1000;
+  const elapsedSec = martigliController.getElapsedSeconds(now);
   const period = martigliController.getCurrentPeriod(elapsedSec);
   const value = martigliController.getValue(now);
   const cyclePosition = (elapsedSec % period) / period;
@@ -870,9 +965,9 @@ const renderMartigliVisualization = () => {
   ctx.stroke();
 
   // Draw current position indicator if active
-  if (martigliController.active && martigliController.startTime) {
+  if (martigliController.active) {
     const now = Date.now();
-    const elapsedSec = (now - martigliController.startTime) / 1000;
+    const elapsedSec = martigliController.getElapsedSeconds(now);
     const period = martigliController.getCurrentPeriod(elapsedSec);
     const cycleProgress = (elapsedSec % period) / period;
     const currentX = cycleProgress * width;
@@ -2144,13 +2239,20 @@ updateMartigliUI();
 martigliController.start();
 updateMartigliUI();
 
-// Update Martigli values and visualization in real-time
-setInterval(() => {
-  if (martigliController.active) {
-    updateMartigliValues();
-    renderMartigliVisualization();
+// Update Martigli values and visualization in real-time using requestAnimationFrame
+let lastUpdateTime = 0;
+const updateMartigliLoop = (timestamp) => {
+  // Throttle to ~10fps (every 100ms) to match previous interval
+  if (timestamp - lastUpdateTime >= 100) {
+    if (martigliController.active) {
+      updateMartigliValues();
+      renderMartigliVisualization();
+    }
+    lastUpdateTime = timestamp;
   }
-}, 100);
+  requestAnimationFrame(updateMartigliLoop);
+};
+requestAnimationFrame(updateMartigliLoop);
 
 // Initial visualization render
 renderMartigliVisualization();

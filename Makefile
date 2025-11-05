@@ -67,10 +67,10 @@ rdf-docs: rdf-docs-pylode rdf-docs-ontospy
 
 rdf-docs-pylode:
 	mkdir -p rdf/docs/pylode
-	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode -i rdf/core/bsc-owl.ttl -o rdf/docs/pylode/bsc-owl.html
-	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode -i rdf/core/bsc-skos.ttl -o rdf/docs/pylode/bsc-skos.html
-	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode -i rdf/external/sso/sso-ontology.ttl -o rdf/docs/pylode/sso-ontology.html
-	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode -i rdf/external/sso/sso-ontology-extended.ttl -o rdf/docs/pylode/sso-ontology-extended.html
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode rdf/core/bsc-owl.ttl -o rdf/docs/pylode/bsc-owl.html
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode rdf/core/bsc-skos.ttl -o rdf/docs/pylode/bsc-skos.html
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode rdf/external/sso/sso-ontology.ttl -o rdf/docs/pylode/sso-ontology.html
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) -m pylode rdf/external/sso/sso-ontology-extended.ttl -o rdf/docs/pylode/sso-ontology-extended.html
 
 rdf-docs-ontospy:
 	mkdir -p rdf/docs/ontospy/bsc rdf/docs/ontospy/sso

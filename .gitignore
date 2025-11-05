@@ -1,5 +1,6 @@
 # Local virtual environments
 .venv-rdf/
+scripts/music/.venv/
 
 # macOS
 .DS_Store# macOS artifacts
@@ -38,3 +39,15 @@ aux/
 # Misc tooling caches
 .DS_Store?
 Thumbs.db
+
+# Music package generated files
+scripts/music/output/*
+!scripts/music/output/.gitkeep
+scripts/music/peals/rendered/*
+!scripts/music/peals/rendered/.gitkeep
+scripts/music/peals/raw/*.txt
+!scripts/music/peals/raw/.gitkeep
+*.wav
+*.mp3
+*.mid
+*.midi
