@@ -2623,10 +2623,30 @@ const audioPresets = {
           default: 0.25,
           live: true,
         },
+        createMartigliDepthParam('base', 'Carrier frequency', 500, 'Hz'),
+        createMartigliDepthParam('beat', 'Beat frequency', 20, 'Hz'),
+        createMartigliDepthParam('gain', 'Gain', 0.5, ''),
       ];
     },
     start(params = {}) {
       const values = { ...params };
+
+      // Martigli modulation config
+      const martigliConfig = {
+        base: {
+          enabled: Number(params.martigliDepth_base ?? 0) > 0,
+          depth: Number(params.martigliDepth_base ?? 0),
+        },
+        beat: {
+          enabled: Number(params.martigliDepth_beat ?? 0) > 0,
+          depth: Number(params.martigliDepth_beat ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
       const nodeId = audioEngine.playBinaural({
         mixMode: 'dichotic',
         frequencyMode: values.frequencyMode,
@@ -2642,8 +2662,16 @@ const audioPresets = {
         crossfadeHold: values.crossfadeHold,
         crossfadeDuration: values.crossfadeDuration,
         panBaseOffset: values.panBaseOffset,
+        martigliConfig,
       });
-      const detail = this.describe(values);
+
+      const modTexts = [];
+      if (martigliConfig.base.enabled) modTexts.push(`Carrier ±${martigliConfig.base.depth}Hz`);
+      if (martigliConfig.beat.enabled) modTexts.push(`Beat ±${martigliConfig.beat.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
+      const detail = this.describe(values) + modulationText;
       return {
         nodeId,
         detail,
@@ -2656,15 +2684,39 @@ const audioPresets = {
           leftFrequency: values.leftFrequency,
           rightFrequency: values.rightFrequency,
           panMode: values.panMode,
+          martigliConfig,
         },
       };
     },
     update(track, params = {}) {
+      const martigliConfig = {
+        base: {
+          enabled: Number(params.martigliDepth_base ?? 0) > 0,
+          depth: Number(params.martigliDepth_base ?? 0),
+        },
+        beat: {
+          enabled: Number(params.martigliDepth_beat ?? 0) > 0,
+          depth: Number(params.martigliDepth_beat ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
       audioEngine.updateBinaural(track.nodeId, {
         mixMode: 'dichotic',
         ...params,
+        martigliConfig,
       });
-      const detail = this.describe(params);
+
+      const modTexts = [];
+      if (martigliConfig.base.enabled) modTexts.push(`Carrier ±${martigliConfig.base.depth}Hz`);
+      if (martigliConfig.beat.enabled) modTexts.push(`Beat ±${martigliConfig.beat.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
+      const detail = this.describe(params) + modulationText;
       return {
         detail,
         meta: {
@@ -2674,6 +2726,7 @@ const audioPresets = {
           leftFrequency: params.leftFrequency,
           rightFrequency: params.rightFrequency,
           panMode: params.panMode,
+          martigliConfig,
         },
       };
     },
@@ -2874,10 +2927,30 @@ const audioPresets = {
           default: 0.3,
           live: true,
         },
+        createMartigliDepthParam('base', 'Carrier frequency', 500, 'Hz'),
+        createMartigliDepthParam('beat', 'Beat frequency', 20, 'Hz'),
+        createMartigliDepthParam('gain', 'Gain', 0.5, ''),
       ];
     },
     start(params = {}) {
       const values = { ...params };
+
+      // Martigli modulation config
+      const martigliConfig = {
+        base: {
+          enabled: Number(params.martigliDepth_base ?? 0) > 0,
+          depth: Number(params.martigliDepth_base ?? 0),
+        },
+        beat: {
+          enabled: Number(params.martigliDepth_beat ?? 0) > 0,
+          depth: Number(params.martigliDepth_beat ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
       const nodeId = audioEngine.playBinaural({
         mixMode: 'monaural',
         frequencyMode: values.frequencyMode,
@@ -2893,8 +2966,16 @@ const audioPresets = {
         crossfadeHold: values.crossfadeHold,
         crossfadeDuration: values.crossfadeDuration,
         panBaseOffset: values.panBaseOffset,
+        martigliConfig,
       });
-      const detail = this.describe(values);
+
+      const modTexts = [];
+      if (martigliConfig.base.enabled) modTexts.push(`Carrier ±${martigliConfig.base.depth}Hz`);
+      if (martigliConfig.beat.enabled) modTexts.push(`Beat ±${martigliConfig.beat.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
+      const detail = this.describe(values) + modulationText;
       return {
         nodeId,
         detail,
@@ -2907,15 +2988,39 @@ const audioPresets = {
           leftFrequency: values.leftFrequency,
           rightFrequency: values.rightFrequency,
           panMode: values.panMode,
+          martigliConfig,
         },
       };
     },
     update(track, params = {}) {
+      const martigliConfig = {
+        base: {
+          enabled: Number(params.martigliDepth_base ?? 0) > 0,
+          depth: Number(params.martigliDepth_base ?? 0),
+        },
+        beat: {
+          enabled: Number(params.martigliDepth_beat ?? 0) > 0,
+          depth: Number(params.martigliDepth_beat ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
       audioEngine.updateBinaural(track.nodeId, {
         mixMode: 'monaural',
         ...params,
+        martigliConfig,
       });
-      const detail = this.describe(params);
+
+      const modTexts = [];
+      if (martigliConfig.base.enabled) modTexts.push(`Carrier ±${martigliConfig.base.depth}Hz`);
+      if (martigliConfig.beat.enabled) modTexts.push(`Beat ±${martigliConfig.beat.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
+      const detail = this.describe(params) + modulationText;
       return {
         detail,
         meta: {
@@ -2984,37 +3089,89 @@ const audioPresets = {
         default: 0.22,
         live: true,
       },
+      createMartigliDepthParam('freq', 'Carrier frequency', 500, 'Hz'),
+      createMartigliDepthParam('pulseFreq', 'Pulse frequency', 15, 'Hz'),
+      createMartigliDepthParam('gain', 'Gain', 0.5, ''),
     ],
     start: (params = {}) => {
       const freq = Number(params.freq ?? 180);
       const pulseFreq = Number(params.pulseFreq ?? 12);
       const gain = Number(params.gain ?? 0.22);
+
+      // Martigli modulation config
+      const martigliConfig = {
+        freq: {
+          enabled: Number(params.martigliDepth_freq ?? 0) > 0,
+          depth: Number(params.martigliDepth_freq ?? 0),
+        },
+        pulseFreq: {
+          enabled: Number(params.martigliDepth_pulseFreq ?? 0) > 0,
+          depth: Number(params.martigliDepth_pulseFreq ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
       const nodeId = audioEngine.playIsochronic({
         freq,
         pulseFreq,
         duration: null,
         gain,
+        martigliConfig,
       });
+
+      const modTexts = [];
+      if (martigliConfig.freq.enabled) modTexts.push(`Carrier ±${martigliConfig.freq.depth}Hz`);
+      if (martigliConfig.pulseFreq.enabled) modTexts.push(`Pulse ±${martigliConfig.pulseFreq.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
       const parameters = { freq, pulseFreq, gain };
       return {
         nodeId,
-        detail: `${freq.toFixed(0)} Hz carrier • ${pulseFreq.toFixed(1)} Hz pulses`,
+        detail: `${freq.toFixed(0)} Hz carrier • ${pulseFreq.toFixed(1)} Hz pulses${modulationText}`,
         parameters,
         meta: {
           type: 'isochronic',
           freq,
           pulseFreq,
+          martigliConfig,
         },
       };
     },
     update: (track, params = {}) => {
-      audioEngine.updateIsochronic(track.nodeId, params);
+      const martigliConfig = {
+        freq: {
+          enabled: Number(params.martigliDepth_freq ?? 0) > 0,
+          depth: Number(params.martigliDepth_freq ?? 0),
+        },
+        pulseFreq: {
+          enabled: Number(params.martigliDepth_pulseFreq ?? 0) > 0,
+          depth: Number(params.martigliDepth_pulseFreq ?? 0),
+        },
+        gain: {
+          enabled: Number(params.martigliDepth_gain ?? 0) > 0,
+          depth: Number(params.martigliDepth_gain ?? 0),
+        },
+      };
+
+      audioEngine.updateIsochronic(track.nodeId, { ...params, martigliConfig });
+
+      const modTexts = [];
+      if (martigliConfig.freq.enabled) modTexts.push(`Carrier ±${martigliConfig.freq.depth}Hz`);
+      if (martigliConfig.pulseFreq.enabled) modTexts.push(`Pulse ±${martigliConfig.pulseFreq.depth.toFixed(1)}Hz`);
+      if (martigliConfig.gain.enabled) modTexts.push(`Gain ±${martigliConfig.gain.depth.toFixed(2)}`);
+      const modulationText = modTexts.length > 0 ? ` • 🫁${modTexts.join(', ')}` : '';
+
       return {
-        detail: `${params.freq.toFixed(0)} Hz carrier • ${params.pulseFreq.toFixed(1)} Hz pulses`,
+        detail: `${params.freq.toFixed(0)} Hz carrier • ${params.pulseFreq.toFixed(1)} Hz pulses${modulationText}`,
         meta: {
           freq: params.freq,
           pulseFreq: params.pulseFreq,
           gain: params.gain,
+          martigliConfig,
         },
       };
     },
