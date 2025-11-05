@@ -3297,6 +3297,161 @@ const audioPresets = {
       return `Martigli ${base.toFixed(0)} Hz ± ${amp.toFixed(0)} Hz (${min.toFixed(0)}-${max.toFixed(0)} Hz)`;
     },
   },
+  martigliMix: {
+    label: 'Martigli-Mix • Multi-pattern breathing',
+    description:
+      'Combines binaural beat, monaural beat, and isochronic pulses, all modulated by Martigli breathing.',
+    params: [
+      {
+        id: 'baseFrequency',
+        label: 'Base carrier frequency',
+        type: 'range',
+        min: 40,
+        max: 2000,
+        step: 1,
+        unit: 'Hz',
+        default: 200,
+        live: true,
+      },
+      {
+        id: 'amplitude',
+        label: 'Modulation amplitude',
+        type: 'range',
+        min: 0,
+        max: 500,
+        step: 1,
+        unit: 'Hz',
+        default: 100,
+        live: true,
+      },
+      {
+        id: 'beatFrequency',
+        label: 'Beat frequency',
+        type: 'range',
+        min: 0.5,
+        max: 40,
+        step: 0.1,
+        unit: 'Hz',
+        default: 10,
+        live: true,
+      },
+      {
+        id: 'isochronicRate',
+        label: 'Isochronic pulse rate',
+        type: 'range',
+        min: 0.5,
+        max: 30,
+        step: 0.1,
+        unit: 'Hz',
+        default: 6,
+        live: true,
+      },
+      {
+        id: 'binauralGain',
+        label: 'Binaural gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.2,
+        live: true,
+      },
+      {
+        id: 'monauralGain',
+        label: 'Monaural gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.2,
+        live: true,
+      },
+      {
+        id: 'isochronicGain',
+        label: 'Isochronic gain',
+        type: 'range',
+        min: 0,
+        max: 1,
+        step: 0.01,
+        default: 0.15,
+        live: true,
+      },
+    ],
+    start(params = {}) {
+      const baseFrequency = Number(params.baseFrequency ?? 200);
+      const amplitude = Number(params.amplitude ?? 100);
+      const beatFrequency = Number(params.beatFrequency ?? 10);
+      const isochronicRate = Number(params.isochronicRate ?? 6);
+      const binauralGain = Number(params.binauralGain ?? 0.2);
+      const monauralGain = Number(params.monauralGain ?? 0.2);
+      const isochronicGain = Number(params.isochronicGain ?? 0.15);
+
+      const nodeId = audioEngine.playMartigliMix({
+        baseFrequency,
+        amplitude,
+        beatFrequency,
+        isochronicRate,
+        binauralGain,
+        monauralGain,
+        isochronicGain,
+      });
+
+      const detail = this.describe(params);
+      return {
+        nodeId,
+        detail,
+        parameters: {
+          baseFrequency,
+          amplitude,
+          beatFrequency,
+          isochronicRate,
+          binauralGain,
+          monauralGain,
+          isochronicGain,
+        },
+        meta: {
+          type: 'martigliMix',
+          baseFrequency,
+          amplitude,
+          beatFrequency,
+          isochronicRate,
+          binauralGain,
+          monauralGain,
+          isochronicGain,
+        },
+      };
+    },
+    update(track, params = {}) {
+      audioEngine.updateMartigliMix(track.nodeId, {
+        baseFrequency: params.baseFrequency,
+        amplitude: params.amplitude,
+        beatFrequency: params.beatFrequency,
+        isochronicRate: params.isochronicRate,
+        binauralGain: params.binauralGain,
+        monauralGain: params.monauralGain,
+        isochronicGain: params.isochronicGain,
+      });
+      return {
+        detail: this.describe(params),
+        meta: {
+          baseFrequency: params.baseFrequency,
+          amplitude: params.amplitude,
+          beatFrequency: params.beatFrequency,
+          isochronicRate: params.isochronicRate,
+          binauralGain: params.binauralGain,
+          monauralGain: params.monauralGain,
+          isochronicGain: params.isochronicGain,
+        },
+      };
+    },
+    describe: (params = {}) => {
+      const base = Number(params.baseFrequency ?? 200);
+      const amp = Number(params.amplitude ?? 100);
+      const beat = Number(params.beatFrequency ?? 10);
+      const iso = Number(params.isochronicRate ?? 6);
+      return `Martigli-Mix ${base.toFixed(0)}Hz ±${amp.toFixed(0)}Hz • Beat ${beat.toFixed(1)}Hz • Pulse ${iso.toFixed(1)}Hz`;
+    },
+  },
 };
 
 const audioParameterState = new Map();

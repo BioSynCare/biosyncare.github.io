@@ -1268,6 +1268,217 @@ export class AudioEngine {
     return true;
   }
 
+  /**
+   * Play Martigli-Mix - combines binaural, monaural, and isochronic all modulated by breathing
+   * @param {Object} opts - { baseFrequency, amplitude, beatFrequency, isochronicRate, binauralGain, monauralGain, isochronicGain }
+   * @returns {string} nodeId
+   */
+  playMartigliMix(opts = {}) {
+    this._ensureInit();
+
+    const {
+      baseFrequency = 200,
+      amplitude = 100,
+      beatFrequency = 10,
+      isochronicRate = 6,
+      binauralGain = 0.2,
+      monauralGain = 0.2,
+      isochronicGain = 0.15,
+      fadeIn = 0.05,
+    } = opts;
+
+    const now = this.ctx.currentTime;
+
+    // Create binaural beat (left and right with frequency difference)
+    const oscBinauralLeft = this.ctx.createOscillator();
+    const oscBinauralRight = this.ctx.createOscillator();
+    oscBinauralLeft.type = 'sine';
+    oscBinauralRight.type = 'sine';
+
+    const gainBinaural = this.ctx.createGain();
+    gainBinaural.gain.value = 0;
+
+    const mergerBinaural = this.ctx.createChannelMerger(2);
+
+    const gainBinauralLeft = this.ctx.createGain();
+    const gainBinauralRight = this.ctx.createGain();
+    gainBinauralLeft.gain.value = 1;
+    gainBinauralRight.gain.value = 1;
+
+    oscBinauralLeft.connect(gainBinauralLeft);
+    oscBinauralRight.connect(gainBinauralRight);
+    gainBinauralLeft.connect(mergerBinaural, 0, 0);
+    gainBinauralRight.connect(mergerBinaural, 0, 1);
+    mergerBinaural.connect(gainBinaural);
+
+    // Create monaural beat (both ears same, summed signal)
+    const oscMonauralA = this.ctx.createOscillator();
+    const oscMonauralB = this.ctx.createOscillator();
+    oscMonauralA.type = 'sine';
+    oscMonauralB.type = 'sine';
+
+    const gainMonaural = this.ctx.createGain();
+    gainMonaural.gain.value = 0;
+
+    oscMonauralA.connect(gainMonaural);
+    oscMonauralB.connect(gainMonaural);
+
+    // Create isochronic pulse (amplitude modulated)
+    const oscIsochronic = this.ctx.createOscillator();
+    oscIsochronic.type = 'sine';
+
+    const gainIsochronic = this.ctx.createGain();
+    gainIsochronic.gain.value = 0;
+
+    const pulseOsc = this.ctx.createOscillator();
+    pulseOsc.type = 'square';
+    pulseOsc.frequency.value = isochronicRate;
+
+    const pulseGain = this.ctx.createGain();
+    pulseGain.gain.value = 0.5; // Modulation depth
+
+    pulseOsc.connect(pulseGain);
+    pulseGain.connect(gainIsochronic.gain);
+
+    oscIsochronic.connect(gainIsochronic);
+
+    // Create master mixer
+    const masterMixer = this.ctx.createGain();
+    masterMixer.gain.value = 0;
+
+    gainBinaural.connect(masterMixer);
+    gainMonaural.connect(masterMixer);
+    gainIsochronic.connect(masterMixer);
+    masterMixer.connect(this.masterGain);
+
+    // Fade in
+    masterMixer.gain.setValueAtTime(0, now);
+    masterMixer.gain.linearRampToValueAtTime(1, now + fadeIn);
+
+    // Start all oscillators
+    oscBinauralLeft.start(now);
+    oscBinauralRight.start(now);
+    oscMonauralA.start(now);
+    oscMonauralB.start(now);
+    oscIsochronic.start(now);
+    pulseOsc.start(now);
+
+    const nodeId = `martigliMix_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+    // Update frequencies based on Martigli controller value
+    const updateFrequencies = () => {
+      if (!this.nodes.has(nodeId)) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      const node = this.nodes.get(nodeId);
+      if (!node) {
+        clearInterval(intervalId);
+        return;
+      }
+
+      // Get current Martigli value [-1, 1]
+      let martigliValue = 0;
+      if (typeof window !== 'undefined' && window.martigliController && window.martigliController.active) {
+        martigliValue = window.martigliController.getValue();
+      }
+
+      // Calculate modulated carrier frequency
+      const modulatedFreq = node._baseFrequency + (node._amplitude * martigliValue);
+      const clampedFreq = clamp(modulatedFreq, 20, 20000);
+
+      const now = this.ctx.currentTime;
+      const halfBeat = node._beatFrequency / 2;
+
+      // Update binaural frequencies (L and R offset by beat)
+      node.oscBinauralLeft.frequency.setTargetAtTime(clampedFreq - halfBeat, now, 0.02);
+      node.oscBinauralRight.frequency.setTargetAtTime(clampedFreq + halfBeat, now, 0.02);
+
+      // Update monaural frequencies (both same, creates beat when summed)
+      node.oscMonauralA.frequency.setTargetAtTime(clampedFreq - halfBeat, now, 0.02);
+      node.oscMonauralB.frequency.setTargetAtTime(clampedFreq + halfBeat, now, 0.02);
+
+      // Update isochronic frequency
+      node.oscIsochronic.frequency.setTargetAtTime(clampedFreq, now, 0.02);
+
+      // Update gains
+      node.gainBinaural.gain.setTargetAtTime(node._binauralGain, now, 0.02);
+      node.gainMonaural.gain.setTargetAtTime(node._monauralGain, now, 0.02);
+      node.gainIsochronic.gain.setTargetAtTime(node._isochronicGain, now, 0.02);
+
+      // Update isochronic pulse rate
+      node.pulseOsc.frequency.setTargetAtTime(node._isochronicRate, now, 0.02);
+    };
+
+    // Store node with all components and start update interval
+    const intervalId = setInterval(updateFrequencies, 50); // Update every 50ms
+
+    this.nodes.set(nodeId, {
+      oscBinauralLeft,
+      oscBinauralRight,
+      oscMonauralA,
+      oscMonauralB,
+      oscIsochronic,
+      pulseOsc,
+      gainBinaural,
+      gainMonaural,
+      gainIsochronic,
+      masterMixer,
+      _baseFrequency: baseFrequency,
+      _amplitude: amplitude,
+      _beatFrequency: beatFrequency,
+      _isochronicRate: isochronicRate,
+      _binauralGain: binauralGain,
+      _monauralGain: monauralGain,
+      _isochronicGain: isochronicGain,
+      _martigliInterval: intervalId,
+    });
+
+    return nodeId;
+  }
+
+  /**
+   * Update Martigli-Mix parameters
+   * @param {string} nodeId
+   * @param {Object} params - { baseFrequency, amplitude, beatFrequency, isochronicRate, binauralGain, monauralGain, isochronicGain }
+   * @returns {boolean} success
+   */
+  updateMartigliMix(nodeId, params = {}) {
+    const node = this.nodes.get(nodeId);
+    if (!node) return false;
+
+    if (params.baseFrequency !== undefined) {
+      node._baseFrequency = clamp(params.baseFrequency, 20, 20000);
+    }
+
+    if (params.amplitude !== undefined) {
+      node._amplitude = clamp(params.amplitude, 0, 1000);
+    }
+
+    if (params.beatFrequency !== undefined) {
+      node._beatFrequency = clamp(params.beatFrequency, 0.5, 100);
+    }
+
+    if (params.isochronicRate !== undefined) {
+      node._isochronicRate = clamp(params.isochronicRate, 0.5, 50);
+    }
+
+    if (params.binauralGain !== undefined) {
+      node._binauralGain = clamp(params.binauralGain, 0, 1);
+    }
+
+    if (params.monauralGain !== undefined) {
+      node._monauralGain = clamp(params.monauralGain, 0, 1);
+    }
+
+    if (params.isochronicGain !== undefined) {
+      node._isochronicGain = clamp(params.isochronicGain, 0, 1);
+    }
+
+    return true;
+  }
+
   _ensureInit() {
     if (!this.initialized) {
       throw new Error('AudioEngine not initialized. Call engine.init() first.');

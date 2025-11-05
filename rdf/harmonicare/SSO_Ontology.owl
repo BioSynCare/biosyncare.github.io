@@ -1,7 +1,7 @@
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
-@prefix sso: <https://acca-harmonicare-chromosound.netlify.app/rdf/SSO_Ontology.owl#> .
+@prefix sso: <https://biosyncare.github.io/rdf/harmonicare/SSO_Ontology.owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 sso:AudioStimulationConcept a skos:Concept ;
