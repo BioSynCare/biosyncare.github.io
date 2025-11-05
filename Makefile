@@ -15,6 +15,7 @@ help:
 	@printf "  rdf-validate    Validate all Turtle files in rdf/ using rdflib\n"
 	@printf "  rdf-report      Generate HTML summary of classes and properties\n"
 	@printf "  rdf-docs        Generate pyLODE and Ontospy HTML documentation\n"
+	@printf "  rdf-webvowl     Generate WebVOWL JSONs (requires Java)\n"
 
 deploy-rules:
 	firebase deploy --only firestore:rules --project $(PROJECT)
@@ -76,3 +77,19 @@ rdf-docs-ontospy:
 	mkdir -p rdf/docs/ontospy/bsc rdf/docs/ontospy/sso
 	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/bsc rdf/core/bsc-owl.ttl || true
 	. $(VENV_RDF)/bin/activate; printf "1\n" | ontospy gendocs -o rdf/docs/ontospy/sso rdf/external/sso/sso-ontology.ttl || true
+
+.PHONY: rdf-webvowl rdf-webvowl-setup
+
+rdf-webvowl-setup:
+	mkdir -p scripts/rdf/tools rdf/docs/webvowl
+	@if [ ! -f scripts/rdf/tools/owl2vowl.jar ]; then \
+		curl -L -o scripts/rdf/tools/owl2vowl.jar https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.3.6/owl2vowl.jar ; \
+		echo "Downloaded OWL2VOWL jar." ; \
+	else \
+		echo "OWL2VOWL jar already present." ; \
+	fi
+
+rdf-webvowl: rdf-webvowl-setup
+	@echo "Generating VOWL JSON for bsc-owl.ttl and sso-ontology.ttl (Java required)..."
+	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -o rdf/docs/webvowl/bsc.json || true
+	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -o rdf/docs/webvowl/sso.json || true
