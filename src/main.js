@@ -2295,7 +2295,7 @@ const audioPresets = {
     params: [
       {
         id: 'frequency',
-        label: 'Frequency',
+        label: 'Base frequency',
         type: 'range',
         min: 40,
         max: 2000,
@@ -2303,6 +2303,26 @@ const audioPresets = {
         unit: 'Hz',
         default: 440,
         live: true,
+      },
+      {
+        id: 'martigliModulateFreq',
+        label: 'Martigli modulate frequency',
+        type: 'checkbox',
+        default: false,
+        live: true,
+        triggersLayout: true,
+      },
+      {
+        id: 'martigliFreqAmplitude',
+        label: 'Frequency modulation depth',
+        type: 'range',
+        min: 0,
+        max: 500,
+        step: 1,
+        unit: 'Hz',
+        default: 100,
+        live: true,
+        isVisible: (state) => state.martigliModulateFreq === true,
       },
       {
         id: 'gain',
@@ -2336,20 +2356,28 @@ const audioPresets = {
       const frequency = Number(params.frequency ?? 440);
       const gain = Number(params.gain ?? 0.2);
       const pan = Number(params.pan ?? 0);
+      const martigliModulateFreq = params.martigliModulateFreq ?? false;
+      const martigliFreqAmplitude = Number(params.martigliFreqAmplitude ?? 100);
+
       const nodeId = audioEngine.playWaveform({
         type: 'sine',
         freq: frequency,
         gain,
         pan,
+        martigliModulateFreq,
+        martigliFreqAmplitude,
       });
       const parameters = {
         frequency,
         gain,
         pan,
+        martigliModulateFreq,
+        martigliFreqAmplitude,
       };
+      const modulationText = martigliModulateFreq ? ` • Martigli ±${martigliFreqAmplitude}Hz` : '';
       return {
         nodeId,
-        detail: `${frequency.toFixed(1)} Hz · gain ${gain.toFixed(2)}`,
+        detail: `${frequency.toFixed(1)} Hz${modulationText} · gain ${gain.toFixed(2)}`,
         parameters,
         meta: {
           type: 'waveform',
@@ -2357,6 +2385,8 @@ const audioPresets = {
           frequency,
           gain,
           pan,
+          martigliModulateFreq,
+          martigliFreqAmplitude,
         },
       };
     },
@@ -2365,13 +2395,18 @@ const audioPresets = {
         freq: params.frequency,
         gain: params.gain,
         pan: params.pan,
+        martigliModulateFreq: params.martigliModulateFreq,
+        martigliFreqAmplitude: params.martigliFreqAmplitude,
       });
+      const modulationText = params.martigliModulateFreq ? ` • Martigli ±${params.martigliFreqAmplitude}Hz` : '';
       return {
-        detail: `${params.frequency.toFixed(1)} Hz · gain ${params.gain.toFixed(2)}`,
+        detail: `${params.frequency.toFixed(1)} Hz${modulationText} · gain ${params.gain.toFixed(2)}`,
         meta: {
           frequency: params.frequency,
           gain: params.gain,
           pan: params.pan,
+          martigliModulateFreq: params.martigliModulateFreq,
+          martigliFreqAmplitude: params.martigliFreqAmplitude,
         },
       };
     },
