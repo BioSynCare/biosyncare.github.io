@@ -22,12 +22,18 @@ from itertools import permutations
 from pathlib import Path
 from typing import Dict, Iterable, List, Sequence, Tuple
 
+from music.structures.peals import PlainChanges
+from music.structures.permutations import InterestingPermutations
+
 
 ROOT = Path(__file__).resolve().parent
 REPO_ROOT = ROOT.parents[1]
 RAW_PEALS_DIR = ROOT / "peals" / "raw"
 MUSIC_OUTPUT_DIR = ROOT / "output"
 JSON_OUTPUT_FILE = MUSIC_OUTPUT_DIR / "musicStructures.json"
+JSON_MIN_FILE = MUSIC_OUTPUT_DIR / "musicStructures.min.json"
+COMPACT_OUTPUT_FILE = MUSIC_OUTPUT_DIR / "musicStructures.compact.json"
+COMPACT_MIN_FILE = MUSIC_OUTPUT_DIR / "musicStructures.compact.min.json"
 
 
 def parse_peal_file(path: Path) -> Dict:
@@ -467,6 +473,186 @@ def build_symmetric_group_catalog(stages: Iterable[int], samples_per_cycle: int 
     return catalog
 
 
+def perm_to_list(perm) -> List[int]:
+    """Convert a sympy Permutation or iterable into a plain list of ints."""
+    if hasattr(perm, "array_form"):
+        arr = list(perm.array_form)
+        size = getattr(perm, "size", len(arr))
+        if len(arr) < size:
+            arr.extend(range(len(arr), size))
+        return arr
+    if isinstance(perm, (list, tuple)):
+        return [int(x) for x in perm]
+    return list(perm)
+
+
+def perms_to_lists(perms) -> List[List[int]]:
+    return [perm_to_list(perm) for perm in perms]
+
+
+def build_symmetry_structures(stages: Iterable[int]) -> List[Dict]:
+    structures: List[Dict] = []
+
+    for stage in sorted(set(stages)):
+        try:
+            ip = InterestingPermutations(nelements=stage)
+        except Exception as exc:  # pragma: no cover - defensive
+            print(f"[WARN] Failed to build symmetry structures for stage {stage}: {exc}")
+            continue
+
+        symmetry_entry = {
+            "stage": stage,
+            "rotations": perms_to_lists(ip.rotations or []),
+            "mirrors": perms_to_lists(ip.mirrors or []),
+            "dihedral": perms_to_lists(ip.dihedral or []),
+            "neighborSwaps": perms_to_lists(ip.neighbor_swaps or []),
+            "swapFamilies": [
+                {
+                    "distance": index + 1,
+                    "permutations": perms_to_lists(family),
+                }
+                for index, family in enumerate(ip.swaps_by_stepsizes or [])
+            ],
+            "metadata": {
+                "rotations": len(ip.rotations or []),
+                "mirrors": len(ip.mirrors or []),
+                "dihedral": len(ip.dihedral or []),
+                "neighborSwaps": len(ip.neighbor_swaps or []),
+                "swapFamilies": [len(family) for family in (ip.swaps_by_stepsizes or [])],
+                "alternatingCount": len(ip.alternations or []),
+                "symmetricCount": len(ip.permutations or []),
+            },
+        }
+
+        alternation_sample = (ip.alternations or [])[: min(24, len(ip.alternations or []))]
+        symmetry_entry["alternatingSample"] = perms_to_lists(alternation_sample)
+
+        structures.append(symmetry_entry)
+
+    return structures
+
+
+def build_additional_plain_changes(
+    library: List[Dict], max_stage: int = 7, max_hunts: int = 3
+) -> List[Dict]:
+    existing_signatures = {
+        tuple(tuple(row["permutation"]) for row in entry["rowsDetail"])
+        for entry in library
+    }
+
+    additional: List[Dict] = []
+
+    for stage in range(3, max_stage + 1):
+        for hunts in range(1, min(stage, max_hunts) + 1):
+            try:
+                peal = PlainChanges(nelements=stage, nhunts=hunts)
+            except Exception:
+                continue
+            sequences = [list(seq) for seq in peal.act()]
+            signature = tuple(tuple(seq) for seq in sequences)
+
+            if signature in existing_signatures:
+                continue
+
+            entry_id = f"plain_changes_{stage}_hunts_{hunts}"
+            additional.append(
+                {
+                    "id": entry_id,
+                    "title": f"Plain Changes on {stage} Bells (hunts={hunts})",
+                    "stage": stage,
+                    "hunts": hunts,
+                    "rows": len(sequences),
+                    "sequences": sequences,
+                }
+            )
+            existing_signatures.add(signature)
+
+    return additional
+
+
+def build_compact_payload(
+    library: List[Dict],
+    permutation_families: List[Dict],
+    catalog: List[Dict],
+    symmetry_structures: List[Dict],
+    additional_plain_changes: List[Dict],
+    generated_at: str,
+) -> Dict:
+    """Create a storage-friendly representation focused on raw sequences."""
+    compact_library = []
+    for entry in library:
+        compact_library.append(
+            {
+                "id": entry["id"],
+                "title": entry["title"],
+                "stage": entry["stage"],
+                "rows": entry["rows"],
+                "family": entry.get("family"),
+                "metadata": entry.get("metadata") or {},
+                "sourceFile": entry.get("sourceFile"),
+                "permutations": [
+                    row_detail["permutation"] for row_detail in entry["rowsDetail"]
+                ],
+            }
+        )
+
+    compact_families = []
+    for family in permutation_families:
+        compact_families.append(
+            {
+                "id": family["id"],
+                "permutation": family["positionPermutation"],
+                "cycleSignature": family["cycleSignature"],
+                "parity": family["parity"],
+                "sign": family["sign"],
+                "stages": family["stages"],
+                "count": family["occurrenceCount"],
+                "adjacentOnly": family["adjacentOnly"],
+            }
+        )
+
+    compact_catalog = []
+    for group in catalog:
+        compact_catalog.append(
+            {
+                "stage": group["stage"],
+                "order": group["order"],
+                "parityCounts": group["parityCounts"],
+                "cycleTypeCounts": group["cycleTypeCounts"],
+                "generators": [
+                    generator["permutation"] for generator in group["canonicalGenerators"]
+                ],
+            }
+        )
+
+    return {
+        "generatedAt": generated_at,
+        "source": "scripts/music/export_structures.py",
+        "changeRinging": compact_library,
+        "additionalPlainChanges": [
+            {
+                "id": entry["id"],
+                "stage": entry["stage"],
+                "hunts": entry["hunts"],
+                "rows": entry["rows"],
+                "sequences": entry["sequences"],
+            }
+            for entry in additional_plain_changes
+        ],
+        "permutationFamilies": compact_families,
+        "symmetricGroups": compact_catalog,
+        "symmetryStructures": [
+            {
+                "stage": entry["stage"],
+                "rotations": entry["rotations"],
+                "mirrors": entry["mirrors"],
+                "dihedral": entry["dihedral"],
+            }
+            for entry in symmetry_structures
+        ],
+    }
+
+
 def main() -> None:
     if not RAW_PEALS_DIR.exists():
         raise SystemExit(f"Missing peal directory: {RAW_PEALS_DIR}")
@@ -475,20 +661,50 @@ def main() -> None:
 
     library = build_change_ringing_library()
     permutation_families = build_permutation_families(library)
-    catalog = build_symmetric_group_catalog([item["stage"] for item in library])
+    stages = [item["stage"] for item in library]
+    catalog = build_symmetric_group_catalog(stages)
+    symmetry_structures = build_symmetry_structures(stages)
+    additional_plain_changes = build_additional_plain_changes(library)
+
+    generated_at = datetime.now(timezone.utc).isoformat()
 
     payload = {
-        "generatedAt": datetime.now(timezone.utc).isoformat(),
+        "generatedAt": generated_at,
         "source": "scripts/music/export_structures.py",
         "changeRingingLibrary": library,
         "permutationFamilies": permutation_families,
         "symmetricGroupCatalog": catalog,
+        "symmetryStructures": symmetry_structures,
+        "additionalPlainChanges": additional_plain_changes,
     }
 
     # Write JSON payload for consumption by the Web agent (or a sync task)
     JSON_OUTPUT_FILE.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    JSON_MIN_FILE.write_text(
+        json.dumps(payload, separators=(",", ":")), encoding="utf-8"
+    )
     print(f"[OK] Wrote JSON to {JSON_OUTPUT_FILE.relative_to(REPO_ROOT)}")
-    print("Hint: run 'make web-sync-music-data' to generate src/data/musicStructures.js for the frontend.")
+    print(f"[OK] Wrote minified JSON to {JSON_MIN_FILE.relative_to(REPO_ROOT)}")
+    print(
+        "Hint: run 'make web-sync-music-data' to generate src/data/musicStructures.js for the frontend."
+    )
+
+    compact_payload = build_compact_payload(
+        library,
+        permutation_families,
+        catalog,
+        symmetry_structures,
+        additional_plain_changes,
+        generated_at,
+    )
+    COMPACT_OUTPUT_FILE.write_text(
+        json.dumps(compact_payload, indent=2), encoding="utf-8"
+    )
+    COMPACT_MIN_FILE.write_text(
+        json.dumps(compact_payload, separators=(",", ":")), encoding="utf-8"
+    )
+    print(f"[OK] Wrote compact JSON to {COMPACT_OUTPUT_FILE.relative_to(REPO_ROOT)}")
+    print(f"[OK] Wrote compact minified JSON to {COMPACT_MIN_FILE.relative_to(REPO_ROOT)}")
 
 
 if __name__ == "__main__":

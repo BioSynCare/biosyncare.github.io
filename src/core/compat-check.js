@@ -125,7 +125,8 @@ export class CompatibilityChecker {
       localStorage.setItem(testKey, '1');
       localStorage.removeItem(testKey);
       this.features.localStorage = true;
-    } catch (error) {
+    } catch (err) {
+      console.log('[CompatCheck] LocalStorage unavailable:', err.message);
       this.features.localStorage = false;
       this.warnings.push({
         feature: 'LocalStorage',
