@@ -1,0 +1,183 @@
+{
+  "version": 1,
+  "generatedAt": "2025-11-06T00:00:00Z",
+  "sessions": [
+    {
+      "id": "alpha_relax_15m",
+      "label": "Alpha Relaxation • 15 min",
+      "description": "Binaural alpha driver with Martigli harmonics and gentle pink noise bed.",
+      "startUtc": null,
+      "totalDurationSec": 900,
+      "loop": false,
+      "voices": [
+        {
+          "presetId": "binaural",
+          "label": "Alpha carrier",
+          "startOffsetSec": 0,
+          "durationSec": 900,
+          "gain": 0.25,
+          "params": {
+            "frequencyMode": "carrier-beat",
+            "base": 200,
+            "beat": 10,
+            "panMode": "static"
+          },
+          "martigli": {
+            "enabled": true,
+            "ma": 2.5,
+            "mp0": 12,
+            "mp1": 8,
+            "md": 180
+          }
+        },
+        {
+          "presetId": "martigli",
+          "label": "Harmonic texture",
+          "startOffsetSec": 60,
+          "durationSec": 780,
+          "gain": 0.12,
+          "params": {
+            "fundamental": 220,
+            "harmonics": [1, 1.5, 2, 3, 5, 8, 13]
+          },
+          "martigli": {
+            "enabled": true,
+            "ma": 0.3,
+            "mp0": 20,
+            "mp1": 10,
+            "md": 240
+          }
+        },
+        {
+          "presetId": "noise-pink",
+          "label": "Atmospheric bed",
+          "startOffsetSec": 0,
+          "durationSec": 900,
+          "gain": 0.12,
+          "params": {
+            "color": "pink"
+          },
+          "martigli": {
+            "enabled": false,
+            "ma": 0,
+            "mp0": 0,
+            "mp1": 0,
+            "md": 0
+          }
+        }
+      ],
+      "symmetryTrack": {
+        "enabled": true,
+        "patternId": "plain_changes_5",
+        "baseFrequency": 110,
+        "division": 8,
+        "scale": {
+          "system": "equal_tempered",
+          "degrees": [0, 3, 5, 7, 10]
+        },
+        "bellMapping": "octave",
+        "customFrequencies": null,
+        "gain": 0.1,
+        "martigli": {
+          "enabled": false,
+          "ma": 0,
+          "mp0": 10,
+          "mp1": 10,
+          "md": 0
+        }
+      },
+      "metadata": {
+        "tags": ["alpha", "relaxation"],
+        "version": 1
+      }
+    },
+    {
+      "id": "focus_uplift_10m",
+      "label": "Focus Uplift • 10 min",
+      "description": "Isochronic pulse with subtle binaural boost and white noise for masking.",
+      "startUtc": null,
+      "totalDurationSec": 600,
+      "loop": false,
+      "voices": [
+        {
+          "presetId": "isochronic",
+          "label": "Pulse driver",
+          "startOffsetSec": 0,
+          "durationSec": 600,
+          "gain": 0.24,
+          "params": {
+            "freq": 180,
+            "pulseFreq": 12
+          },
+          "martigli": {
+            "enabled": true,
+            "ma": 0.15,
+            "mp0": 15,
+            "mp1": 6,
+            "md": 120
+          }
+        },
+        {
+          "presetId": "binaural",
+          "label": "Beta reinforcement",
+          "startOffsetSec": 120,
+          "durationSec": 360,
+          "gain": 0.18,
+          "params": {
+            "frequencyMode": "carrier-beat",
+            "base": 210,
+            "beat": 18,
+            "panMode": "lfo",
+            "panDepth": 0.75,
+            "panFrequency": 0.25
+          },
+          "martigli": {
+            "enabled": false,
+            "ma": 0,
+            "mp0": 0,
+            "mp1": 0,
+            "md": 0
+          }
+        },
+        {
+          "presetId": "noise-white",
+          "label": "Masking layer",
+          "startOffsetSec": 0,
+          "durationSec": 600,
+          "gain": 0.16,
+          "params": {
+            "color": "white"
+          },
+          "martigli": {
+            "enabled": false,
+            "ma": 0,
+            "mp0": 0,
+            "mp1": 0,
+            "md": 0
+          }
+        }
+      ],
+      "symmetryTrack": {
+        "enabled": false,
+        "patternId": null,
+        "baseFrequency": null,
+        "division": null,
+        "scale": null,
+        "bellMapping": null,
+        "customFrequencies": null,
+        "gain": null,
+        "martigli": {
+          "enabled": false,
+          "ma": 0,
+          "mp0": 0,
+          "mp1": 0,
+          "md": 0
+        }
+      },
+      "metadata": {
+        "tags": ["focus", "beta"],
+        "version": 1
+      }
+    }
+  ]
+}

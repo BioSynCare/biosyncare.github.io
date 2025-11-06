@@ -56,7 +56,7 @@ Current state
 - Branch: main
 - Files changed: rdf/docs/explorer/{index.html, style.css, app.js}
 - Build/validation: PASS (static pages). Tested basic interactions locally.
-- Known issues: 
+- Known issues:
 	- Label text backgrounds may overlap on highly dense views (expected). Use zoom/edge label toggle/focus to declutter.
 	- “Reset” currently re-runs default layout; not restoring original positions.
 

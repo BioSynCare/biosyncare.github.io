@@ -1,5 +1,8 @@
+const VERSION = '20251106-1';
+
 async function loadJSON(path) {
-  const res = await fetch(path);
+  const url = path + (path.includes('?') ? '&' : '?') + 'v=' + VERSION;
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Failed to fetch ${path}`);
   return res.json();
 }
@@ -26,18 +29,18 @@ function toElements(nodes, edges, toggles, colorForNs) {
   return elements;
 }
 
-function styleSheet(edgeLabels = true, nodeFont = 12, edgeFont = 10, textBg = 'rgba(255,255,255,0.85)', textOutline = 1) {
+function styleSheet(edgeLabels = true, nodeFont = 12, edgeFont = 10, textBg = 'rgba(255,255,255,0.85)', textOutline = 1, emphasizeSubclass = false) {
   return [
     { selector: 'node', style: { 'label': 'data(label)', 'font-size': nodeFont, 'text-valign': 'center', 'text-halign': 'center', 'background-color': 'data(color)', 'color': '#111', 'text-background-color': textBg, 'text-background-opacity': 1, 'text-background-shape': 'roundrectangle', 'text-border-width': 0, 'text-margin-y': -2, 'text-outline-color': '#fff', 'text-outline-width': textOutline } },
     { selector: 'node[type = "Concept"]', style: { 'background-color': '#2563eb' } },
     { selector: 'node[type = "Property"]', style: { 'background-color': '#7c3aed' } },
     { selector: 'node[type = "Datatype"]', style: { 'background-color': '#16a34a' } },
-    { selector: 'edge', style: { 'width': 1.2, 'line-color': '#bbb', 'target-arrow-color': '#bbb', 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'arrow-scale': 0.8, 'label': edgeLabels ? 'data(label)' : '', 'font-size': edgeFont, 'text-rotation': 'autorotate', 'color': '#666', 'text-background-color': textBg, 'text-background-opacity': 1, 'text-background-shape': 'roundrectangle' } },
-    { selector: 'edge[kind = "subclass"]', style: { 'line-style': 'dashed', 'line-color': '#888', 'target-arrow-color': '#888' } },
-    { selector: 'edge[kind = "objectProperty"]', style: { 'line-color': '#ea580c', 'target-arrow-color': '#ea580c' } },
-    { selector: 'edge[kind = "datatypeProperty"]', style: { 'line-color': '#16a34a', 'target-arrow-color': '#16a34a' } },
-    { selector: 'edge[kind = "skosBroader"]', style: { 'line-color': '#2563eb', 'target-arrow-color': '#2563eb' } },
-    { selector: 'edge[kind = "skosNarrower"]', style: { 'line-color': '#60a5fa', 'target-arrow-color': '#60a5fa' } },
+  { selector: 'edge', style: { 'width': 1.2, 'line-color': '#bbb', 'target-arrow-color': '#bbb', 'source-arrow-color': '#bbb', 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'source-arrow-shape': 'circle', 'arrow-scale': 0.7, 'label': edgeLabels ? 'data(label)' : '', 'font-size': edgeFont, 'text-rotation': 'autorotate', 'color': '#666', 'text-background-color': textBg, 'text-background-opacity': 1, 'text-background-shape': 'roundrectangle' } },
+  { selector: 'edge[kind = "subclass"]', style: { 'width': 2, 'line-style': 'dashed', 'line-color': '#4b5563', 'target-arrow-color': '#4b5563', 'source-arrow-color': '#4b5563', 'curve-style': 'straight', 'opacity': emphasizeSubclass ? 1 : 1 } },
+  { selector: 'edge[kind = "objectProperty"]', style: { 'line-color': '#ea580c', 'target-arrow-color': '#ea580c', 'source-arrow-color': '#ea580c', 'opacity': emphasizeSubclass ? 0.4 : 1 } },
+  { selector: 'edge[kind = "datatypeProperty"]', style: { 'line-color': '#16a34a', 'target-arrow-color': '#16a34a', 'source-arrow-color': '#16a34a', 'opacity': emphasizeSubclass ? 0.4 : 1 } },
+  { selector: 'edge[kind = "skosBroader"]', style: { 'line-color': '#2563eb', 'target-arrow-color': '#2563eb', 'source-arrow-color': '#2563eb', 'opacity': emphasizeSubclass ? 0.8 : 1 } },
+  { selector: 'edge[kind = "skosNarrower"]', style: { 'line-color': '#60a5fa', 'target-arrow-color': '#60a5fa', 'source-arrow-color': '#60a5fa', 'opacity': emphasizeSubclass ? 0.8 : 1 } },
     { selector: ':selected', style: { 'border-color': '#111', 'border-width': 2 } }
   ];
 }
@@ -101,6 +104,7 @@ async function main() {
   let showEdgeLabels = true;
   let theme = 'light';
   let focusSet = null; // Set of node ids to keep when focused
+  let emphasizeSubclass = false;
 
   const cy = cytoscape({
     container: document.getElementById('cy'),
@@ -109,29 +113,41 @@ async function main() {
       const tOk = nsAllowed(idNode.get(e.target) || {ns:''});
       return sOk && tOk;
     }), toggles, colorForNs),
-    style: styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1),
+  style: styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass),
     layout: { name: 'cose', animate: false, fit: true, padding: 20 },
     wheelSensitivity: 0.2,
   });
 
   function currentVisibleGraph() {
-    let nodeList = nodes.filter(nsAllowed);
-    const nodeIds = new Set(nodeList.map(n => n.id));
-    let edgeList = edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target) && edgeVisible(e.kind, toggles));
-    // Apply focus restriction if present
+    // Start from namespace-allowed nodes
+    let preNodes = nodes.filter(nsAllowed);
+    const preIds = new Set(preNodes.map(n => n.id));
+    // Keep only edges between allowed nodes and visible kinds
+    let edgeList = edges.filter(e => preIds.has(e.source) && preIds.has(e.target) && edgeVisible(e.kind, toggles));
+    // Apply focus restriction if present (only restrict edges/nodes used for degree calc/render)
     if (focusSet && focusSet.size > 0) {
-      nodeList = nodeList.filter(n => focusSet.has(n.id));
-      const focusedIds = new Set(nodeList.map(n => n.id));
+      preNodes = preNodes.filter(n => focusSet.has(n.id));
+      const focusedIds = new Set(preNodes.map(n => n.id));
       edgeList = edgeList.filter(e => focusedIds.has(e.source) && focusedIds.has(e.target));
     }
-    return { nodeList, edgeList };
+    // Compute degrees in the current edge set
+    const deg = new Map(preNodes.map(n => [n.id, 0]));
+    for (const e of edgeList) {
+      deg.set(e.source, (deg.get(e.source) || 0) + 1);
+      deg.set(e.target, (deg.get(e.target) || 0) + 1);
+    }
+    // Determine isolated nodes BEFORE pruning, to display in sidebar
+    const isolated = preNodes.filter(n => (deg.get(n.id) || 0) === 0);
+    // Prune isolated nodes from the graph drawing (always omit isolated)
+    const nodeList = preNodes.filter(n => (deg.get(n.id) || 0) > 0);
+    return { nodeList, edgeList, isolated };
   }
 
   function refresh(relayout = true) {
-    const { nodeList, edgeList } = currentVisibleGraph();
+    const { nodeList, edgeList, isolated } = currentVisibleGraph();
     cy.json({ elements: toElements(nodeList, edgeList, toggles, colorForNs) });
     if (relayout) cy.layout({ name: 'cose', animate: false, fit: false }).run();
-    renderIsolated(nodeList, edgeList);
+    renderIsolated(isolated);
   }
 
   for (const [id, key] of [
@@ -253,7 +269,7 @@ async function main() {
       root.style.setProperty('--muted', '#6b7280');
       root.style.setProperty('--border', '#e5e7eb');
     }
-    cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1));
+  cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
   }
 
   btnApplyLayout.addEventListener('click', () => {
@@ -275,15 +291,15 @@ async function main() {
 
   nodeFontInput.addEventListener('input', () => {
     nodeFont = Number(nodeFontInput.value);
-    cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1));
+  cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
   });
   edgeFontInput.addEventListener('input', () => {
     edgeFont = Number(edgeFontInput.value);
-    cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1));
+  cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
   });
   toggleEdgeLabels.addEventListener('change', () => {
     showEdgeLabels = toggleEdgeLabels.checked;
-    cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1));
+  cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
   });
   themeSelect.addEventListener('change', () => applyTheme(themeSelect.value));
   applyTheme('light');
@@ -320,32 +336,32 @@ async function main() {
   // Zoom-based edge label visibility
   cy.on('zoom', () => {
     const z = cy.zoom();
-    const show = showEdgeLabels && z >= 0.7;
-    cy.style(styleSheet(show, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1));
+  const show = showEdgeLabels && z >= 0.7;
+  cy.style(styleSheet(show, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
+  // Emphasize subclass toggle
+  const emphSubclassInput = document.getElementById('emphSubclass');
+  emphSubclassInput.addEventListener('change', () => {
+    emphasizeSubclass = emphSubclassInput.checked;
+    cy.style(styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass));
+  });
   });
 
   // Isolated nodes list
   const isolatedList = document.getElementById('isolatedList');
-  function renderIsolated(nodeList, edgeList) {
-    const deg = new Map(nodeList.map(n => [n.id, 0]));
-    for (const e of edgeList) {
-      deg.set(e.source, (deg.get(e.source) || 0) + 1);
-      deg.set(e.target, (deg.get(e.target) || 0) + 1);
-    }
-    const isolated = nodeList.filter(n => (deg.get(n.id) || 0) === 0);
+  function renderIsolated(isolatedNodes) {
     isolatedList.innerHTML = '';
-    for (const n of isolated) {
+    for (const n of isolatedNodes) {
       const row = document.createElement('div');
       row.className = 'isolated-item';
       const a = document.createElement('a');
       a.href = '#'; a.textContent = n.label || n.id;
       a.title = n.id;
-      a.addEventListener('click', (ev) => { ev.preventDefault(); cy.$id(n.id).select(); cy.center(cy.$id(n.id)); });
-      const btn = document.createElement('button');
-      btn.textContent = 'Focus';
-      btn.addEventListener('click', () => { focusSet = new Set([n.id]); refresh(false); cy.center(cy.$id(n.id)); });
+      a.addEventListener('click', (ev) => { ev.preventDefault(); showInfo(n.id); });
+      const open = document.createElement('button');
+      open.textContent = 'Open';
+      open.addEventListener('click', () => { window.location.href = `./entity.html?uri=${encodeURIComponent(n.id)}`; });
       row.appendChild(a);
-      row.appendChild(btn);
+      row.appendChild(open);
       isolatedList.appendChild(row);
     }
   }

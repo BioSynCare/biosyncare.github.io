@@ -24,6 +24,14 @@ Available helpers (2025-11-06)
 - `url.js`: parses URL arguments (`?preset=sine&preset.frequency=432&session=alpha_relax_15m`), returning defaults and overrides.
 - Shared JSON is also consumed by Python tooling via `scripts/music/presets/load_presets.py`.
 
+### URL overrides
+
+`src/presets/url.js` supports:
+- `?preset=binaural` to preselect a preset.
+- `?preset.base=205&preset.beat=9` to override parameters.
+- `?session=alpha_relax_15m` to launch a session.
+- `?voice.0.gain=0.2` to tweak individual session voices (indexed).
+
 Boundaries
 - Web Core must not edit files in `src/presets/**`. Changes go through a PR owned by Web Presets agent.
 - Do not modify Python music scripts from here; consume their outputs in `scripts/music/output/**`.

@@ -1,0 +1,132 @@
+{
+  "version": 1,
+  "generatedAt": "2025-11-06T00:00:00Z",
+  "presets": [
+    {
+      "id": "sine",
+      "label": "Pure sine • 440Hz",
+      "category": "core",
+      "defaults": {
+        "frequency": 440,
+        "gain": 0.2,
+        "pan": 0,
+        "martigliDepth_frequency": 0,
+        "martigliDepth_gain": 0,
+        "martigliDepth_pan": 0
+      }
+    },
+    {
+      "id": "binaural",
+      "label": "Binaural beat • Alpha 10Hz",
+      "category": "core",
+      "defaults": {
+        "frequencyMode": "carrier-beat",
+        "base": 200,
+        "beat": 10,
+        "leftFrequency": 195,
+        "rightFrequency": 205,
+        "panMode": "static",
+        "panDepth": 1,
+        "panFrequency": 0.2,
+        "martigliFrequency": 0.1,
+        "crossfadeHold": 90,
+        "crossfadeDuration": 20,
+        "panBaseOffset": 0,
+        "gain": 0.25,
+        "martigliDepth_base": 0,
+        "martigliDepth_beat": 0,
+        "martigliDepth_gain": 0
+      }
+    },
+    {
+      "id": "monaural",
+      "label": "Monaural beat • Theta 6Hz",
+      "category": "core",
+      "defaults": {
+        "base": 210,
+        "beat": 6,
+        "gain": 0.3,
+        "martigliDepth_base": 0,
+        "martigliDepth_beat": 0,
+        "martigliDepth_gain": 0
+      }
+    },
+    {
+      "id": "isochronic",
+      "label": "Isochronic pulse • 12Hz breathing",
+      "category": "core",
+      "defaults": {
+        "freq": 180,
+        "pulseFreq": 12,
+        "gain": 0.22,
+        "martigliDepth_freq": 0,
+        "martigliDepth_pulseFreq": 0,
+        "martigliDepth_gain": 0
+      }
+    },
+    {
+      "id": "martigli",
+      "label": "Martigli harmonics",
+      "category": "core",
+      "defaults": {
+        "fundamental": 220,
+        "harmonics": [1, 1.5, 2, 3, 5, 8, 13],
+        "gain": 0.14,
+        "martigliDepth_fundamental": 0,
+        "martigliDepth_gain": 0
+      }
+    },
+    {
+      "id": "martigliOscillation",
+      "label": "Martigli oscillation • Breathing tone",
+      "category": "martigli",
+      "defaults": {
+        "baseFrequency": 200,
+        "amplitude": 100,
+        "gain": 0.2,
+        "pan": 0
+      }
+    },
+    {
+      "id": "martigliMix",
+      "label": "Martigli-Mix • Multi-pattern breathing",
+      "category": "martigli",
+      "defaults": {
+        "baseFrequency": 200,
+        "amplitude": 100,
+        "beatFrequency": 10,
+        "isochronicRate": 6,
+        "binauralGain": 0.2,
+        "monauralGain": 0.2,
+        "isochronicGain": 0.15
+      }
+    },
+    {
+      "id": "noise-white",
+      "label": "Noise • White spectrum",
+      "category": "noise",
+      "defaults": {
+        "color": "white",
+        "gain": 0.18
+      }
+    },
+    {
+      "id": "noise-pink",
+      "label": "Noise • Pink spectrum",
+      "category": "noise",
+      "defaults": {
+        "color": "pink",
+        "gain": 0.18
+      }
+    },
+    {
+      "id": "noise-brown",
+      "label": "Noise • Brown spectrum",
+      "category": "noise",
+      "defaults": {
+        "color": "brown",
+        "gain": 0.22
+      }
+    }
+  ]
+}

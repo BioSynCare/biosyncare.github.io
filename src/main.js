@@ -85,6 +85,13 @@ import {
   getAllAudioTracks,
   getAllVisualTracks,
 } from './state/track-state.js';
+import {
+  loadPresetCatalog,
+  listAudioPresets,
+  clonePresetDefaults,
+  cloneSessionPreset,
+} from './presets/catalog.js';
+import { parsePresetUrlConfig } from './presets/url.js';
 
 // Maintain backward compatibility with legacy helpers
 const generateTrackId = (prefix) => generateId(prefix);
@@ -106,6 +113,26 @@ const extendedRangeSettings = {
   allowExtendedCrossfade: false,
 };
 const EXTENDED_RANGE_STORAGE_KEY = 'biosyncare_extended_ranges';
+
+const initialSearchParams =
+  typeof window !== 'undefined' && window.location ? window.location.search : '';
+const urlPresetConfig = parsePresetUrlConfig(initialSearchParams);
+
+await loadPresetCatalog();
+
+const sharedAudioDefaults = (() => {
+  const map = new Map();
+  try {
+    listAudioPresets().forEach((preset) => {
+      map.set(preset.id, { ...(preset.defaults || {}) });
+    });
+  } catch (error) {
+    console.warn('[Presets] Unable to load shared audio defaults', error);
+  }
+  return map;
+})();
+
+const sessionTimers = new Set();
 
 // Martigli/Breathing Controller - Global shared breathing oscillation
 const martigliController = {
@@ -4147,6 +4174,215 @@ const getPresetParameterValues = (presetKey) => {
   return values;
 };
 
+const cloneSharedDefaults = (presetKey) =>
+  sharedAudioDefaults.get(presetKey)
+    ? { ...sharedAudioDefaults.get(presetKey) }
+    : clonePresetDefaults(presetKey) || {};
+
+const buildPresetParameters = (presetKey, overrides = {}) => {
+  const preset = audioPresets[presetKey];
+  if (!preset) return { ...overrides };
+  const params = { ...cloneSharedDefaults(presetKey), ...(overrides || {}) };
+  const fields = getPresetParams(preset);
+  if (!fields.length) {
+    return params;
+  }
+  const normalized = {};
+  fields.forEach((field) => {
+    const value =
+      params[field.id] !== undefined ? params[field.id] : field.default ?? field.min ?? 0;
+    normalized[field.id] = normalizeParameterValue(field, value);
+  });
+  return normalized;
+};
+
+const startAudioPresetTrack = async (presetKey, overrideParams = {}, options = {}) => {
+  const preset = audioPresets[presetKey];
+  if (!preset) return null;
+
+  const params = buildPresetParameters(presetKey, overrideParams);
+
+  const engine = await ensureAudioEngine({ userInitiated: !!options.userInitiated });
+  if (!engine) return null;
+  await engine.resume?.();
+
+  const result = preset.start(params);
+  if (!result || !result.nodeId) {
+    throw new Error(`Preset "${presetKey}" did not return a node id`);
+  }
+
+  const trackId = options.trackId || generateTrackId('audio');
+  const parameters = { ...(result.parameters || params) };
+  const detailText =
+    result.detail || (typeof preset.describe === 'function' ? preset.describe(parameters) : '');
+  const trackLabel = options.label || preset.label;
+  const trackMeta = {
+    ...(result.meta || { type: presetKey }),
+    source: options.source || 'manual',
+    sessionId: options.sessionId || null,
+  };
+
+  addAudioTrack(trackId, {
+    presetKey,
+    label: trackLabel,
+    detail: detailText,
+    nodeId: result.nodeId,
+    parameters,
+    startedAt: Date.now(),
+    finalized: false,
+    meta: trackMeta,
+    uiCollapsed: options.uiCollapsed ?? false,
+  });
+  incrementAudioAdds();
+  recordUsageEvent('audio_add', {
+    label: trackLabel,
+    presetKey,
+    category: options.category || 'audio',
+    count: 1,
+    meta: trackMeta,
+    parameters,
+    source: options.source || 'manual',
+  });
+
+  return {
+    trackId,
+    presetKey,
+    label: trackLabel,
+    detail: detailText,
+    parameters,
+  };
+};
+
+const stopAudioTrackById = (trackId, reason = 'auto_stop') => {
+  const track = getAudioTrack(trackId);
+  if (!track) return null;
+
+  if (audioEngine && track.nodeId) {
+    try {
+      audioEngine.stop(track.nodeId);
+    } catch (error) {
+      console.warn('Failed to stop audio track', error);
+    }
+  }
+
+  finalizeTrack(track, 'audio');
+  removeAudioTrack(trackId);
+  recordUsageEvent('audio_stop', {
+    label: track.label,
+    presetKey: track.presetKey || null,
+    reason,
+  });
+  return track;
+};
+
+const clearSessionTimers = () => {
+  sessionTimers.forEach((timerId) => clearTimeout(timerId));
+  sessionTimers.clear();
+};
+
+const scheduleSessionPlayback = (session, voiceOverrides = {}) => {
+  if (!session?.voices || !session.voices.length) return;
+
+  const now = Date.now();
+  const startUtcMs = session.startUtc ? Date.parse(session.startUtc) : NaN;
+  const sessionStartMs =
+    Number.isFinite(startUtcMs) && startUtcMs > 0 ? startUtcMs : now;
+  const baseDelay = Math.max(0, sessionStartMs - now);
+
+  if (statusEl) {
+    if (baseDelay > 0) {
+      statusEl.textContent = `Session "${session.label}" scheduled for ${formatDateTime(
+        sessionStartMs
+      )}.`;
+    } else {
+      statusEl.textContent = `Session "${session.label}" starting now.`;
+    }
+  }
+
+  session.voices.forEach((voice, index) => {
+    const voiceIndexKey = String(index);
+    const overrideForVoice =
+      voiceOverrides?.[voiceIndexKey] ??
+      voiceOverrides?.[index] ??
+      voiceOverrides?.[voice.label] ??
+      {};
+    const mergedParams = {
+      ...(voice.params || {}),
+      ...(overrideForVoice || {}),
+    };
+    if (voice.gain !== undefined && voice.gain !== null) {
+      mergedParams.gain = voice.gain;
+    }
+
+    const delayMs = baseDelay + Math.max(0, (voice.startOffsetSec || 0) * 1000);
+    const timerId = setTimeout(async () => {
+      sessionTimers.delete(timerId);
+      try {
+        const result = await startAudioPresetTrack(voice.presetId, mergedParams, {
+          label: voice.label || audioPresets[voice.presetId]?.label,
+          source: 'session',
+          category: `session:${session.id}`,
+          uiCollapsed: true,
+          sessionId: session.id,
+        });
+        if (result) {
+          const count = getAllAudioTracks().length;
+          renderAudioTracks({
+            message: `Started ${result.label} (${session.label}). ${count} audio layer${
+              count === 1 ? '' : 's'
+            } active.`,
+          });
+          if (voice.durationSec && voice.durationSec > 0) {
+            const stopTimer = setTimeout(() => {
+              sessionTimers.delete(stopTimer);
+              const stopped = stopAudioTrackById(result.trackId, 'session_auto_stop');
+              const remaining = getAllAudioTracks().length;
+              const message = stopped
+                ? `Stopped ${stopped.label}. ${remaining} audio layer${
+                    remaining === 1 ? '' : 's'
+                  } active.`
+                : `${remaining} audio layer${remaining === 1 ? '' : 's'} active.`;
+              renderAudioTracks({ message });
+            }, voice.durationSec * 1000);
+            sessionTimers.add(stopTimer);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to start session voice', error);
+      }
+    }, delayMs);
+    sessionTimers.add(timerId);
+  });
+};
+
+const applyUrlPresetConfig = () => {
+  const { presetId, mergedPreset, sessionId, overrides } = urlPresetConfig || {};
+
+  if (presetId && audioPresets[presetId]) {
+    if (audioMenu) {
+      audioMenu.value = presetId;
+    }
+    const state = ensurePresetState(presetId);
+    if (mergedPreset && typeof mergedPreset === 'object') {
+      Object.assign(state, mergedPreset);
+    }
+    const preset = audioPresets[presetId];
+    const params = getPresetParams(preset);
+    params.forEach((field) => {
+      state[field.id] = normalizeParameterValue(field, state[field.id]);
+    });
+  }
+
+  if (sessionId) {
+    const sessionPreset = cloneSessionPreset(sessionId);
+    if (sessionPreset) {
+      scheduleSessionPlayback(sessionPreset, overrides?.voices || {});
+    } else {
+      console.warn(`[Presets] Session preset not found: ${sessionId}`);
+    }
+  }
+};
+
 const createParameterControl = (field, value, { context = 'form', onInput } = {}) => {
   const wrapper = document.createElement('div');
   wrapper.className = context === 'track' ? 'track-parameter-field' : 'parameter-field';
@@ -4275,6 +4511,21 @@ const updateAudioPresetSummary = (presetKey, state) => {
     audioParameterPreviewEl.textContent = summary ? `Current: ${summary}` : '';
   }
 };
+
+const applySharedAudioDefaults = () => {
+  Object.entries(audioPresets).forEach(([presetId, preset]) => {
+    const defaults = sharedAudioDefaults.get(presetId);
+    if (!defaults) return;
+    const params = getPresetParams(preset);
+    params.forEach((field) => {
+      if (Object.prototype.hasOwnProperty.call(defaults, field.id)) {
+        field.default = defaults[field.id];
+      }
+    });
+  });
+};
+
+applySharedAudioDefaults();
 
 const renderAudioParameterForm = () => {
   if (!audioParameterPanel || !audioMenu) return;
@@ -4747,6 +4998,7 @@ const stopAllAudio = ({ message } = {}) => {
       console.warn('Failed to stop audio nodes', error);
     }
   }
+  clearSessionTimers();
   clearAudioTracks();
   renderAudioTracks({
     message: message ?? 'All audio layers stopped.',
@@ -4786,54 +5038,15 @@ visualMenu.addEventListener('change', updateVisualDescription);
 
 addAudioBtn.addEventListener('click', async () => {
   const presetKey = audioMenu.value;
-  const preset = audioPresets[presetKey];
-  if (!preset) return;
-
   const params = getPresetParameterValues(presetKey);
 
   try {
-    const engine = await ensureAudioEngine({ userInitiated: false });
-    if (!engine) {
-      return;
-    }
-    await engine.resume?.();
-    const result = preset.start(params);
-    if (!result || !result.nodeId) {
-      throw new Error('Preset did not return a node id');
-    }
-
-    const trackId = generateTrackId('audio');
-    const parameters = { ...(result.parameters || params) };
-    const detailText = result.detail
-      ? result.detail
-      : preset.describe
-        ? preset.describe(parameters)
-        : '';
-    const trackMeta = result.meta || { type: presetKey };
-    addAudioTrack(trackId, {
-      presetKey,
-      label: preset.label,
-      detail: detailText,
-      nodeId: result.nodeId,
-      parameters,
-      startedAt: Date.now(),
-      finalized: false,
-      meta: trackMeta,
-      uiCollapsed: false,
-    });
-    incrementAudioAdds();
-    recordUsageEvent('audio_add', {
-      label: preset.label,
-      presetKey,
-      category: 'audio',
-      count: 1,
-      meta: trackMeta,
-      parameters,
-    });
+    const result = await startAudioPresetTrack(presetKey, params, { source: 'manual' });
+    if (!result) return;
 
     const count = getAllAudioTracks().length;
     renderAudioTracks({
-      message: `Started ${preset.label}. ${count} audio layer${
+      message: `Started ${result.label}. ${count} audio layer${
         count === 1 ? '' : 's'
       } active.`,
     });
@@ -4959,6 +5172,7 @@ stopBtn.addEventListener('click', async () => {
   });
 });
 
+applyUrlPresetConfig();
 updateAudioDescription();
 renderAudioParameterForm();
 updateVisualDescription();
@@ -5484,20 +5698,48 @@ initDiagnosticsWidget();
     console.warn('[PWA] Service worker registration failed or not supported');
   }
 
+  // PWA Install Button with smart install/update detection
+  const { createInstallButton } = await import('./ui/pwa-install-button.js');
+
+  console.log('[PWA] Creating install button...');
+  const installButton = createInstallButton({
+    text: pwaInstaller.isInstalled() ? 'App Installed ✓' : 'Install App',
+    position: 'bottom-right',
+    hideWhenInstalled: false, // Keep visible to show status
+    onInstalled: () => {
+      console.log('[PWA] App installed successfully!');
+      // Show success notification
+      showToast('✅ App installed successfully! You can now use it offline.', 'success');
+    },
+  });
+
+  console.log('[PWA] Install button created:', {
+    visible: installButton.visible,
+    canInstall: pwaInstaller.canInstall(),
+    isInstalled: pwaInstaller.isInstalled(),
+  });
+
   // Listen for install prompt
   pwaInstaller.onInstallable = () => {
     console.log('[PWA] App can be installed - prompt available');
-    // TODO: Show install button in UI
   };
 
   pwaInstaller.onInstalled = () => {
     console.log('[PWA] App installed successfully!');
-    // TODO: Show success notification
+    // Update button text
+    if (installButton.element) {
+      const btn = installButton.element.querySelector('button');
+      if (btn) {
+        btn.querySelector('span').textContent = 'App Installed ✓';
+        btn.style.backgroundColor = '#10b981'; // Green
+      }
+    }
   };
 
-  pwaInstaller.onUpdateAvailable = () => {
+  pwaInstaller.onUpdateAvailable = (newWorker) => {
     console.log('[PWA] App update available');
-    // TODO: Show update notification with refresh button
+    // Show update notification
+    showUpdateNotification(newWorker);
   };
 
   pwaInstaller.onOffline = () => {
@@ -5523,4 +5765,99 @@ initDiagnosticsWidget();
   });
 
   console.log('[BioSynCare] PWA & Safety systems initialized');
+
+  // Helper: Show toast notification
+  function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.textContent = message;
+    Object.assign(toast.style, {
+      position: 'fixed',
+      bottom: '80px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      padding: '16px 32px',
+      borderRadius: '8px',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      zIndex: '10000',
+      fontSize: '14px',
+      fontWeight: '500',
+      maxWidth: '90%',
+      textAlign: 'center',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      backgroundColor: type === 'success' ? '#10b981' : type === 'warning' ? '#f59e0b' : '#6366f1',
+      color: 'white',
+      opacity: '0',
+      transition: 'opacity 0.3s ease',
+    });
+    document.body.appendChild(toast);
+
+    // Fade in
+    setTimeout(() => { toast.style.opacity = '1'; }, 10);
+
+    // Fade out and remove
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4000);
+  }
+
+  // Helper: Show update notification
+  function showUpdateNotification(newWorker) {
+    const notification = document.createElement('div');
+    notification.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <span style="flex: 1;">🔄 App update available!</span>
+        <button id="update-btn" style="
+          padding: 8px 16px;
+          background: white;
+          color: #6366f1;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          cursor: pointer;
+          font-size: 14px;
+        ">Update Now</button>
+        <button id="dismiss-update-btn" style="
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          border: none;
+          background: rgba(255,255,255,0.2);
+          color: white;
+          font-size: 20px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        ">×</button>
+      </div>
+    `;
+    Object.assign(notification.style, {
+      position: 'fixed',
+      top: '20px',
+      right: '20px',
+      padding: '16px 24px',
+      borderRadius: '8px',
+      backgroundColor: '#6366f1',
+      color: 'white',
+      boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+      zIndex: '10000',
+      maxWidth: '400px',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '14px',
+      fontWeight: '500',
+    });
+    document.body.appendChild(notification);
+
+    // Update button click
+    notification.querySelector('#update-btn').onclick = () => {
+      pwaInstaller.activateUpdate();
+      notification.remove();
+    };
+
+    // Dismiss button click
+    notification.querySelector('#dismiss-update-btn').onclick = () => {
+      notification.remove();
+    };
+  }
 })();
