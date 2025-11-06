@@ -11,6 +11,8 @@ help:
 	@printf "  git-sync        Run 'git commit -am \"$(MSG)\"' and push if there are changes\n"
 	@printf "  firebase-login  Run 'firebase login' to authenticate the CLI\n"
 	@printf "  open-console    Open the Firebase console for $(PROJECT)\n"
+	@printf "  agents-info     Show locations of AGENTS.md and per-agent instructions\n"
+	@printf "  open-agents     Open AGENTS.md (macOS)\n"
 	@printf "  rdf-setup       Create Python venv and install RDF tooling\n"
 	@printf "  rdf-validate    Validate all Turtle files in rdf/ using rdflib\n"
 	@printf "  rdf-report      Generate HTML summary of classes and properties\n"
@@ -45,6 +47,18 @@ firebase-login:
 
 open-console:
 	open "https://console.firebase.google.com/project/$(PROJECT)"
+
+# ---------- Agents helpers ----------
+.PHONY: agents-info open-agents
+
+agents-info:
+	@echo "Coordination file: AGENTS.md"
+	@echo "Per-agent instructions: .vscode/ai-instructions/"
+	@ls -1 .vscode/ai-instructions || true
+	@echo "Handoffs folder: handoffs/ (append your notes to the relevant file)"
+
+open-agents:
+	open AGENTS.md
 
 # ---------- RDF workflow (isolated) ----------
 .PHONY: rdf-setup rdf-validate
@@ -93,19 +107,20 @@ rdf-webvowl-setup:
 			echo "  -> trying $$URL"; \
 			curl -fL -H "Accept: application/octet-stream" -o scripts/rdf/tools/owl2vowl.jar "$$URL" && break; \
 			done; \
-		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \\
-			echo "WARN: Direct jar download failed; trying legacy 0.2.0 zip asset..."; \\
-			rm -rf scripts/rdf/tools/owl2vowl-zip && mkdir -p scripts/rdf/tools/owl2vowl-zip; \\
-			curl -fL -H "Accept: application/octet-stream" -o scripts/rdf/tools/owl2vowl-0.2.0.zip https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.2.0/owl2vowl.zip || true; \\
-			unzip -q -o scripts/rdf/tools/owl2vowl-0.2.0.zip -d scripts/rdf/tools/owl2vowl-zip || true; \\
-			JAR=$$(cd scripts/rdf/tools/owl2vowl-zip && find . -name 'owl2vowl.jar' -maxdepth 3 -print -quit); \\
-			if [ -n "$$JAR" ]; then \\
-				cp "scripts/rdf/tools/owl2vowl-zip/$$JAR" scripts/rdf/tools/owl2vowl.jar; \\
-			fi; \\
-		fi; \\
-		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \\
-			echo "WARN: Could not obtain owl2vowl.jar from releases; will attempt to build from source."; \\
-			$(MAKE) rdf-webvowl-build-owl2vowl || { echo "ERROR: Build failed. Install Maven or download the jar manually."; exit 1; }; \\
+		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \
+			echo "WARN: Direct jar download failed; trying legacy 0.2.0 zip asset..."; \
+			rm -rf scripts/rdf/tools/owl2vowl-zip && mkdir -p scripts/rdf/tools/owl2vowl-zip; \
+			curl -fL -H "Accept: application/octet-stream" -o scripts/rdf/tools/owl2vowl-0.2.0.zip https://github.com/VisualDataWeb/OWL2VOWL/releases/download/0.2.0/owl2vowl.zip || true; \
+			unzip -q -o scripts/rdf/tools/owl2vowl-0.2.0.zip -d scripts/rdf/tools/owl2vowl-zip || true; \
+			chmod -R u+rwX scripts/rdf/tools/owl2vowl-zip || true; \
+			JAR=$$(cd scripts/rdf/tools/owl2vowl-zip && find . -name 'owl2vowl.jar' -maxdepth 3 -print -quit); \
+			if [ -n "$$JAR" ]; then \
+				cp "scripts/rdf/tools/owl2vowl-zip/$$JAR" scripts/rdf/tools/owl2vowl.jar; \
+			fi; \
+		fi; \
+		if [ ! -s scripts/rdf/tools/owl2vowl.jar ] || [ $$(wc -c < scripts/rdf/tools/owl2vowl.jar) -lt 100000 ]; then \
+			echo "WARN: Could not obtain owl2vowl.jar from releases; will attempt to build from source."; \
+			$(MAKE) rdf-webvowl-build-owl2vowl || { echo "ERROR: Build failed. Install Maven or download the jar manually."; exit 1; }; \
 		fi; \
 		if ! unzip -t scripts/rdf/tools/owl2vowl.jar >/dev/null 2>&1; then \
 			echo "ERROR: owl2vowl.jar appears to be invalid."; \
@@ -138,8 +153,8 @@ rdf-webvowl-build-owl2vowl:
 
 rdf-webvowl: rdf-webvowl-setup rdf-webvowl-jar
 	@echo "Generating VOWL JSON for bsc-owl.ttl and sso-ontology.ttl (Java required)..."
-	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -o rdf/docs/webvowl/bsc.json || true
-	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -o rdf/docs/webvowl/sso.json || true
+	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -echo > rdf/docs/webvowl/bsc.json || true
+	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -echo > rdf/docs/webvowl/sso.json || true
 
 rdf-webvowl-jar:
 	@if [ ! -s scripts/rdf/tools/owl2vowl.jar ]; then \
@@ -156,7 +171,9 @@ rdf-webvowl-viewer:
 		git -C scripts/rdf/tools/WebVOWL-build-page fetch origin build/page; \
 		git -C scripts/rdf/tools/WebVOWL-build-page reset --hard origin/build/page; \
 	fi
-	@# Copy static viewer from src/ into site folder
+	@# Install and build deploy/ with grunt (postinstall runs release)
+	@cd scripts/rdf/tools/WebVOWL-build-page && npm install --silent || npm install
+	@# Copy built app from deploy/
 	@rm -rf rdf/docs/webvowl/app/*
-	@cp -R scripts/rdf/tools/WebVOWL-build-page/src/* rdf/docs/webvowl/app/ || true
+	@cp -R scripts/rdf/tools/WebVOWL-build-page/deploy/* rdf/docs/webvowl/app/ || true
 	@echo "WebVOWL viewer assets installed under rdf/docs/webvowl/app/ (entry: index.html)"

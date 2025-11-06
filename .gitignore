@@ -13,6 +13,9 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
+# RDF tooling caches and binaries (re-built via Makefile)
+scripts/rdf/tools/
+
 # Python cache
 __pycache__/
 *.py[cod]
