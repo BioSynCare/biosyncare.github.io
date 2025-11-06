@@ -96,6 +96,7 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
 
 - Web ⇄ Music
   - Music writes machine-readable outputs to `scripts/music/output/` (JSON/CSV/audio). Web may import or fetch these outputs.
+  - Preferred flow: Music exports `scripts/music/output/musicStructures.json`; Web runs `make web-sync-music-data` to (re)generate `src/data/musicStructures.js` for synchronous imports.
   - If web requires changes to runtime JS (e.g., `src/core/change-ringing.js`), do so via PRs with a small adapter, not by overwriting music’s Python logic.
 
 - RDF/ONT ⇄ Music
