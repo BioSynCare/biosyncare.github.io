@@ -1,0 +1,3 @@
+# Ignore everything in this build workspace
+*
+!.gitignore
