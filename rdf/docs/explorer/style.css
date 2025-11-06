@@ -9,6 +9,9 @@ h1 { margin: 0 0 .5rem; font-size: 1.1rem; }
 .ns-filters { display: flex; flex-wrap: wrap; gap: .25rem .5rem; max-width: 52vw; }
 .ns-pill { display: inline-flex; align-items: center; gap: .25rem; padding: .15rem .4rem; border: 1px solid var(--border); border-radius: 999px; }
 .ns-pill input { margin: 0; }
+.ns-legend { display: flex; flex-wrap: wrap; gap: .25rem .5rem; align-items: center; margin-left: .5rem; }
+.legend-item { display: inline-flex; align-items: center; gap: .25rem; font-size: .85rem; color: var(--muted); }
+.legend-dot { width: .8rem; height: .8rem; border-radius: 50%; display: inline-block; border: 1px solid var(--border); }
 label { color: var(--muted); }
 input#search { min-width: 240px; padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; }
 .btn { padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--fg); }
@@ -18,3 +21,11 @@ aside#info { border-left: 1px solid var(--border); padding: .75rem; overflow: au
 aside h2 { font-size: 1rem; margin: .25rem 0 .5rem; }
 aside .muted { color: var(--muted); font-size: .9rem; }
 .pill { display: inline-block; padding: .15rem .4rem; border-radius: 999px; border: 1px solid var(--border); margin-right: .25rem; font-size: .8rem; }
+
+/* Enhancements */
+.btn { cursor: pointer; background: transparent; }
+#cy { background: var(--bg); }
+.isolated-list { display: flex; flex-direction: column; gap: .25rem; }
+.isolated-item { display: flex; justify-content: space-between; gap: .5rem; align-items: center; }
+.isolated-item a { text-decoration: none; color: var(--blue); font-size: .9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.isolated-item button { font-size: .8rem; padding: .2rem .4rem; }

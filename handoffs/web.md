@@ -11,6 +11,7 @@
   - `playChangeRinging(opts)` on `AudioEngine` consumes that schedule
 - Audio preset reference renders available via `python scripts/music/render_presets_audio.py` (see `scripts/music/output/presets` for WAV baselines)
 - Preset/session schema (including Martigli & symmetry-track fields) lives in `scripts/music/presets/README.md`.
+- Shared preset catalog JSON lives in `src/data/presets/audio-presets.json` and `session-presets.json`; access via `src/presets/catalog.js`.
 
 ## What you need to do
 - Import from `src/data/musicStructures.js` or call the helpers above to surface pattern selectors / previews in the UI

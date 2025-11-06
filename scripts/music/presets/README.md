@@ -100,3 +100,7 @@ timings.
 This template is intentionally JSON-friendly so it can be shared with the
 frontend or persisted in Firestore. Feel free to evolve the schema, but keep
 `voices` and `symmetryTrack` stable so both Python and web agents can cooperate.
+
+> Shared preset catalog JSON lives in `src/data/presets/audio-presets.json`
+> and `src/data/presets/session-presets.json`. Use the helper
+> `scripts/music/presets/load_presets.py` when consuming them from Python.

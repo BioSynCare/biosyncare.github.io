@@ -8,6 +8,7 @@ Context
 - Docs updated (`scripts/music/README.md`, `scripts/music/WORKFLOW.md`) with usage notes; handoff for Web agent updated with consumption instructions.
 - Added `scripts/music/render_presets_audio.py` to generate WAV baselines for sine/binaural/etc. presets (outputs land in `scripts/music/output/`).
 - Added preset/session schema guidance at `scripts/music/presets/README.md`.
+- Shared preset catalogs now live in `src/data/presets/*.json`; Python helper `scripts/music/presets/load_presets.py` reads them for offline tooling.
 
 Current state
 - Branch: n/a (working tree dirty only for exporters + docs)

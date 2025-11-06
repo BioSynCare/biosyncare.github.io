@@ -19,6 +19,11 @@ Contract (suggested)
 - `applyPreset(preset)` returns `Result` with validation errors if any
 - Emits events or returns data-only objects, leaving UI rendering to callers
 
+Available helpers (2025-11-06)
+- `catalog.js`: exposes `listAudioPresets()`, `getAudioPreset()`, `listSessionPresets()`, etc. All backed by JSON in `src/data/presets/`.
+- `url.js`: parses URL arguments (`?preset=sine&preset.frequency=432&session=alpha_relax_15m`), returning defaults and overrides.
+- Shared JSON is also consumed by Python tooling via `scripts/music/presets/load_presets.py`.
+
 Boundaries
 - Web Core must not edit files in `src/presets/**`. Changes go through a PR owned by Web Presets agent.
 - Do not modify Python music scripts from here; consume their outputs in `scripts/music/output/**`.

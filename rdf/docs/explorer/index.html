@@ -22,14 +22,56 @@
         <div class="group ns-group">
           <strong>Namespaces:</strong>
           <div id="nsFilters" class="ns-filters"></div>
+          <div id="nsLegend" class="ns-legend"></div>
         </div>
-        <input id="search" placeholder="Search label or URI…" />
-        <a class="btn" href="../webvowl/index.html">Open WebVOWL</a>
+        <div class="group">
+          <label>Layout
+            <select id="layoutSelect">
+              <option value="cose">cose (force)</option>
+              <option value="breadthfirst">breadthfirst (hierarchical)</option>
+              <option value="concentric">concentric</option>
+              <option value="circle">circle</option>
+              <option value="grid">grid</option>
+            </select>
+          </label>
+          <button class="btn" id="applyLayout">Apply</button>
+          <button class="btn" id="fitView">Fit</button>
+          <button class="btn" id="resetView">Reset</button>
+        </div>
+        <div class="group">
+          <label>Node labels <input type="range" id="nodeFont" min="8" max="20" value="12" /></label>
+          <label>Edge labels <input type="range" id="edgeFont" min="8" max="16" value="10" /></label>
+          <label><input type="checkbox" id="toggleEdgeLabels" checked /> show edge labels</label>
+        </div>
+        <div class="group">
+          <label>Theme
+            <select id="themeSelect">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select>
+          </label>
+        </div>
+        <div class="group">
+          <input id="search" placeholder="Search label or URI…" />
+          <a class="btn" href="../webvowl/index.html">WebVOWL</a>
+        </div>
+        <div class="group">
+          <label>Focus k-hop <input type="number" id="focusK" min="1" max="3" value="1" /></label>
+          <button class="btn" id="focusSelection">Focus selection</button>
+          <button class="btn" id="clearFocus">Clear focus</button>
+        </div>
       </div>
     </header>
     <main>
       <div id="cy"></div>
-      <aside id="info"></aside>
+      <aside id="info">
+        <div id="infoContent"></div>
+        <hr />
+        <div>
+          <h3>Isolated in view</h3>
+          <div id="isolatedList" class="isolated-list"></div>
+        </div>
+      </aside>
     </main>
   </body>
   </html>

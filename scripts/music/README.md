@@ -131,6 +131,9 @@ Session/preset JSON guidance (including Martigli and symmetry-track fields) live
 `scripts/music/presets/README.md`. Share this with the web agent when defining
 coordinated sessions or multi-voice experiences.
 
+Python helpers for loading the shared preset JSON are available in
+`scripts/music/presets/load_presets.py`.
+
 ## Dependencies
 
 The toolkit uses the **ttm/music** package, a comprehensive Python library for
