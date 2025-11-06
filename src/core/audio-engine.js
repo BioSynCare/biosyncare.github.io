@@ -12,7 +12,7 @@
  * - Martigli waves (complex harmonics)
  * - Sonic symmetries (mathematical patterns)
  * - Noise generators: white, pink, brown, blue, violet, black
- * - Safe gain limiting
+ * - Safe gain limiting & safety monitoring
  * - Smooth fade in/out
  * - Spatial audio (stereo panning)
  * - Martigli worklet-driven modulation (sample-accurate)
@@ -57,6 +57,14 @@
  *   });
  */
 
+
+import { SafetyMonitor } from './safety-monitor.js';
+import {
+  listChangeRingingPatterns as listChangeRingingPatternsData,
+  getChangeRingingPatternById as getChangeRingingPatternFromData,
+  createChangeRingingSchedule as buildChangeRingingSchedule,
+  DEFAULT_CHANGE_RINGING_OPTIONS,
+} from './change-ringing.js';
 
 const clamp = (value, min, max) => {
   if (min !== undefined && value < min) return min;
@@ -234,6 +242,8 @@ export class AudioEngine {
     this.martigliWorklet = null;
     this.martigliBypassGain = null;
     this._martigliModulations = {}; // Cache of modulation values from worklet
+    this.safetyMonitor = null;
+    this.safetyEnabled = true;
   }
 
   /**
@@ -255,11 +265,28 @@ export class AudioEngine {
 
     this._initMartigliWorklet();
 
+    // Initialize safety monitor
+    if (this.safetyEnabled) {
+      this.safetyMonitor = new SafetyMonitor(this.ctx);
+      this.safetyMonitor.connect(this.masterGain);
+      this.safetyMonitor.startSession();
+
+      // Set up safety callbacks
+      this.safetyMonitor.onWarning = (severity, data) => {
+        this._handleSafetyWarning(severity, data);
+      };
+
+      this.safetyMonitor.onEmergencyStop = (data) => {
+        this._handleEmergencyStop(data);
+      };
+    }
+
     this.initialized = true;
     console.log('[AudioEngine] Initialized', {
       sampleRate: this.ctx.sampleRate,
       state: this.ctx.state,
       baseLatency: this.ctx.baseLatency,
+      safetyEnabled: this.safetyEnabled,
     });
   }
 
@@ -401,6 +428,39 @@ export class AudioEngine {
     if (this.ctx && this.ctx.state === 'suspended') {
       await this.ctx.resume();
     }
+  }
+
+  /**
+   * Get catalog of available change-ringing patterns (static metadata)
+   * @returns {Array} simplified pattern summaries
+   */
+  getChangeRingingPatterns() {
+    return listChangeRingingPatternsData();
+  }
+
+  /**
+   * Fetch full change-ringing pattern by id
+   * @param {string} patternId
+   * @returns {Object|null}
+   */
+  getChangeRingingPattern(patternId) {
+    return getChangeRingingPatternFromData(patternId);
+  }
+
+  /**
+   * Build a change-ringing playback schedule (does not start audio)
+   * @param {Object} options forwarded to schedule builder
+   * @returns {Object} schedule with events, metadata, duration
+   */
+  prepareChangeRingingSchedule(options = {}) {
+    return buildChangeRingingSchedule(options);
+  }
+
+  /**
+   * Return default configuration used by the change-ringing scheduler
+   */
+  getDefaultChangeRingingOptions() {
+    return { ...DEFAULT_CHANGE_RINGING_OPTIONS };
   }
 
   /**
@@ -787,6 +847,10 @@ export class AudioEngine {
     const node = this.nodes.get(id);
     if (!node) return;
 
+    if (node.cleanupTimeout) {
+      clearTimeout(node.cleanupTimeout);
+    }
+
     const safeStop = (osc) => {
       if (!osc) return;
       try {
@@ -866,6 +930,9 @@ export class AudioEngine {
 
       if (Array.isArray(node.gainNodes)) {
         node.gainNodes.forEach(safeDisconnect);
+      }
+      if (Array.isArray(node.panners)) {
+        node.panners.forEach(safeDisconnect);
       }
     } catch {
       // Already stopped
@@ -1374,6 +1441,245 @@ export class AudioEngine {
       fadeIn,
       fadeOut,
     });
+  }
+
+  /**
+   * Play change-ringing pattern as sequenced bell strikes
+   * @param {Object} opts
+   *  - patternId: string identifier from library (default: 'plain_changes_5')
+   *  - schedule: precomputed schedule from prepareChangeRingingSchedule()
+   *  - baseFreq / scale / rowsPerMinute / bellInterval / rowGap / strikeDuration
+   *  - gain: base amplitude (0-1, defaults to 0.18)
+   *  - accentMode: 'rowLead' | 'none'
+   *  - accentGain: multiplier applied when accentMode matches (default: 1.3)
+   *  - bellAccents: optional array of per-bell multipliers
+   *  - panSpread: stereo spread 0-1
+   *  - detuneCents: cents offset per bell position away from centre
+   *  - waveform: oscillator type (sine, triangle, square, sawtooth, custom)
+   *  - startDelay: seconds to wait before first strike
+   */
+  playChangeRinging(opts = {}) {
+    this._ensureInit();
+
+    const {
+      patternId = 'plain_changes_5',
+      schedule: scheduleOverride = null,
+      baseFreq,
+      scale,
+      rowsPerMinute,
+      bellInterval,
+      rowGap,
+      strikeDuration,
+      attack,
+      release,
+      waveform = 'sine',
+      gain = 0.18,
+      accentMode = 'rowLead',
+      accentGain = 1.3,
+      bellAccents = null,
+      panSpread = 0.85,
+      detuneCents = 0,
+      startDelay = 0,
+      metadata = {},
+    } = opts;
+
+    let schedule = scheduleOverride;
+
+    if (!schedule) {
+      const scheduleOptions = { patternId };
+      if (baseFreq !== undefined) scheduleOptions.baseFreq = baseFreq;
+      if (scale !== undefined) scheduleOptions.scale = scale;
+      if (rowsPerMinute !== undefined) {
+        scheduleOptions.rowsPerMinute = rowsPerMinute;
+      }
+      if (bellInterval !== undefined) scheduleOptions.bellInterval = bellInterval;
+      if (rowGap !== undefined) scheduleOptions.rowGap = rowGap;
+      if (strikeDuration !== undefined) {
+        scheduleOptions.strikeDuration = strikeDuration;
+      }
+      if (attack !== undefined) scheduleOptions.attack = attack;
+      if (release !== undefined) scheduleOptions.release = release;
+      schedule = buildChangeRingingSchedule(scheduleOptions);
+    }
+
+    if (!schedule?.events?.length) {
+      console.warn('[AudioEngine] Change-ringing schedule has no events');
+      return null;
+    }
+
+    const stage = schedule.stage || schedule.bellFrequencies?.length || 1;
+    const effectiveGain = Math.max(0, toNumberOr(gain, 0.18));
+    const stageGainNormalizer = stage > 0 ? Math.sqrt(stage) : 1;
+    const baseLevel = effectiveGain / stageGainNormalizer;
+    const accentMultiplier = Math.max(0, toNumberOr(accentGain, 1.3));
+    const accentModeNormalized = accentMode || 'rowLead';
+    const perBellAccents = Array.isArray(bellAccents) ? bellAccents : [];
+    const effectivePanSpread = clamp(toNumberOr(panSpread, 0.85), 0, 1);
+    const detuneSpread = toNumberOr(detuneCents, 0);
+    const startOffset = Math.max(0, toNumberOr(startDelay, 0));
+    const baseStartTime = this.ctx.currentTime + startOffset;
+
+    const strikeDur = Math.max(0.02, schedule.strikeDuration ?? 0.15);
+    const envAttackRaw = schedule.attack ?? DEFAULT_CHANGE_RINGING_OPTIONS.attack;
+    const envReleaseRaw = schedule.release ?? DEFAULT_CHANGE_RINGING_OPTIONS.release;
+    const envAttack = Math.min(Math.max(0.001, envAttackRaw), strikeDur * 0.9);
+    const envRelease = Math.max(0.01, envReleaseRaw);
+
+    const panPositions =
+      stage <= 1 || effectivePanSpread === 0
+        ? [0]
+        : Array.from({ length: stage }, (_, index) => {
+            const t = stage === 1 ? 0 : index / (stage - 1);
+            return -effectivePanSpread + 2 * effectivePanSpread * t;
+          });
+    const centerOffset = (stage - 1) / 2;
+
+    const oscillators = [];
+    const gainNodes = [];
+    const panners = [];
+    const renderedEvents = [];
+
+    schedule.events.forEach((event) => {
+      const startTime = baseStartTime + event.time;
+      const releaseStart = startTime + strikeDur;
+      const stopTime = releaseStart + envRelease;
+
+      const bellAccent = perBellAccents[event.bell];
+      const accentFactor =
+        accentModeNormalized === 'rowLead' && event.isRowLead
+          ? accentMultiplier
+          : 1;
+      const perBellFactor =
+        Number.isFinite(bellAccent) && bellAccent > 0 ? bellAccent : 1;
+
+      let level = baseLevel * accentFactor * perBellFactor;
+      level = Math.max(0, Math.min(1, level));
+
+      if (level <= 0) {
+        return;
+      }
+
+      const osc = this.ctx.createOscillator();
+      osc.type = waveform;
+      osc.frequency.setValueAtTime(event.frequency, startTime);
+
+      if (detuneSpread !== 0) {
+        const detuneValue = detuneSpread * (event.bell - centerOffset);
+        osc.detune.setValueAtTime(detuneValue, startTime);
+      }
+
+      const eventGain = this.ctx.createGain();
+      eventGain.gain.setValueAtTime(0, startTime);
+      eventGain.gain.linearRampToValueAtTime(level, startTime + envAttack);
+      eventGain.gain.setValueAtTime(level, releaseStart);
+      eventGain.gain.linearRampToValueAtTime(0, stopTime);
+
+      osc.connect(eventGain);
+
+      let panValue = 0;
+      if (stage > 1 && effectivePanSpread > 0) {
+        const panner = this.ctx.createStereoPanner();
+        panValue = panPositions[event.bell] ?? 0;
+        panner.pan.setValueAtTime(panValue, startTime);
+        eventGain.connect(panner);
+        panner.connect(this.masterGain);
+        panners.push(panner);
+      } else {
+        eventGain.connect(this.masterGain);
+      }
+
+      oscillators.push(osc);
+      gainNodes.push(eventGain);
+
+      osc.start(startTime);
+      osc.stop(stopTime);
+
+      renderedEvents.push({
+        ...event,
+        level,
+        pan: panValue,
+        startTime,
+        stopTime,
+      });
+    });
+
+    if (!oscillators.length) {
+      console.warn('[AudioEngine] All change-ringing strikes were muted');
+      return null;
+    }
+
+    const finalStopTime = renderedEvents.reduce(
+      (max, evt) => Math.max(max, evt.stopTime),
+      baseStartTime
+    );
+    const cleanupDelayMs = Math.max(
+      0,
+      (finalStopTime - this.ctx.currentTime + 0.5) * 1000
+    );
+
+    const nodeId = `change_ringing_${Date.now()}_${Math.random()
+      .toString(36)
+      .slice(2, 8)}`;
+
+    const cleanupTimeout = setTimeout(() => {
+      this.stop(nodeId);
+    }, cleanupDelayMs);
+
+    this.nodes.set(nodeId, {
+      type: 'changeRinging',
+      oscillators,
+      gainNodes,
+      panners,
+      schedule,
+      renderedEvents,
+      options: {
+        patternId: schedule.patternId,
+        patternTitle: schedule.patternTitle,
+        baseFreq: schedule.baseFreq,
+        scale: schedule.scale,
+        bellInterval: schedule.bellInterval,
+        rowGap: schedule.rowGap,
+        rowsPerMinute:
+          stage > 0 && schedule.bellInterval
+            ? 60 / (stage * schedule.bellInterval)
+            : null,
+        waveform,
+        gain: effectiveGain,
+        baseLevel,
+        accentMode: accentModeNormalized,
+        accentGain: accentMultiplier,
+        panSpread: effectivePanSpread,
+        detuneCents: detuneSpread,
+        startDelay: startOffset,
+        metadata: {
+          ...schedule.metadata,
+          ...metadata,
+        },
+        sourceFile: schedule.sourceFile,
+      },
+      playback: {
+        startTime: baseStartTime,
+        finalStopTime,
+        duration: finalStopTime - baseStartTime,
+      },
+      cleanupTimeout,
+    });
+
+    console.log('[AudioEngine] Change ringing', {
+      patternId: schedule.patternId,
+      title: schedule.patternTitle,
+      stage,
+      rows: schedule.rows,
+      waveform,
+      gain: effectiveGain,
+      accentMode: accentModeNormalized,
+      panSpread: effectivePanSpread,
+      detuneCents: detuneSpread,
+      strikes: renderedEvents.length,
+      duration: (finalStopTime - baseStartTime).toFixed(2),
+    });
+
+    return nodeId;
   }
 
   /**
@@ -2325,6 +2631,90 @@ export class AudioEngine {
     if (!this.initialized) {
       throw new Error('AudioEngine not initialized. Call engine.init() first.');
     }
+  }
+
+  /**
+   * Handle safety warnings from SafetyMonitor
+   * @param {string} severity - 'warning' | 'emergency'
+   * @param {Object} data - Warning data
+   */
+  _handleSafetyWarning(severity, data) {
+    console.warn(`[AudioEngine] Safety ${severity}:`, data.message);
+
+    // Dispatch custom event for UI to handle
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(
+        new CustomEvent('audioSafetyWarning', {
+          detail: { severity, ...data },
+        })
+      );
+    }
+
+    // For volume warnings, optionally reduce master gain
+    if (data.type === 'volume' && severity === 'emergency') {
+      const targetGain = this.masterGain.gain.value * 0.7; // Reduce by 30%
+      this.masterGain.gain.linearRampToValueAtTime(
+        targetGain,
+        this.ctx.currentTime + 0.5
+      );
+      console.log(`[AudioEngine] Auto-reduced volume to ${(targetGain * 100).toFixed(0)}%`);
+    }
+  }
+
+  /**
+   * Handle emergency stop from SafetyMonitor
+   * @param {Object} data - Emergency data
+   */
+  _handleEmergencyStop(data) {
+    console.error('[AudioEngine] EMERGENCY STOP:', data.message);
+
+    // Gracefully stop all audio
+    if (data.type === 'duration') {
+      // Fade out all sounds
+      const fadeTime = 2.0; // 2 seconds
+      this.masterGain.gain.linearRampToValueAtTime(
+        0,
+        this.ctx.currentTime + fadeTime
+      );
+
+      setTimeout(() => {
+        this.stopAll();
+        console.log('[AudioEngine] All sounds stopped due to session duration limit');
+      }, fadeTime * 1000);
+    }
+  }
+
+  /**
+   * Get safety monitor status
+   * @returns {Object|null}
+   */
+  getSafetyStatus() {
+    return this.safetyMonitor?.getStatus() || null;
+  }
+
+  /**
+   * Enable/disable safety monitoring
+   * @param {boolean} enabled
+   */
+  setSafetyEnabled(enabled) {
+    this.safetyEnabled = enabled;
+
+    if (!this.safetyEnabled && this.safetyMonitor) {
+      this.safetyMonitor.dispose();
+      this.safetyMonitor = null;
+    } else if (this.safetyEnabled && !this.safetyMonitor && this.ctx) {
+      this.safetyMonitor = new SafetyMonitor(this.ctx);
+      this.safetyMonitor.connect(this.masterGain);
+      this.safetyMonitor.startSession();
+    }
+  }
+
+  /**
+   * Update safety configuration
+   * @param {Object} config
+   */
+  updateSafetyConfig(config) {
+    this.safetyMonitor?.updateConfig(config);
   }
 }
 
