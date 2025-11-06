@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Entity — Ontology Explorer</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script defer src="./entity.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Entity</h1>
+      <div class="bar">
+        <a class="btn" href="./index.html">Back to graph</a>
+        <a class="btn" id="webvowlLink" target="_blank">Open in WebVOWL</a>
+        <a class="btn" id="pylodeLink" target="_blank">pyLODE docs</a>
+      </div>
+    </header>
+    <main>
+      <div style="grid-column: 1 / -1; padding: .75rem;">
+        <h2 id="title"></h2>
+        <div class="muted" id="subtitle"></div>
+        <p id="desc"></p>
+      </div>
+      <aside id="neighbors" style="grid-column: 1 / -1; padding: .75rem; border-top: 1px solid var(--border)"></aside>
+    </main>
+  </body>
+  </html>

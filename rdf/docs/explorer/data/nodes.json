@@ -1,0 +1,807 @@
+[
+  {
+    "id": "https://biosyncare.github.io/ont#Project",
+    "label": "Project",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#Protocol",
+    "label": "Protocol",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#Technique",
+    "label": "Technique",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#Session",
+    "label": "Session",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#Outcome",
+    "label": "Outcome",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#Report",
+    "label": "Report",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#ParticipantGroup",
+    "label": "Participant Group",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudioStimulation",
+    "label": "AudioStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudiovisualStimulation",
+    "label": "AudiovisualStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BinauralBeats",
+    "label": "BinauralBeats",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudioTechniques",
+    "label": "AudioTechniques",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BrainwaveEntrainment",
+    "label": "BrainwaveEntrainment",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Technique",
+    "label": "Technique",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ChemicalStimulation",
+    "label": "ChemicalStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Neuromodulation",
+    "label": "Neuromodulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Chromosound",
+    "label": "Chromosound",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ColorTherapy",
+    "label": "ColorTherapy",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#VisualTechniques",
+    "label": "VisualTechniques",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Context",
+    "label": "Context",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#CognitiveModulation",
+    "label": "CognitiveModulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#DeepBrainStimulation",
+    "label": "DeepBrainStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ElectricalStimulation",
+    "label": "ElectricalStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Flickering",
+    "label": "Flickering",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GeneralPurposeDevice",
+    "label": "GeneralPurposeDevice",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Device",
+    "label": "Device",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GroupSession",
+    "label": "GroupSession",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Session",
+    "label": "Session",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GuidingStimulation",
+    "label": "GuidingStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SensoryStimulation",
+    "label": "SensoryStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#IndividualSession",
+    "label": "IndividualSession",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#IsochronousSounds",
+    "label": "IsochronousSounds",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Language",
+    "label": "Language",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#MonauralBeats",
+    "label": "MonauralBeats",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SpecialistPerson",
+    "label": "SpecialistPerson",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Expert",
+    "label": "Expert",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TactileStimulation",
+    "label": "TactileStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TranscranialMagneticStimulation",
+    "label": "TranscranialMagneticStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TranscranialStimulation",
+    "label": "TranscranialStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#VisualStimulation",
+    "label": "VisualStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BrainStimulation",
+    "label": "BrainStimulation",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Company",
+    "label": "Company",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SpecializedNeuromodulationDevice",
+    "label": "SpecializedNeuromodulationDevice",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#Collaborator",
+    "label": "Collaborator",
+    "type": "Class",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/Techniques",
+    "label": "Techniques",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/Outcomes",
+    "label": "Outcomes",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/NeurosensoryStimulation",
+    "label": "Audiovisual neurosensory stimulation",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/BinauralBeats",
+    "label": "Binaural beats",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/MonauralBeats",
+    "label": "Monaural beats",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/IsochronicTones",
+    "label": "Isochronic tones",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/SlowRhythmicBreathing",
+    "label": "Slow rhythmic breathing",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/SupportGroups",
+    "label": "Support groups",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/LovingKindnessMeditation",
+    "label": "Loving-kindness meditation",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/SuicidalIdeationRelief",
+    "label": "Relief of suicidal ideation",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/MigraineRelief",
+    "label": "Migraine relief",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/CognitiveEnhancement",
+    "label": "Cognitive enhancement",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/id/Wellbeing",
+    "label": "Well-being",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/id/",
+    "prefix": "id"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudioStimulationConcept",
+    "label": "AudioStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudioTechniquesConcept",
+    "label": "AudioTechniques Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#AudiovisualStimulationConcept",
+    "label": "AudiovisualStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BinauralBeatsConcept",
+    "label": "BinauralBeats Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BrainStimulationConcept",
+    "label": "BrainStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#BrainwaveEntrainmentConcept",
+    "label": "BrainwaveEntrainment Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ChemicalStimulationConcept",
+    "label": "ChemicalStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ChromosoundConcept",
+    "label": "Chromosound Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#CognitiveModulationConcept",
+    "label": "CognitiveModulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#CollaboratorConcept",
+    "label": "Collaborator Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ColorTherapyConcept",
+    "label": "ColorTherapy Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#CompanyConcept",
+    "label": "Company Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ContextConcept",
+    "label": "Context Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#DeepBrainStimulationConcept",
+    "label": "DeepBrainStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#DeviceConcept",
+    "label": "Device Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ElectricalStimulationConcept",
+    "label": "ElectricalStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#ExpertConcept",
+    "label": "Expert Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#FlickeringConcept",
+    "label": "Flickering Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GeneralPurposeDeviceConcept",
+    "label": "GeneralPurposeDevice Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GroupSessionConcept",
+    "label": "GroupSession Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#GuidingStimulationConcept",
+    "label": "GuidingStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#IndividualSessionConcept",
+    "label": "IndividualSession Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#IsochronousSoundsConcept",
+    "label": "IsochronousSounds Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#LanguageConcept",
+    "label": "Language Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#MonauralBeatsConcept",
+    "label": "MonauralBeats Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#NeuromodulationConcept",
+    "label": "Neuromodulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SensoryStimulationConcept",
+    "label": "SensoryStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SessionConcept",
+    "label": "Session Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SpecialistPersonConcept",
+    "label": "SpecialistPerson Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#SpecializedNeuromodulationDeviceConcept",
+    "label": "SpecializedNeuromodulationDevice Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TactileStimulationConcept",
+    "label": "TactileStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TechniqueConcept",
+    "label": "Technique Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TranscranialMagneticStimulationConcept",
+    "label": "TranscranialMagneticStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#TranscranialStimulationConcept",
+    "label": "TranscranialStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#VisualStimulationConcept",
+    "label": "VisualStimulation Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#VisualTechniquesConcept",
+    "label": "VisualTechniques Concept",
+    "type": "Concept",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#usesTechnique",
+    "label": "uses technique",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#appliesTechnique",
+    "label": "applies technique",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#hasOutcome",
+    "label": "has outcome",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#partOfProject",
+    "label": "part of project",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#documents",
+    "label": "documents",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#occurredDuring",
+    "label": "occurred during",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "http://www.w3.org/2006/time#TemporalEntity",
+    "label": "TemporalEntity",
+    "type": "Class",
+    "ns": "http://www.w3.org/2006/time#",
+    "prefix": "time"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#administeredBy",
+    "label": "administeredBy",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#appliesTechnique",
+    "label": "appliesTechnique",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#employsTechnique",
+    "label": "employsTechnique",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#enhances",
+    "label": "enhances",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#isPotentialCollaborator",
+    "label": "isPotentialCollaborator",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#providedBy",
+    "label": "providedBy",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#recommendsTechnique",
+    "label": "recommendsTechnique",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#supportsDevice",
+    "label": "supportsDevice",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont/sso#usesDevice",
+    "label": "usesDevice",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont/sso#",
+    "prefix": "sso"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#participantCount",
+    "label": "participant count",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "http://www.w3.org/2001/XMLSchema#integer",
+    "label": "integer",
+    "type": "Datatype",
+    "ns": "http://www.w3.org/2001/XMLSchema#",
+    "prefix": "xsd"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#durationMinutes",
+    "label": "duration (minutes)",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "http://www.w3.org/2001/XMLSchema#decimal",
+    "label": "decimal",
+    "type": "Datatype",
+    "ns": "http://www.w3.org/2001/XMLSchema#",
+    "prefix": "xsd"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#minLatencyDays",
+    "label": "minimum latency (days)",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#maxLatencyDays",
+    "label": "maximum latency (days)",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  },
+  {
+    "id": "https://biosyncare.github.io/ont#notes",
+    "label": "notes",
+    "type": "Property",
+    "ns": "https://biosyncare.github.io/ont#",
+    "prefix": "bsc"
+  }
+]

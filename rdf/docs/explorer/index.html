@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ontology Explorer — Graph</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script defer src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>Ontology Explorer — Graph</h1>
+      <div class="bar">
+        <label><input type="checkbox" id="toggleSubclass" checked /> subclass</label>
+        <label><input type="checkbox" id="toggleObjProp" checked /> object property</label>
+        <label><input type="checkbox" id="toggleDataProp" checked /> datatype property</label>
+        <label><input type="checkbox" id="toggleSkosBroader" checked /> skos:broader</label>
+        <label><input type="checkbox" id="toggleSkosNarrower" checked /> skos:narrower</label>
+        <input id="search" placeholder="Search label or URI…" />
+        <a class="btn" href="../webvowl/index.html">Open WebVOWL</a>
+      </div>
+    </header>
+    <main>
+      <div id="cy"></div>
+      <aside id="info"></aside>
+    </main>
+  </body>
+  </html>

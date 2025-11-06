@@ -23,6 +23,7 @@ help:
 	@printf "  rdf-docs        Generate pyLODE and Ontospy HTML documentation\n"
 	@printf "  rdf-webvowl     Generate WebVOWL JSONs (requires Java)\n"
 	@printf "  rdf-webvowl-viewer  Vendor WebVOWL viewer assets (static)\n"
+	@printf "  rdf-explorer-data  Export graph/entity JSON for the static explorer\n"
 
 deploy-rules:
 	firebase deploy --only firestore:rules --project $(PROJECT)
@@ -199,3 +200,8 @@ rdf-webvowl-viewer:
 	@rm -rf rdf/docs/webvowl/app/*
 	@cp -R scripts/rdf/tools/WebVOWL-build-page/deploy/* rdf/docs/webvowl/app/ || true
 	@echo "WebVOWL viewer assets installed under rdf/docs/webvowl/app/ (entry: index.html)"
+
+.PHONY: rdf-explorer-data
+
+rdf-explorer-data:
+	. $(VENV_RDF)/bin/activate; $(PYTHON_RDF) scripts/rdf/export_explorer_data.py

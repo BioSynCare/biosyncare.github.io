@@ -1,0 +1,15 @@
+:root { --bg:#fff; --fg:#111; --muted:#6b7280; --border:#e5e7eb; --blue:#2563eb; --green:#16a34a; --orange:#ea580c; --purple:#7c3aed; }
+* { box-sizing: border-box; }
+body { margin: 0; color: var(--fg); font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial; background: var(--bg); }
+header { padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
+h1 { margin: 0 0 .5rem; font-size: 1.1rem; }
+.bar { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+label { color: var(--muted); }
+input#search { min-width: 240px; padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; }
+.btn { padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--fg); }
+main { display: grid; grid-template-columns: 1fr 320px; gap: 0; height: calc(100vh - 74px); }
+#cy { width: 100%; height: 100%; }
+aside#info { border-left: 1px solid var(--border); padding: .75rem; overflow: auto; }
+aside h2 { font-size: 1rem; margin: .25rem 0 .5rem; }
+aside .muted { color: var(--muted); font-size: .9rem; }
+.pill { display: inline-block; padding: .15rem .4rem; border-radius: 999px; border: 1px solid var(--border); margin-right: .25rem; font-size: .8rem; }
