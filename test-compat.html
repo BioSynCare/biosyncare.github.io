@@ -1,0 +1,5 @@
+<script type="module">
+import { compatChecker } from './src/core/compat-check.js';
+const result = compatChecker.check();
+console.log('Compat Result:', JSON.stringify(result, null, 2));
+</script>

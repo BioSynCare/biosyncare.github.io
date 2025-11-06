@@ -17,18 +17,11 @@ const CACHE_NAME = `biosyncare-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `biosyncare-runtime-${CACHE_VERSION}`;
 
 // Static assets to cache on install
+// Keep minimal - other assets cached on first access
 const STATIC_ASSETS = [
   '/',
   '/index.html',
   '/manifest.json',
-  '/src/main.js',
-  '/src/core/audio-engine.js',
-  '/src/core/safety-monitor.js',
-  '/src/core/compat-check.js',
-  '/src/core/worklets/martigli-processor.js',
-  '/src/services/firebase-auth.js',
-  '/src/services/firestore.js',
-  // Add more critical assets as needed
 ];
 
 // Assets to cache at runtime (on first access)

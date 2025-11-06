@@ -154,7 +154,7 @@ export class CompatibilityChecker {
       promises: typeof Promise !== 'undefined',
       arrow: (() => true)(),
       classes: typeof class {} === 'function',
-      templateLiterals: (() => { try { eval('`test`'); return true; } catch (e) { console.log(e); return false; } })(),
+      templateLiterals: true, // Always true if code is running (parser would fail otherwise)
     };
 
     this.features.modernJS = checks;
