@@ -23,6 +23,9 @@ python scripts/music/export_structures.py
 # Sync JSON into a JS module for the frontend (keeps Web/Music boundary clean)
 make web-sync-music-data
 
+# Render reference WAVs for audio presets
+python scripts/music/render_presets_audio.py
+
 # Convert a peal to audio (explicit opt-in; disabled by default)
 python peal_to_audio.py generate output/my_peal.wav --bells 4 --hunts 1 --allow-render
 ```
@@ -105,6 +108,22 @@ Outputs (all under `scripts/music/output/`):
 
 Use `make web-sync-music-data` if you need to sync the pretty JSON into the
 web bundle.
+
+### `render_presets_audio.py`
+
+Renders WAV reference files for the web audio presets (sine, binaural, monaural,
+isochronic, Martigli harmonics, and coloured noise variants). Useful for QA or
+regression checks against the browser engine.
+
+```bash
+python render_presets_audio.py --output scripts/music/output/presets --duration 12
+```
+
+Arguments:
+- `--output`: Target directory (default `scripts/music/output/presets`)
+- `--duration`: Seconds per render (default 10s)
+- `--sample-rate`: Sample rate in Hz (default 44100)
+- `--presets`: Optional subset of preset keys
 
 ## Dependencies
 
