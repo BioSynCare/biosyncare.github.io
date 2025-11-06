@@ -112,7 +112,17 @@ Import the generated module from the frontend to drive realtime synthesis.
 > `musicStructures.json`, `musicStructures.min.json`,
 > `musicStructures.compact.json`, and `musicStructures.compact.min.json`.
 
-### 4. Convert Peals to Audio
+### 4. Render Preset Reference Audio
+
+Generate WAV snapshots of the web audio presets for QA baselines:
+
+```bash
+python scripts/music/render_presets_audio.py --output scripts/music/output/presets
+```
+
+Optional flags let you tweak duration, sample rate, or select a subset of presets.
+
+### 5. Convert Peals to Audio
 
 Use `peal_to_audio.py` to generate audio files from peals. Audio rendering is
 disabled by default to keep the workflow aligned with the realtime JavaScript

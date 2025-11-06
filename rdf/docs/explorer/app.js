@@ -58,16 +58,37 @@ async function main() {
     skosNarrower: true,
   };
 
+  // Namespace filter state (prefix strings or raw ns strings)
+  const namespaces = new Map();
+  for (const n of nodes) {
+    const key = n.prefix || n.ns || '';
+    if (!namespaces.has(key)) namespaces.set(key, { key, label: n.prefix ? n.prefix + ':' : (n.ns || '(none)'), selected: true });
+  }
+
+  const selectedNamespaces = new Set(Array.from(namespaces.keys()));
+
+  function nsAllowed(node) {
+    const key = node.prefix || node.ns || '';
+    return selectedNamespaces.has(key);
+  }
+
   const cy = cytoscape({
     container: document.getElementById('cy'),
-    elements: toElements(nodes, edges, toggles),
+    elements: toElements(nodes.filter(nsAllowed), edges.filter(e => {
+      const sOk = nsAllowed(nodes.find(n => n.id === e.source) || {ns:''});
+      const tOk = nsAllowed(nodes.find(n => n.id === e.target) || {ns:''});
+      return sOk && tOk;
+    }), toggles),
     style: styleSheet(),
     layout: { name: 'cose', animate: false, fit: true, padding: 20 },
     wheelSensitivity: 0.2,
   });
 
   function refresh() {
-    cy.json({ elements: toElements(nodes, edges, toggles) });
+    const nodeList = nodes.filter(nsAllowed);
+    const nodeIds = new Set(nodeList.map(n => n.id));
+    const edgeList = edges.filter(e => nodeIds.has(e.source) && nodeIds.has(e.target));
+    cy.json({ elements: toElements(nodeList, edgeList, toggles) });
     cy.layout({ name: 'cose', animate: false, fit: false }).run();
   }
 
@@ -117,6 +138,31 @@ async function main() {
   });
 
   cy.style().selector('.match').style({ 'border-width': 4, 'border-color': '#111' }).update();
+
+  // Build namespace pills
+  const nsFilters = document.getElementById('nsFilters');
+  function renderNsFilters() {
+    nsFilters.innerHTML = '';
+    for (const { key, label } of namespaces.values()) {
+      const id = 'ns_' + btoa(key).replace(/=/g, '');
+      const wrap = document.createElement('label');
+      wrap.className = 'ns-pill';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.checked = selectedNamespaces.has(key);
+      cb.id = id;
+      cb.addEventListener('change', () => {
+        if (cb.checked) selectedNamespaces.add(key); else selectedNamespaces.delete(key);
+        refresh();
+      });
+      const span = document.createElement('span');
+      span.textContent = label;
+      wrap.appendChild(cb);
+      wrap.appendChild(span);
+      nsFilters.appendChild(wrap);
+    }
+  }
+  renderNsFilters();
 }
 
 document.addEventListener('DOMContentLoaded', main);

@@ -125,6 +125,12 @@ Arguments:
 - `--sample-rate`: Sample rate in Hz (default 44100)
 - `--presets`: Optional subset of preset keys
 
+### Preset Templates
+
+Session/preset JSON guidance (including Martigli and symmetry-track fields) lives in
+`scripts/music/presets/README.md`. Share this with the web agent when defining
+coordinated sessions or multi-voice experiences.
+
 ## Dependencies
 
 The toolkit uses the **ttm/music** package, a comprehensive Python library for

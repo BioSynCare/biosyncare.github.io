@@ -2,14 +2,20 @@
 
 This document defines how three AI agents collaborate in this repository without stepping on each other’s work, and how they hand off progress cleanly.
 
-Last updated: 2025-11-06
+Last updated: 2025-11-06 (web agents split: Presets vs Core)
 
 ## Agents and scopes
 
-- Web agent (Neurosensory Modulation UI)
-  - Goal: Evolve the client-side web app and UX.
-  - Owns: `index.html`, `src/**`, `src/ui/**`, `src/core/**`, `src/services/**`, `src/state/**`, `src/data/**`, `src/utils/**`, `docs_landing.html`, `eslint.config.js`, `firebase.json`, `firestore.*`.
-  - Avoid: `rdf/**`, `ont/**`, `scripts/rdf/**`, `scripts/music/**` (open a PR instead if needed), `rdf/docs/**`.
+- Web Presets agent (Presets I/O and Music bridge)
+  - Goal: Own preset input/output for BSCLab: URL parsing, Firebase read/write, and consuming Music outputs; expose a small API to the rest of the app.
+  - Owns: `src/presets/**`, preset-related helpers under `src/utils/presets-*.js`, preset state/selectors under `src/state/presets-*.js`, and any preset data under `src/data/presets/**`.
+  - Avoid: Changing Python logic in `scripts/music/**` directly (coordinate via PR to Music agent). Avoid unrelated UI/service edits—hand off to Web Core.
+  - Notes: Responsible for sanitizing URL-provided configs, schema versioning/migrations of presets, and coordinating with Music’s JSON under `scripts/music/output/**` (via the sync step below).
+
+- Web Core agent (Neurosensory Modulation UI)
+  - Goal: Evolve the client-side web app and UX excluding the presets subsystem; keep boundaries clean.
+  - Owns: `index.html`, `docs_landing.html`, `src/**` except `src/presets/**`, including `src/ui/**`, `src/core/**`, `src/services/**`, `src/state/**`, `src/data/**`, `src/utils/**`.
+  - Avoid: `src/presets/**` (owned by Web Presets). Also avoid `rdf/**`, `ont/**`, `scripts/rdf/**`, `scripts/music/**` (open a PR instead).
 
 - RDF/ONT agent (ONC/SSO + BSC OWL/SKOS + visualization/analysis)
   - Goal: Author and validate ontologies and datasets; generate docs and viz; analysis and PDF navigation helpers.
@@ -38,12 +44,13 @@ Notes:
 ## Branching and commit hygiene
 
 - Branch prefixes by agent:
-  - Web: `web/<short-topic>`
+  - Web Presets: `web-presets/<short-topic>`
+  - Web Core: `web-core/<short-topic>`
   - RDF/ONT: `rdf/<short-topic>`
   - Music: `music/<short-topic>`
   - Agent master: `meta/<short-topic>`
   - Git master: `ops/<short-topic>`
-- Commit message prefix: `[web]`, `[rdf]`, or `[music]`.
+- Commit message prefix: `[web-presets]`, `[web-core]`, `[rdf]`, or `[music]`.
   - Meta/governance: `[meta]`
   - Ops/repo health: `[ops]`
 - Commit small and often. Reference the Handoff when stopping.
@@ -94,17 +101,22 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
   - RDF produces artifacts in `rdf/**`, docs in `rdf/docs/**` (pyLODE, Ontospy, WebVOWL). Web only links/consumes.
   - If web needs a new RDF export, open an issue/PR tagged `[rdf]` describing the shape/location.
 
-- Web ⇄ Music
-  - Music writes machine-readable outputs to `scripts/music/output/` (JSON/CSV/audio). Web may import or fetch these outputs.
-  - Preferred flow: Music exports `scripts/music/output/musicStructures.json`; Web runs `make web-sync-music-data` to (re)generate `src/data/musicStructures.js` for synchronous imports.
-  - If web requires changes to runtime JS (e.g., `src/core/change-ringing.js`), do so via PRs with a small adapter, not by overwriting music’s Python logic.
+- Web Presets ⇄ Music
+  - Music writes machine-readable outputs to `scripts/music/output/` (JSON/CSV/audio). Presets agent may import or fetch these outputs to construct presets.
+  - Preferred flow: Music exports `scripts/music/output/musicStructures.json`; Web runs `make web-sync-music-data` to (re)generate `src/data/musicStructures.js` for synchronous imports consumed by Presets and Core.
+  - If preset logic needs changes in Python outputs, open a PR to Music with a small, documented adapter rather than altering core music scripts.
+
+- Web Core ⇄ Web Presets
+  - Web Core uses only the Presets agent’s public API (`src/presets/**`), not its internals.
+  - If Core needs new preset capabilities, open a PR targeted to the Presets branch/folder. Core must not directly modify `src/presets/**`.
 
 - RDF/ONT ⇄ Music
   - Optional: music emits metadata (e.g., technique URIs) that map to RDF vocabularies. Coordinate via a small schema doc in `scripts/music/README.md` and an example file in `scripts/music/output/`.
 
 ## Minimal DoD per agent
 
-- Web: feature works locally (`make serve`), no console errors, basic accessibility, and a Handoff note.
+- Web Presets: preset load/save (URL, Firebase, Music JSON) works locally (`make serve`); schema validated/sanitized; includes a Handoff note.
+- Web Core: feature works locally (`make serve`), no console errors, basic accessibility, and a Handoff note; does not modify `src/presets/**`.
 - RDF/ONT: `make rdf-validate` passes, docs generated (`make rdf-docs`), JSONs for WebVOWL updated (`make rdf-webvowl`), and a Handoff note.
 - Music: scripts run with a clean venv, outputs written under `scripts/music/output/`, readme updated if data shape changes, and a Handoff note.
 - Agent master: governance docs and instruction files improved; helpers added to Makefile if needed; Handoff note explains changes and intended usage.
@@ -115,5 +127,13 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
 - Show where the coordination docs live: `make agents-info`
 - Open this file (macOS): `make open-agents`
  - Quick repo health scan (lint/status): `make repo-health`
+
+Folders to know
+- Presets API and adapters: `src/presets/**` (owned by Web Presets agent)
+- New handoffs: `handoffs/web-presets.md`, `handoffs/web-core.md`
+
+Instruction files
+- `.vscode/ai-instructions/web-presets-agent.md`
+- `.vscode/ai-instructions/web-core-agent.md`
 
 These are convenience wrappers so you don’t have to remember paths.

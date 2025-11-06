@@ -9,6 +9,7 @@ matches the canonical tones generated with the ttm/music Python framework.
 from __future__ import annotations
 
 import argparse
+import math
 from pathlib import Path
 
 import numpy as np
@@ -22,34 +23,46 @@ PRESET_DEFINITIONS = {
     "sine": {
         "filename": "preset_sine.wav",
         "description": "Pure 440Hz sine tone (calibration reference).",
+        "settings": {"freq": 440.0, "gain": 0.2},
     },
     "binaural": {
         "filename": "preset_binaural_alpha.wav",
         "description": "Stereo alpha-range binaural beat (200Hz ± 5Hz).",
+        "settings": {"base": 200.0, "beat": 10.0, "gain": 0.25},
     },
     "monaural": {
         "filename": "preset_monaural_theta.wav",
         "description": "Summed dual-tone theta monaural beat (210Hz ± 3Hz).",
+        "settings": {"base": 210.0, "beat": 6.0, "gain": 0.3},
     },
     "isochronic": {
         "filename": "preset_isochronic_12hz.wav",
         "description": "Isochronic pulse: 180Hz carrier with 12Hz gating.",
+        "settings": {"freq": 180.0, "pulseFreq": 12.0, "gain": 0.22},
     },
     "martigli": {
         "filename": "preset_martigli_harmonics.wav",
         "description": "Layered Martigli ratios atop a 220Hz fundamental.",
+        "settings": {
+            "fundamental": 220.0,
+            "harmonics": [1, 1.5, 2, 3, 5, 8, 13],
+            "gain": 0.14,
+        },
     },
     "noise-white": {
         "filename": "preset_noise_white.wav",
         "description": "Broad-spectrum white noise.",
+        "settings": {"color": "white", "gain": 0.18},
     },
     "noise-pink": {
         "filename": "preset_noise_pink.wav",
         "description": "1/f pink noise.",
+        "settings": {"color": "pink", "gain": 0.18},
     },
     "noise-brown": {
         "filename": "preset_noise_brown.wav",
         "description": "Brownian noise emphasising low frequencies.",
+        "settings": {"color": "brown", "gain": 0.22},
     },
 }
 
@@ -59,18 +72,21 @@ def ensure_output_dir(path: Path) -> None:
 
 
 def render_sine(output_path: Path, duration: float, sample_rate: int) -> None:
+    settings = PRESET_DEFINITIONS["sine"]["settings"]
     audio = note(
-        freq=440,
+        freq=settings["freq"],
         duration=duration,
         waveform_table=WAVEFORM_SINE,
         sample_rate=sample_rate,
     )
-    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(20, 20))
+    audio = audio * settings["gain"]
+    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(50, 50))
 
 
 def render_binaural(output_path: Path, duration: float, sample_rate: int) -> None:
-    base = 200.0
-    beat = 10.0
+    settings = PRESET_DEFINITIONS["binaural"]["settings"]
+    base = settings["base"]
+    beat = settings["beat"]
     left = note(
         freq=base - beat / 2,
         duration=duration,
@@ -83,13 +99,14 @@ def render_binaural(output_path: Path, duration: float, sample_rate: int) -> Non
         waveform_table=WAVEFORM_SINE,
         sample_rate=sample_rate,
     )
-    stereo = np.vstack((left, right))
-    write_wav_stereo(stereo, filename=str(output_path), sample_rate=sample_rate, fades=(20, 20))
+    stereo = np.vstack((left, right)) * settings["gain"]
+    write_wav_stereo(stereo, filename=str(output_path), sample_rate=sample_rate, fades=(50, 50))
 
 
 def render_monaural(output_path: Path, duration: float, sample_rate: int) -> None:
-    base = 210.0
-    beat = 6.0
+    settings = PRESET_DEFINITIONS["monaural"]["settings"]
+    base = settings["base"]
+    beat = settings["beat"]
     low = note(
         freq=base - beat / 2,
         duration=duration,
@@ -103,12 +120,15 @@ def render_monaural(output_path: Path, duration: float, sample_rate: int) -> Non
         sample_rate=sample_rate,
     )
     audio = 0.5 * (low + high)
-    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(20, 20))
+    audio = audio * settings["gain"]
+    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(50, 50))
 
 
 def render_isochronic(output_path: Path, duration: float, sample_rate: int) -> None:
-    carrier_freq = 180.0
-    pulse_freq = 12.0
+    settings = PRESET_DEFINITIONS["isochronic"]["settings"]
+    carrier_freq = settings["freq"]
+    pulse_freq = settings["pulseFreq"]
+    gain = settings["gain"]
     carrier = note(
         freq=carrier_freq,
         duration=duration,
@@ -116,14 +136,16 @@ def render_isochronic(output_path: Path, duration: float, sample_rate: int) -> N
         sample_rate=sample_rate,
     )
     samples = np.arange(carrier.size)
-    envelope = (np.sin(2 * np.pi * pulse_freq * (samples / sample_rate)) > 0).astype(float)
-    audio = carrier * envelope
-    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(20, 20))
+    square = np.sign(np.sin(2 * math.pi * pulse_freq * samples / sample_rate))
+    envelope = 0.5 * (square + 1.0)
+    audio = carrier * envelope * gain
+    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(100, 100))
 
 
 def render_martigli(output_path: Path, duration: float, sample_rate: int) -> None:
-    fundamental = 220.0
-    harmonic_ratios = [1, 1.5, 2, 3, 5, 8, 13]
+    settings = PRESET_DEFINITIONS["martigli"]["settings"]
+    fundamental = settings["fundamental"]
+    harmonic_ratios = settings["harmonics"]
     layers = []
     for idx, ratio in enumerate(harmonic_ratios, start=1):
         partial = note(
@@ -134,12 +156,15 @@ def render_martigli(output_path: Path, duration: float, sample_rate: int) -> Non
         )
         layers.append(partial / idx)
     audio = np.sum(layers, axis=0)
-    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(40, 40))
+    audio = audio * settings["gain"]
+    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(120, 120))
 
 
 def render_noise(output_path: Path, duration: float, sample_rate: int, color: str) -> None:
-    audio = synth_noise(noise_type=color.split("-")[-1], duration=duration, sample_rate=sample_rate)
-    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(10, 10))
+    settings = PRESET_DEFINITIONS[color]["settings"]
+    audio = synth_noise(noise_type=settings["color"], duration=duration, sample_rate=sample_rate)
+    audio = audio * settings["gain"]
+    write_wav_mono(audio, filename=str(output_path), sample_rate=sample_rate, fades=(50, 50))
 
 
 RENDERERS = {

@@ -4,6 +4,11 @@ body { margin: 0; color: var(--fg); font: 14px/1.5 system-ui, -apple-system, Seg
 header { padding: .75rem 1rem; border-bottom: 1px solid var(--border); }
 h1 { margin: 0 0 .5rem; font-size: 1.1rem; }
 .bar { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+.ns-group strong { margin-right: .25rem; }
+.ns-filters { display: flex; flex-wrap: wrap; gap: .25rem .5rem; max-width: 52vw; }
+.ns-pill { display: inline-flex; align-items: center; gap: .25rem; padding: .15rem .4rem; border: 1px solid var(--border); border-radius: 999px; }
+.ns-pill input { margin: 0; }
 label { color: var(--muted); }
 input#search { min-width: 240px; padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; }
 .btn { padding: .4rem .6rem; border: 1px solid var(--border); border-radius: 6px; text-decoration: none; color: var(--fg); }

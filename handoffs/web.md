@@ -9,6 +9,8 @@
   - `getChangeRingingPatterns()` → quick list of `{id,title,stage,rows}`
   - `prepareChangeRingingSchedule({ patternId, ... })` → bell strike schedule with timings & frequencies
   - `playChangeRinging(opts)` on `AudioEngine` consumes that schedule
+- Audio preset reference renders available via `python scripts/music/render_presets_audio.py` (see `scripts/music/output/presets` for WAV baselines)
+- Preset/session schema (including Martigli & symmetry-track fields) lives in `scripts/music/presets/README.md`.
 
 ## What you need to do
 - Import from `src/data/musicStructures.js` or call the helpers above to surface pattern selectors / previews in the UI

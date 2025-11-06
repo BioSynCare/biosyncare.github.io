@@ -6,6 +6,8 @@ Context
 - Export pipeline refreshed (`scripts/music/export_structures.py`) to emit full + compact JSON under `scripts/music/output/`.
 - Adds additional PlainChanges variants (extra hunts/stages) and symmetry datasets (rotations/mirrors/dihedral, swap families).
 - Docs updated (`scripts/music/README.md`, `scripts/music/WORKFLOW.md`) with usage notes; handoff for Web agent updated with consumption instructions.
+- Added `scripts/music/render_presets_audio.py` to generate WAV baselines for sine/binaural/etc. presets (outputs land in `scripts/music/output/`).
+- Added preset/session schema guidance at `scripts/music/presets/README.md`.
 
 Current state
 - Branch: n/a (working tree dirty only for exporters + docs)
