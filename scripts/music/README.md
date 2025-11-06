@@ -17,8 +17,11 @@ python generate_sample_peals.py
 # Format the peals
 python peal_renderer.py --input peals/raw --output peals/rendered
 
-# Export structured data for the JS engine
-python export_structures.py
+# Export structured data (JSON) for the JS engine
+python scripts/music/export_structures.py
+
+# Sync JSON into a JS module for the frontend (keeps Web/Music boundary clean)
+make web-sync-music-data
 
 # Convert a peal to audio (explicit opt-in; disabled by default)
 python peal_to_audio.py generate output/my_peal.wav --bells 4 --hunts 1 --allow-render
@@ -144,7 +147,7 @@ The **PlainChanges** algorithm generates true peals where:
 
 These utilities can be integrated with:
 
-- **BioSynCare web interface**: `src/core/change-ringing.js` consumes the exported structures for realtime synthesis
+- **BioSynCare web interface**: `src/core/change-ringing.js` consumes `src/data/musicStructures.js` (generated from `scripts/music/output/musicStructures.json` via `make web-sync-music-data`)
 - **RDF/OWL ontologies**: Describe peal patterns and properties
 - **Audiovisual synchronization**: Match peal rhythms with breathing cycles
 - **Pattern analysis**: Study symmetries and mathematical properties

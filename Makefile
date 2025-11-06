@@ -13,6 +13,9 @@ help:
 	@printf "  open-console    Open the Firebase console for $(PROJECT)\n"
 	@printf "  agents-info     Show locations of AGENTS.md and per-agent instructions\n"
 	@printf "  open-agents     Open AGENTS.md (macOS)\n"
+	@printf "  web-sync-music-data  Build src/data/musicStructures.js from scripts/music/output/musicStructures.json\n"
+	@printf "  agents-info     Show locations of AGENTS.md and per-agent instructions\n"
+	@printf "  open-agents     Open AGENTS.md (macOS)\n"
 	@printf "  rdf-setup       Create Python venv and install RDF tooling\n"
 	@printf "  rdf-validate    Validate all Turtle files in rdf/ using rdflib\n"
 	@printf "  rdf-report      Generate HTML summary of classes and properties\n"
@@ -59,6 +62,16 @@ agents-info:
 
 open-agents:
 	open AGENTS.md
+
+# ---------- Web/Music data sync ----------
+.PHONY: web-sync-music-data
+
+web-sync-music-data:
+	@if [ ! -f scripts/music/output/musicStructures.json ]; then \
+		echo "ERROR: scripts/music/output/musicStructures.json not found. Run: python3 scripts/music/export_structures.py"; \
+		exit 1; \
+	fi
+	@python3 scripts/music/sync_to_web.py
 
 # ---------- RDF workflow (isolated) ----------
 .PHONY: rdf-setup rdf-validate

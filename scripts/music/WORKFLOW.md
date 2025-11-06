@@ -83,13 +83,13 @@ Generated: 2025-11-05T18:19:35
 ...
 ```
 
-### 3. Export Structures for the JavaScript Engine
+### 3. Export Structures for the JavaScript Engine (JSON)
 
 Package the peal definitions and their permutation analyses for use in the
 browser audio engine:
 
 ```bash
-python export_structures.py
+python scripts/music/export_structures.py
 ```
 
 This writes `src/data/musicStructures.js` with:
@@ -97,6 +97,13 @@ This writes `src/data/musicStructures.js` with:
 - Aggregated permutation families shared across peals
 - Symmetric group summaries (cycle types, canonical generators, samples)
 
+Then sync the JSON into a JS module for the frontend:
+
+```bash
+make web-sync-music-data
+```
+
+This writes `src/data/musicStructures.js` from `scripts/music/output/musicStructures.json`.
 Import the generated module from the frontend to drive realtime synthesis.
 
 ### 4. Convert Peals to Audio
