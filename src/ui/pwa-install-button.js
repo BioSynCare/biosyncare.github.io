@@ -186,23 +186,35 @@ export class PWAInstallButton {
     const canInstall = pwaInstaller.canInstall();
     const isInstalled = pwaInstaller.isInstalled();
 
+    console.log('[PWAInstallButton] Visibility check:', {
+      canInstall,
+      isInstalled,
+      dismissed: this._dismissed,
+      hideWhenInstalled: this.options.hideWhenInstalled,
+    });
+
     if (this._dismissed) {
+      console.log('[PWAInstallButton] Hiding: dismissed by user');
       this.hide();
       return;
     }
 
     if (canInstall && !isInstalled) {
       // Can install and not installed yet - show button
+      console.log('[PWAInstallButton] Showing: can install');
       this.show();
     } else if (isInstalled) {
       // Already installed - show or hide based on option
       if (this.options.hideWhenInstalled) {
+        console.log('[PWAInstallButton] Hiding: installed and hideWhenInstalled=true');
         this.hide();
       } else {
+        console.log('[PWAInstallButton] Showing: installed status indicator');
         this.show(); // Show to indicate installed status
       }
     } else if (!canInstall && !isInstalled) {
       // Cannot install and not installed - hide button
+      console.log('[PWAInstallButton] Hiding: cannot install and not installed');
       this.hide();
     }
   }

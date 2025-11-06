@@ -1,4 +1,42 @@
-const VERSION = '20251106-2';
+const VERSION = '20251106-3';
+
+// Minimal Firebase ESM client for shared comments (falls back to LocalStorage if unavailable)
+const FB_VER = '10.7.0';
+const FB_BASE = `https://www.gstatic.com/firebasejs/${FB_VER}`;
+const FB_APP = `${FB_BASE}/firebase-app.js`;
+const FB_AUTH = `${FB_BASE}/firebase-auth.js`;
+const FB_FS = `${FB_BASE}/firebase-firestore.js`;
+const FB_CONFIG = {
+  apiKey: 'AIzaSyAWcLkLlzmwlGJAb-CSkue78rnTUEhfAo8',
+  authDomain: 'biosyncarelab.firebaseapp.com',
+  projectId: 'biosyncarelab',
+  storageBucket: 'biosyncarelab.firebasestorage.app',
+  messagingSenderId: '831255166249',
+  appId: '1:831255166249:web:708133d374e80af9d48b38',
+  measurementId: 'G-K4X7HXKQ2C',
+};
+
+let fb = { app: null, auth: null, db: null, authModule: null, fsModule: null, ready: false };
+async function initFirebaseClient() {
+  if (fb.ready) return fb;
+  try {
+    const appMod = await import(FB_APP);
+    const fsMod = await import(FB_FS);
+    const authMod = await import(FB_AUTH);
+    const app = appMod.initializeApp(FB_CONFIG);
+    const db = fsMod.getFirestore(app);
+    const auth = authMod.getAuth(app);
+    try { auth.useDeviceLanguage && auth.useDeviceLanguage(); } catch {}
+    if (!auth.currentUser) {
+      try { await authMod.signInAnonymously(auth); } catch (e) { console.warn('[Explorer] Anonymous auth failed', e); }
+    }
+    fb = { app, db, auth, authModule: authMod, fsModule: fsMod, ready: true };
+  } catch (e) {
+    console.warn('[Explorer] Firebase unavailable, falling back to local comments.', e);
+    fb.ready = false;
+  }
+  return fb;
+}
 
 async function loadJSON(path) {
   const url = path + (path.includes('?') ? '&' : '?') + 'v=' + VERSION;
@@ -35,6 +73,7 @@ function styleSheet(edgeLabels = true, nodeFont = 12, edgeFont = 10, textBg = 'r
     { selector: 'node[type = "Concept"]', style: { 'background-color': '#2563eb' } },
     { selector: 'node[type = "Property"]', style: { 'background-color': '#7c3aed' } },
     { selector: 'node[type = "Datatype"]', style: { 'background-color': '#16a34a' } },
+    { selector: 'node.commented', style: { 'border-width': 4, 'border-color': '#ef4444' } },
   { selector: 'edge', style: { 'width': 1.2, 'line-color': '#bbb', 'target-arrow-color': '#bbb', 'source-arrow-color': '#bbb', 'curve-style': 'bezier', 'target-arrow-shape': 'triangle', 'source-arrow-shape': 'circle', 'arrow-scale': 0.7, 'label': edgeLabels ? 'data(label)' : '', 'font-size': edgeFont, 'text-rotation': 'autorotate', 'color': '#666', 'text-background-color': textBg, 'text-background-opacity': 1, 'text-background-shape': 'roundrectangle' } },
   { selector: 'edge[kind = "subclass"]', style: { 'width': 2, 'line-style': 'dashed', 'line-color': '#4b5563', 'target-arrow-color': '#4b5563', 'source-arrow-color': '#4b5563', 'curve-style': 'straight', 'opacity': emphasizeSubclass ? 1 : 1 } },
   { selector: 'edge[kind = "objectProperty"]', style: { 'line-color': '#ea580c', 'target-arrow-color': '#ea580c', 'source-arrow-color': '#ea580c', 'opacity': emphasizeSubclass ? 0.4 : 1 } },
@@ -148,6 +187,7 @@ async function main() {
     cy.json({ elements: toElements(nodeList, edgeList, toggles, colorForNs) });
     if (relayout) cy.layout({ name: 'cose', animate: false, fit: false }).run();
     renderIsolated(isolated);
+    updateCommentHighlights();
   }
 
   for (const [id, key] of [
@@ -168,37 +208,106 @@ async function main() {
   const commentInputEl = document.getElementById('commentInput');
   const addCommentBtn = document.getElementById('addComment');
   const COMMENTS_KEY = 'bsc-explorer-comments';
-  function loadCommentsStore() {
-    try { const s = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); return { nodes: s.nodes || {}, edges: s.edges || {} }; }
-    catch { return { nodes: {}, edges: {} }; }
-  }
-  function saveCommentsStore() {
-    localStorage.setItem(COMMENTS_KEY, JSON.stringify(commentsStore));
-  }
-  let commentsStore = loadCommentsStore();
+  function loadLocalStore() { try { const s = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); return { nodes: s.nodes || {}, edges: s.edges || {} }; } catch { return { nodes: {}, edges: {} }; } }
+  function saveLocalStore(store) { localStorage.setItem(COMMENTS_KEY, JSON.stringify(store)); }
+  let localStore = loadLocalStore();
   let currentSelection = null; // { type: 'node'|'edge', id: string }
 
-  function getCommentsFor(sel) {
+  // Meta-highlight of commented nodes
+  let commentedTargets = new Set();
+  function updateCommentHighlights() {
+    cy.nodes().forEach((n) => {
+      if (commentedTargets.has(n.id())) n.addClass('commented'); else n.removeClass('commented');
+    });
+  }
+
+  async function fetchMetaAndHighlight() {
+    const { ready, db, fsModule } = await initFirebaseClient();
+    if (!ready) return;
+    try {
+      const { collection, getDocs } = fsModule;
+      const snap = await getDocs(collection(db, 'ontology_comments_meta'));
+      const next = new Set();
+      snap.forEach((doc) => { const d = doc.data(); if ((d?.count || 0) > 0) next.add(doc.id); });
+      commentedTargets = next;
+      updateCommentHighlights();
+    } catch (e) { console.warn('[Explorer] Failed to fetch comment meta', e); }
+  }
+
+  async function getCommentsFor(sel) {
     if (!sel) return [];
-    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
-    return bucket[sel.id] || [];
+    const { ready, db, fsModule } = await initFirebaseClient();
+    if (!ready) {
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      return bucket[sel.id] || [];
+    }
+    const { collection, query, where, getDocs } = fsModule;
+    const q = query(
+      collection(db, 'ontology_comments'),
+      where('targetType', '==', sel.type),
+      where('targetId', '==', sel.id)
+    );
+    const snap = await getDocs(q);
+    const items = [];
+    snap.forEach((doc) => {
+      const d = doc.data();
+      items.push({ id: doc.id, text: d.text, ts: d.createdAt?.toMillis ? d.createdAt.toMillis() : d.createdAt || Date.now(), userId: d.userId || null });
+    });
+    items.sort((a,b) => b.ts - a.ts);
+    return items;
   }
-  function addComment(sel, text) {
+
+  async function addComment(sel, text) {
     if (!sel) return;
-    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
-    const arr = bucket[sel.id] || (bucket[sel.id] = []);
-    arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now() });
-    saveCommentsStore();
+    const { ready, db, fsModule, auth } = await initFirebaseClient();
+    if (!ready) {
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      const arr = bucket[sel.id] || (bucket[sel.id] = []);
+      arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now() });
+      saveLocalStore(localStore);
+      return;
+    }
+    const { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc } = fsModule;
+    const userId = (auth && auth.currentUser) ? auth.currentUser.uid : null;
+    await addDoc(collection(db, 'ontology_comments'), {
+      targetType: sel.type,
+      targetId: sel.id,
+      text: text.trim(),
+      userId,
+      createdAt: serverTimestamp(),
+    });
+    // increment meta count
+    const metaRef = doc(db, 'ontology_comments_meta', sel.id);
+    const ms = await getDoc(metaRef);
+    if (!ms.exists()) await setDoc(metaRef, { count: 1 });
+    else await updateDoc(metaRef, { count: (ms.data().count || 0) + 1 });
+    await fetchMetaAndHighlight();
   }
-  function deleteComment(sel, cid) {
+
+  async function deleteComment(sel, cid) {
     if (!sel) return;
-    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
-    const arr = bucket[sel.id] || [];
-    const idx = arr.findIndex(c => c.id === cid);
-    if (idx >= 0) { arr.splice(idx, 1); saveCommentsStore(); }
+    const { ready, db, fsModule } = await initFirebaseClient();
+    if (!ready) {
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      const arr = bucket[sel.id] || [];
+      const idx = arr.findIndex(c => c.id === cid);
+      if (idx >= 0) { arr.splice(idx, 1); saveLocalStore(localStore); }
+      return;
+    }
+    const { doc, deleteDoc, getDoc, updateDoc } = fsModule;
+    try { await deleteDoc(doc(db, 'ontology_comments', cid)); } catch (e) { console.warn('Delete failed', e); }
+    const metaRef = doc(db, 'ontology_comments_meta', sel.id);
+    const ms = await getDoc(metaRef);
+    if (ms.exists()) {
+      const next = Math.max(0, (ms.data().count || 0) - 1);
+      if (next === 0) { try { await deleteDoc(metaRef); } catch {} }
+      else { await updateDoc(metaRef, { count: next }); }
+    }
+    await fetchMetaAndHighlight();
   }
-  function renderComments() {
-    const items = getCommentsFor(currentSelection);
+
+  async function renderComments() {
+    const items = await getCommentsFor(currentSelection);
     commentsListEl.innerHTML = '';
     for (const c of items) {
       const div = document.createElement('div');
@@ -208,19 +317,19 @@ async function main() {
       const date = new Date(c.ts).toLocaleString();
       const left = document.createElement('span'); left.textContent = date;
       const del = document.createElement('button'); del.className = 'btn'; del.textContent = 'Delete';
-      del.addEventListener('click', () => { deleteComment(currentSelection, c.id); renderComments(); });
+      del.addEventListener('click', async () => { await deleteComment(currentSelection, c.id); await renderComments(); });
       meta.appendChild(left); meta.appendChild(del);
       const text = document.createElement('div'); text.textContent = c.text;
       div.appendChild(meta); div.appendChild(text);
       commentsListEl.appendChild(div);
     }
   }
-  addCommentBtn.addEventListener('click', () => {
+  addCommentBtn.addEventListener('click', async () => {
     const text = (commentInputEl.value || '').trim();
     if (!text) return;
-    addComment(currentSelection, text);
+    await addComment(currentSelection, text);
     commentInputEl.value = '';
-    renderComments();
+    await renderComments();
   });
   function showInfo(nodeId) {
     const ent = entities[nodeId];
@@ -443,6 +552,8 @@ async function main() {
   }
   // initial isolated render
   refresh(false);
+  // Initialize Firebase (if available) and fetch comment meta for highlighting
+  initFirebaseClient().then(() => fetchMetaAndHighlight());
 }
 
 document.addEventListener('DOMContentLoaded', main);

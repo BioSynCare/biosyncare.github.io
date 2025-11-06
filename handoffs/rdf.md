@@ -1,5 +1,33 @@
 <!-- Append new handoff entries below. Keep newest at the top. -->
 
+Handoff — RDF/ONT agent — 2025-11-06 12:30 local
+
+Context
+- Wired shared (Firebase) comments into the BSCLab Ontology Explorer (graph and entity pages), replacing the LocalStorage-only MVP. Added visual highlighting for nodes that have comments using a Firestore-backed meta collection.
+- Kept a LocalStorage fallback when Firebase is unavailable, per serverless constraints.
+
+Current state
+- Branch: main
+- Files changed: rdf/docs/explorer/{index.html, app.js, entity.html, entity.js}
+- Build/validation: PASS (static assets). No bundler. Tested basic add/delete comment with anonymous auth; meta highlights update after change.
+- Known issues:
+	- Comment deletion is allowed by rules only for the owner; UI still shows a Delete button for all items. Non-owners will see a console warning if deletion fails.
+	- Meta highlights are fetched once on load and after comment mutations; not live-subscribed. Good enough for now.
+
+Next steps (queue for successor)
+- [ ] Add live subscription to ontology_comments_meta to update highlights in real time.
+- [ ] Show per-node comment count as a small badge in the sidebar and/or on hover.
+- [ ] Persist UI state (theme/layout/fonts) in localStorage.
+- [ ] Optional: add edge-level highlighting when edges have comments.
+
+Risks / assumptions
+- Assumes project allows anonymous auth (enabled). If disabled, UI silently falls back to LocalStorage.
+- Firestore composite indexes are not required for equality filters used; sorting done client-side by createdAt.
+
+Owner handoff
+- Suggested next agent: rdf
+
+
 Handoff — RDF/ONT agent — 2025-11-06 00:00 local
 
 Context

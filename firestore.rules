@@ -54,6 +54,31 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // Ontology Explorer comments: shared among users
+    // Documents in collection 'ontology_comments' have fields:
+    // { targetType: 'node'|'edge', targetId: string, text: string, userId: string, createdAt: timestamp }
+    match /ontology_comments/{commentId} {
+      allow read: if true; // public readable
+      allow create: if request.auth != null
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.targetType in ['node', 'edge']
+                    && request.resource.data.targetId is string
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 2000
+                    && request.resource.data.createdAt is timestamp;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow update: if false; // immutable text (delete+add to edit)
+    }
+
+    // Meta collection to quickly detect commented targets and counts
+    // Doc id = targetId; fields: { count: number }
+    match /ontology_comments_meta/{targetId} {
+      allow read: if true;
+      allow create, update: if request.auth != null;
+      allow delete: if request.auth != null; // cleaned up when count hits 0
+    }
+
     // Bloquear tudo que não está explicitamente permitido
     match /{document=**} {
       allow read, write: if false;
