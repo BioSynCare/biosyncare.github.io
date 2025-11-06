@@ -17,9 +17,15 @@ python generate_sample_peals.py
 # Format the peals
 python peal_renderer.py --input peals/raw --output peals/rendered
 
-# Convert a peal to audio
-python peal_to_audio.py generate output/my_peal.wav --bells 4 --hunts 1
+# Export structured data for the JS engine
+python export_structures.py
+
+# Convert a peal to audio (explicit opt-in; disabled by default)
+python peal_to_audio.py generate output/my_peal.wav --bells 4 --hunts 1 --allow-render
 ```
+
+> ⚠️ Audio rendering is opt-in. The BioSyncare frontend now synthesizes peals in real time,
+> so the Python tools refuse to write WAV files unless you pass `--allow-render`.
 
 For detailed workflow documentation, see [WORKFLOW.md](WORKFLOW.md).
 
@@ -53,10 +59,10 @@ Maps bell positions to frequencies and renders complete peals as WAV files.
 
 ```bash
 # Render an existing peal file
-python peal_to_audio.py render peals/raw/plain_changes_4.txt output/my_peal.wav
+python peal_to_audio.py render peals/raw/plain_changes_4.txt output/my_peal.wav --allow-render
 
 # Generate and render a new peal
-python peal_to_audio.py generate output/custom.wav --bells 5 --hunts 2 --duration 0.25
+python peal_to_audio.py generate output/custom.wav --bells 5 --hunts 2 --duration 0.25 --allow-render
 ```
 
 Options:
@@ -138,7 +144,7 @@ The **PlainChanges** algorithm generates true peals where:
 
 These utilities can be integrated with:
 
-- **BioSynCare web interface**: Load generated audio files
+- **BioSynCare web interface**: `src/core/change-ringing.js` consumes the exported structures for realtime synthesis
 - **RDF/OWL ontologies**: Describe peal patterns and properties
 - **Audiovisual synchronization**: Match peal rhythms with breathing cycles
 - **Pattern analysis**: Study symmetries and mathematical properties

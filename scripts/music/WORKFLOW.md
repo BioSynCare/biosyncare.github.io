@@ -83,9 +83,27 @@ Generated: 2025-11-05T18:19:35
 ...
 ```
 
-### 3. Convert Peals to Audio
+### 3. Export Structures for the JavaScript Engine
 
-Use `peal_to_audio.py` to generate audio files from peals.
+Package the peal definitions and their permutation analyses for use in the
+browser audio engine:
+
+```bash
+python export_structures.py
+```
+
+This writes `src/data/musicStructures.js` with:
+- Detailed change-ringing libraries (rows, transitions, metrics)
+- Aggregated permutation families shared across peals
+- Symmetric group summaries (cycle types, canonical generators, samples)
+
+Import the generated module from the frontend to drive realtime synthesis.
+
+### 4. Convert Peals to Audio
+
+Use `peal_to_audio.py` to generate audio files from peals. Audio rendering is
+disabled by default to keep the workflow aligned with the realtime JavaScript
+engine—add `--allow-render` when you truly need to write a WAV export.
 
 #### Option A: Render from a peal definition file
 
@@ -94,7 +112,8 @@ python peal_to_audio.py render peals/raw/plain_changes_4.txt output/my_peal.wav 
   --base-freq 220 \
   --duration 0.3 \
   --vibrato-freq 5.0 \
-  --vibrato-depth 0.02
+  --vibrato-depth 0.02 \
+  --allow-render
 ```
 
 #### Option B: Generate and render a new peal
@@ -104,7 +123,8 @@ python peal_to_audio.py generate output/custom_peal.wav \
   --bells 5 \
   --hunts 2 \
   --base-freq 440 \
-  --duration 0.25
+  --duration 0.25 \
+  --allow-render
 ```
 
 Parameters:
@@ -222,7 +242,7 @@ Process multiple peals at once:
 ```bash
 for peal in peals/raw/*.txt; do
   basename=$(basename "$peal" .txt)
-  python peal_to_audio.py render "$peal" "output/${basename}.wav" --duration 0.2
+  python peal_to_audio.py render "$peal" "output/${basename}.wav" --duration 0.2 --allow-render
 done
 ```
 

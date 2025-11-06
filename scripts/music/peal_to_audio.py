@@ -2,8 +2,9 @@
 """
 Convert change-ringing peals to audio using the ttm/music package.
 
-This script reads peal definition files and renders them as audio files,
-mapping each bell position to a specific frequency.
+Audio rendering is intentionally gated behind `--allow-render` because BioSyncare
+now synthesizes peals on the fly in the JavaScript audio engine. Use this tool
+only when you explicitly need offline WAV exports.
 """
 
 import argparse
@@ -199,6 +200,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--vibrato-depth", type=float, default=0.0,
         help="Vibrato depth 0-1 (default: 0)"
     )
+    render_parser.add_argument(
+        "--allow-render",
+        action="store_true",
+        help="Explicitly allow WAV rendering (disabled by default for realtime engine)",
+    )
 
     # Subcommand: generate peal and render
     generate_parser = subparsers.add_parser(
@@ -221,10 +227,21 @@ def main(argv: Optional[List[str]] = None) -> int:
         "--duration", type=float, default=0.3,
         help="Note duration in seconds (default: 0.3)"
     )
+    generate_parser.add_argument(
+        "--allow-render",
+        action="store_true",
+        help="Explicitly allow WAV rendering (disabled by default for realtime engine)",
+    )
 
     args = parser.parse_args(argv)
 
     if args.command == "render":
+        if not args.allow_render:
+            print(
+                "Audio rendering disabled. Use --allow-render if you truly need to write WAV files.\n"
+                "Realtime synthesis now happens in the JavaScript audio engine."
+            )
+            return 0
         if not args.input.exists():
             parser.error(f"Input file does not exist: {args.input}")
 
@@ -238,6 +255,12 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
 
     elif args.command == "generate":
+        if not args.allow_render:
+            print(
+                "Audio rendering disabled. Use --allow-render if you truly need to write WAV files.\n"
+                "Realtime synthesis now happens in the JavaScript audio engine."
+            )
+            return 0
         generate_peal_audio(
             args.bells,
             args.hunts,

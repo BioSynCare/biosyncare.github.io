@@ -14,7 +14,9 @@ yarn-error.log*
 pnpm-debug.log*
 
 # RDF tooling caches and binaries (re-built via Makefile)
-scripts/rdf/tools/
+scripts/rdf/tools/*
+!scripts/rdf/tools/.gitignore
+/scripts/rdf/tools/WebVOWL-build-page
 
 # Python cache
 __pycache__/
