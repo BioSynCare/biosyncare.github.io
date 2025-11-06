@@ -1,0 +1,373 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
+  "namespace" : [ ],
+  "header" : {
+    "languages" : [ "IRI-based", "undefined" ],
+    "title" : {
+      "undefined" : "BioSynCare Core Ontology (minimal)"
+    },
+    "uri" : "file:/Users/renatofabbri/rep/sleek/biosyncare/rdf/core/",
+    "version" : "0.1.0",
+    "author" : [ "BioSynCare Lab" ],
+    "description" : {
+      "undefined" : "Minimal OWL classes and properties for BioSynCare sessions, protocols, techniques, outcomes and reports."
+    },
+    "other" : {
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2025-11-05",
+        "type" : "label"
+      } ]
+    }
+  },
+  "metrics" : {
+    "classCount" : 8,
+    "datatypeCount" : 5,
+    "objectPropertyCount" : 6,
+    "datatypePropertyCount" : 5,
+    "propertyCount" : 11,
+    "nodeCount" : 13,
+    "axiomCount" : 58,
+    "individualCount" : 1
+  },
+  "class" : [ {
+    "id" : "class3",
+    "type" : "externalclass"
+  }, {
+    "id" : "class4",
+    "type" : "externalclass"
+  }, {
+    "id" : "class6",
+    "type" : "externalclass"
+  }, {
+    "id" : "class7",
+    "type" : "externalclass"
+  }, {
+    "id" : "class5",
+    "type" : "externalclass"
+  }, {
+    "id" : "class1",
+    "type" : "externalclass"
+  }, {
+    "id" : "class2",
+    "type" : "externalclass"
+  }, {
+    "id" : "class8",
+    "type" : "externalclass"
+  }, {
+    "id" : "thing3",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "thing2",
+    "type" : "owl:Thing"
+  }, {
+    "id" : "thing1",
+    "type" : "owl:Thing"
+  } ],
+  "classAttribute" : [ {
+    "id" : "class3",
+    "label" : {
+      "IRI-based" : "Session",
+      "undefined" : "Session"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Session",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class4",
+    "label" : {
+      "IRI-based" : "Outcome",
+      "undefined" : "Outcome"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Outcome",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class6",
+    "label" : {
+      "IRI-based" : "Project",
+      "undefined" : "Project"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Project",
+    "attributes" : [ "external" ],
+    "instances" : 1,
+    "individuals" : [ {
+      "iri" : "https://biosyncare.github.io/id/BioSynCareLab",
+      "labels" : {
+        "IRI-based" : "https://biosyncare.github.io/id/BioSynCareLab"
+      },
+      "annotations" : {
+        "description" : [ {
+          "identifier" : "description",
+          "language" : "undefined",
+          "value" : "Open, client-side neurosensory stimulation lab and transparency hub.",
+          "type" : "label"
+        } ],
+        "label" : [ {
+          "identifier" : "label",
+          "language" : "undefined",
+          "value" : "BioSynCare Lab",
+          "type" : "label"
+        } ]
+      }
+    } ]
+  }, {
+    "id" : "class7",
+    "label" : {
+      "IRI-based" : "Report",
+      "undefined" : "Report"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Report",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class5",
+    "label" : {
+      "IRI-based" : "TemporalEntity"
+    },
+    "iri" : "http://www.w3.org/2006/time#TemporalEntity",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class1",
+    "label" : {
+      "IRI-based" : "Protocol",
+      "undefined" : "Protocol"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Protocol",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class2",
+    "label" : {
+      "IRI-based" : "Technique",
+      "undefined" : "Technique"
+    },
+    "iri" : "https://biosyncare.github.io/ont#Technique",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "class8",
+    "label" : {
+      "IRI-based" : "ParticipantGroup",
+      "undefined" : "Participant Group"
+    },
+    "iri" : "https://biosyncare.github.io/ont#ParticipantGroup",
+    "attributes" : [ "external" ],
+    "instances" : 0
+  }, {
+    "id" : "thing3",
+    "label" : {
+      "undefined" : "Thing"
+    },
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "instances" : 0
+  }, {
+    "id" : "thing2",
+    "label" : {
+      "undefined" : "Thing"
+    },
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "instances" : 0
+  }, {
+    "id" : "thing1",
+    "label" : {
+      "undefined" : "Thing"
+    },
+    "iri" : "http://www.w3.org/2002/07/owl#Thing",
+    "instances" : 0
+  } ],
+  "datatype" : [ {
+    "id" : "datatype5",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "datatype4",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "datatype1",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "datatype3",
+    "type" : "rdfs:Datatype"
+  }, {
+    "id" : "datatype2",
+    "type" : "rdfs:Datatype"
+  } ],
+  "datatypeAttribute" : [ {
+    "id" : "datatype5",
+    "label" : {
+      "IRI-based" : "decimal"
+    },
+    "iri" : "http://www.w3.org/2001/XMLSchema#decimal"
+  }, {
+    "id" : "datatype4",
+    "label" : {
+      "IRI-based" : "decimal"
+    },
+    "iri" : "http://www.w3.org/2001/XMLSchema#decimal"
+  }, {
+    "id" : "datatype1",
+    "label" : {
+      "IRI-based" : "decimal"
+    },
+    "iri" : "http://www.w3.org/2001/XMLSchema#decimal"
+  }, {
+    "id" : "datatype3",
+    "label" : {
+      "IRI-based" : "integer"
+    },
+    "iri" : "http://www.w3.org/2001/XMLSchema#integer"
+  }, {
+    "id" : "datatype2",
+    "label" : {
+      "IRI-based" : "string"
+    },
+    "iri" : "http://www.w3.org/2001/XMLSchema#string"
+  } ],
+  "property" : [ {
+    "id" : "property6",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property4",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property11",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "property2",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property1",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property10",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "property5",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property7",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "property8",
+    "type" : "owl:datatypeProperty"
+  }, {
+    "id" : "property3",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property9",
+    "type" : "owl:datatypeProperty"
+  } ],
+  "propertyAttribute" : [ {
+    "id" : "property6",
+    "label" : {
+      "IRI-based" : "occurredDuring",
+      "undefined" : "occurred during"
+    },
+    "iri" : "https://biosyncare.github.io/ont#occurredDuring",
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "class5"
+  }, {
+    "id" : "property4",
+    "label" : {
+      "IRI-based" : "documents",
+      "undefined" : "documents"
+    },
+    "iri" : "https://biosyncare.github.io/ont#documents",
+    "attributes" : [ "external" ],
+    "domain" : "class7",
+    "range" : "thing2"
+  }, {
+    "id" : "property11",
+    "label" : {
+      "IRI-based" : "minLatencyDays",
+      "undefined" : "minimum latency (days)"
+    },
+    "iri" : "https://biosyncare.github.io/ont#minLatencyDays",
+    "attributes" : [ "external" ],
+    "domain" : "class4",
+    "range" : "datatype5"
+  }, {
+    "id" : "property2",
+    "label" : {
+      "IRI-based" : "usesTechnique",
+      "undefined" : "uses technique"
+    },
+    "iri" : "https://biosyncare.github.io/ont#usesTechnique",
+    "attributes" : [ "external" ],
+    "domain" : "class1",
+    "range" : "class2"
+  }, {
+    "id" : "property1",
+    "label" : {
+      "IRI-based" : "partOfProject",
+      "undefined" : "part of project"
+    },
+    "iri" : "https://biosyncare.github.io/ont#partOfProject",
+    "attributes" : [ "external" ],
+    "domain" : "thing1",
+    "range" : "class6"
+  }, {
+    "id" : "property10",
+    "label" : {
+      "IRI-based" : "durationMinutes",
+      "undefined" : "duration (minutes)"
+    },
+    "iri" : "https://biosyncare.github.io/ont#durationMinutes",
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "datatype4"
+  }, {
+    "id" : "property5",
+    "label" : {
+      "IRI-based" : "hasOutcome",
+      "undefined" : "has outcome"
+    },
+    "iri" : "https://biosyncare.github.io/ont#hasOutcome",
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "class4"
+  }, {
+    "id" : "property7",
+    "label" : {
+      "IRI-based" : "maxLatencyDays",
+      "undefined" : "maximum latency (days)"
+    },
+    "iri" : "https://biosyncare.github.io/ont#maxLatencyDays",
+    "attributes" : [ "external" ],
+    "domain" : "class4",
+    "range" : "datatype1"
+  }, {
+    "id" : "property8",
+    "label" : {
+      "IRI-based" : "notes",
+      "undefined" : "notes"
+    },
+    "iri" : "https://biosyncare.github.io/ont#notes",
+    "attributes" : [ "external" ],
+    "domain" : "thing3",
+    "range" : "datatype2"
+  }, {
+    "id" : "property3",
+    "label" : {
+      "IRI-based" : "appliesTechnique",
+      "undefined" : "applies technique"
+    },
+    "iri" : "https://biosyncare.github.io/ont#appliesTechnique",
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "class2"
+  }, {
+    "id" : "property9",
+    "label" : {
+      "IRI-based" : "participantCount",
+      "undefined" : "participant count"
+    },
+    "iri" : "https://biosyncare.github.io/ont#participantCount",
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "datatype3"
+  } ]
+}

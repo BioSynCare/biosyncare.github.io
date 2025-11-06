@@ -1,0 +1,2117 @@
+{
+  "_comment" : "Created with OWL2VOWL (version 0.2.0), http://vowl.visualdataweb.org",
+  "namespace" : [ ],
+  "header" : {
+    "languages" : [ "IRI-based", "en", "undefined" ],
+    "title" : {
+      "en" : "SSO Ontology (BioSynCare mirror)"
+    },
+    "uri" : "file:/Users/renatofabbri/rep/sleek/biosyncare/rdf/external/sso/",
+    "version" : "snapshot",
+    "other" : {
+      "created" : [ {
+        "identifier" : "created",
+        "language" : "undefined",
+        "value" : "2025-11-05",
+        "type" : "label"
+      } ]
+    }
+  },
+  "metrics" : {
+    "classCount" : 37,
+    "datatypeCount" : 0,
+    "objectPropertyCount" : 9,
+    "datatypePropertyCount" : 0,
+    "propertyCount" : 9,
+    "nodeCount" : 37,
+    "axiomCount" : 342,
+    "individualCount" : 44
+  },
+  "class" : [ {
+    "id" : "class17",
+    "type" : "externalclass"
+  }, {
+    "id" : "class9",
+    "type" : "externalclass"
+  }, {
+    "id" : "class22",
+    "type" : "externalclass"
+  }, {
+    "id" : "class31",
+    "type" : "externalclass"
+  }, {
+    "id" : "class36",
+    "type" : "externalclass"
+  }, {
+    "id" : "class37",
+    "type" : "externalclass"
+  }, {
+    "id" : "class12",
+    "type" : "externalclass"
+  }, {
+    "id" : "class15",
+    "type" : "externalclass"
+  }, {
+    "id" : "class29",
+    "type" : "externalclass"
+  }, {
+    "id" : "class27",
+    "type" : "externalclass"
+  }, {
+    "id" : "class2",
+    "type" : "externalclass"
+  }, {
+    "id" : "class32",
+    "type" : "externalclass"
+  }, {
+    "id" : "class28",
+    "type" : "externalclass"
+  }, {
+    "id" : "class4",
+    "type" : "externalclass"
+  }, {
+    "id" : "class14",
+    "type" : "externalclass"
+  }, {
+    "id" : "class35",
+    "type" : "externalclass"
+  }, {
+    "id" : "class19",
+    "type" : "externalclass"
+  }, {
+    "id" : "class6",
+    "type" : "externalclass"
+  }, {
+    "id" : "class3",
+    "type" : "externalclass"
+  }, {
+    "id" : "class1",
+    "type" : "externalclass"
+  }, {
+    "id" : "class23",
+    "type" : "externalclass"
+  }, {
+    "id" : "class33",
+    "type" : "externalclass"
+  }, {
+    "id" : "class26",
+    "type" : "externalclass"
+  }, {
+    "id" : "class34",
+    "type" : "externalclass"
+  }, {
+    "id" : "class7",
+    "type" : "externalclass"
+  }, {
+    "id" : "class25",
+    "type" : "externalclass"
+  }, {
+    "id" : "class10",
+    "type" : "externalclass"
+  }, {
+    "id" : "class5",
+    "type" : "externalclass"
+  }, {
+    "id" : "class13",
+    "type" : "externalclass"
+  }, {
+    "id" : "class30",
+    "type" : "externalclass"
+  }, {
+    "id" : "class11",
+    "type" : "externalclass"
+  }, {
+    "id" : "class21",
+    "type" : "externalclass"
+  }, {
+    "id" : "class8",
+    "type" : "externalclass"
+  }, {
+    "id" : "class18",
+    "type" : "externalclass"
+  }, {
+    "id" : "class16",
+    "type" : "externalclass"
+  }, {
+    "id" : "class20",
+    "type" : "externalclass"
+  }, {
+    "id" : "class24",
+    "type" : "externalclass"
+  } ],
+  "classAttribute" : [ {
+    "id" : "class17",
+    "label" : {
+      "IRI-based" : "ColorTherapy",
+      "undefined" : "ColorTherapy"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#ColorTherapy",
+    "comment" : {
+      "undefined" : "Therapy using color exposure to influence mental and physical health."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class24" ],
+    "instances" : 0
+  }, {
+    "id" : "class9",
+    "label" : {
+      "IRI-based" : "Expert",
+      "undefined" : "Expert"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Expert",
+    "comment" : {
+      "undefined" : "An expert in neuromodulation, could be a person or a company."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class3", "class5" ],
+    "instances" : 0
+  }, {
+    "id" : "class22",
+    "label" : {
+      "IRI-based" : "Context",
+      "undefined" : "Context"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Context",
+    "comment" : {
+      "undefined" : "Context in which stimulation is administered, impacting efficacy."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class27" ],
+    "instances" : 0
+  }, {
+    "id" : "class31",
+    "label" : {
+      "IRI-based" : "MonauralBeats",
+      "undefined" : "MonauralBeats"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#MonauralBeats",
+    "comment" : {
+      "undefined" : "Single-tone auditory beats used for stimulation."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class34" ],
+    "instances" : 0
+  }, {
+    "id" : "class36",
+    "label" : {
+      "IRI-based" : "DeepBrainStimulation",
+      "undefined" : "DeepBrainStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#DeepBrainStimulation",
+    "comment" : {
+      "undefined" : "Stimulation of deep brain structures using implanted electrodes."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class29" ],
+    "instances" : 0
+  }, {
+    "id" : "class37",
+    "label" : {
+      "IRI-based" : "SpecializedNeuromodulationDevice",
+      "undefined" : "SpecializedNeuromodulationDevice"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#SpecializedNeuromodulationDevice",
+    "comment" : {
+      "undefined" : "Devices specifically built for neuromodulation, like MindAlive devices."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class18" ],
+    "instances" : 0
+  }, {
+    "id" : "class12",
+    "label" : {
+      "IRI-based" : "Flickering",
+      "undefined" : "Flickering"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Flickering",
+    "comment" : {
+      "undefined" : "Visual technique using flickering lights to stimulate the brain."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class24" ],
+    "instances" : 0
+  }, {
+    "id" : "class15",
+    "label" : {
+      "IRI-based" : "Session",
+      "undefined" : "Session"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Session",
+    "comment" : {
+      "undefined" : "A session instance involving stimulation, either guided or unguided."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class16", "class19" ],
+    "instances" : 0
+  }, {
+    "id" : "class29",
+    "label" : {
+      "IRI-based" : "ElectricalStimulation",
+      "undefined" : "ElectricalStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#ElectricalStimulation",
+    "comment" : {
+      "undefined" : "Stimulation via low-level electrical currents."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class36" ],
+    "superClasses" : [ "class2" ],
+    "instances" : 0
+  }, {
+    "id" : "class27",
+    "label" : {
+      "IRI-based" : "CognitiveModulation",
+      "undefined" : "CognitiveModulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#CognitiveModulation",
+    "comment" : {
+      "undefined" : "Modulation techniques that affect cognitive functions and states."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class22", "class35" ],
+    "superClasses" : [ "class6" ],
+    "instances" : 0
+  }, {
+    "id" : "class2",
+    "label" : {
+      "IRI-based" : "BrainStimulation",
+      "undefined" : "BrainStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#BrainStimulation",
+    "comment" : {
+      "undefined" : "Direct stimulation targeted at brain regions for therapeutic effects."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class29" ],
+    "superClasses" : [ "class6" ],
+    "instances" : 0
+  }, {
+    "id" : "class32",
+    "label" : {
+      "IRI-based" : "Concept"
+    },
+    "iri" : "http://www.w3.org/2004/02/skos/core#Concept",
+    "attributes" : [ "external" ],
+    "instances" : 36,
+    "individuals" : [ {
+      "iri" : "https://biosyncare.github.io/ont/sso#BrainwaveEntrainmentConcept",
+      "labels" : {
+        "IRI-based" : "BrainwaveEntrainmentConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "BrainwaveEntrainment Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#BrainwaveEntrainment",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Techniques aligning brainwave frequencies with external rhythms.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#TechniqueConcept",
+      "labels" : {
+        "IRI-based" : "TechniqueConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Technique",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Technique Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Techniques used for neuromodulation.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#GeneralPurposeDeviceConcept",
+      "labels" : {
+        "IRI-based" : "GeneralPurposeDeviceConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Devices like smartphones and laptops that can run software for stimulation.",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "GeneralPurposeDevice Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#GeneralPurposeDevice",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#DeviceConcept",
+      "labels" : {
+        "IRI-based" : "DeviceConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Device",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Device used for various stimulation techniques.",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Device Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ColorTherapyConcept",
+      "labels" : {
+        "IRI-based" : "ColorTherapyConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Therapy using color exposure to influence mental and physical health.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#ColorTherapy",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "ColorTherapy Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#AudioStimulationConcept",
+      "labels" : {
+        "IRI-based" : "AudioStimulationConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "AudioStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation using audio signals like isochronic or binaural beats.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#AudioStimulation",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#VisualStimulationConcept",
+      "labels" : {
+        "IRI-based" : "VisualStimulationConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation using visual signals, including flickering lights and color.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#VisualStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "VisualStimulation Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#SensoryStimulationConcept",
+      "labels" : {
+        "IRI-based" : "SensoryStimulationConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation via sensory inputs such as audio, visual, and tactile cues.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#SensoryStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "SensoryStimulation Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#MonauralBeatsConcept",
+      "labels" : {
+        "IRI-based" : "MonauralBeatsConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Single-tone auditory beats used for stimulation.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#MonauralBeats",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "MonauralBeats Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#CollaboratorConcept",
+      "labels" : {
+        "IRI-based" : "CollaboratorConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Potential collaborators for the SSO project, including experts and organizations.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Collaborator",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Collaborator Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ChemicalStimulationConcept",
+      "labels" : {
+        "IRI-based" : "ChemicalStimulationConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation using chemical agents or drugs.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#ChemicalStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "ChemicalStimulation Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#TranscranialMagneticStimulationConcept",
+      "labels" : {
+        "IRI-based" : "TranscranialMagneticStimulationConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "TranscranialMagneticStimulation Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#TranscranialMagneticStimulation",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Magnetic stimulation applied to the brain non-invasively.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#AudioTechniquesConcept",
+      "labels" : {
+        "IRI-based" : "AudioTechniquesConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Audio-based modulation techniques for brain and sensory stimulation.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#AudioTechniques",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "AudioTechniques Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#SpecializedNeuromodulationDeviceConcept",
+      "labels" : {
+        "IRI-based" : "SpecializedNeuromodulationDeviceConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "SpecializedNeuromodulationDevice Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Devices specifically built for neuromodulation, like MindAlive devices.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#SpecializedNeuromodulationDevice",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#IsochronousSoundsConcept",
+      "labels" : {
+        "IRI-based" : "IsochronousSoundsConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#IsochronousSounds",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "IsochronousSounds Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Sounds with equal intervals, often used for entrainment.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#VisualTechniquesConcept",
+      "labels" : {
+        "IRI-based" : "VisualTechniquesConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "VisualTechniques Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Visual-based modulation techniques for stimulation.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#VisualTechniques",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#DeepBrainStimulationConcept",
+      "labels" : {
+        "IRI-based" : "DeepBrainStimulationConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation of deep brain structures using implanted electrodes.",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "DeepBrainStimulation Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#DeepBrainStimulation",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ContextConcept",
+      "labels" : {
+        "IRI-based" : "ContextConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Context Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Context",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Context in which stimulation is administered, impacting efficacy.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#TactileStimulationConcept",
+      "labels" : {
+        "IRI-based" : "TactileStimulationConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "TactileStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation through tactile feedback, using vibrations or touch.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#TactileStimulation",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ElectricalStimulationConcept",
+      "labels" : {
+        "IRI-based" : "ElectricalStimulationConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#ElectricalStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "ElectricalStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation via low-level electrical currents.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#CompanyConcept",
+      "labels" : {
+        "IRI-based" : "CompanyConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Company Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Company",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "An organization providing neuromodulation devices or services.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#GroupSessionConcept",
+      "labels" : {
+        "IRI-based" : "GroupSessionConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#GroupSession",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "A session involving multiple users undergoing the same stimulation protocol.",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "GroupSession Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#CognitiveModulationConcept",
+      "labels" : {
+        "IRI-based" : "CognitiveModulationConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Modulation techniques that affect cognitive functions and states.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#CognitiveModulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "CognitiveModulation Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#BinauralBeatsConcept",
+      "labels" : {
+        "IRI-based" : "BinauralBeatsConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Dual-tone auditory beats used to create a perceived third beat for entrainment.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#BinauralBeats",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "BinauralBeats Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#AudiovisualStimulationConcept",
+      "labels" : {
+        "IRI-based" : "AudiovisualStimulationConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#AudiovisualStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "AudiovisualStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation using both audio and visual cues together.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ExpertConcept",
+      "labels" : {
+        "IRI-based" : "ExpertConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Expert Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "An expert in neuromodulation, could be a person or a company.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Expert",
+          "type" : "iri"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#GuidingStimulationConcept",
+      "labels" : {
+        "IRI-based" : "GuidingStimulationConcept"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "GuidingStimulation Concept",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#GuidingStimulation",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation guided by rhythms or cycles, such as breathing cycles.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#BrainStimulationConcept",
+      "labels" : {
+        "IRI-based" : "BrainStimulationConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#BrainStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "BrainStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Direct stimulation targeted at brain regions for therapeutic effects.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#TranscranialStimulationConcept",
+      "labels" : {
+        "IRI-based" : "TranscranialStimulationConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#TranscranialStimulation",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "TranscranialStimulation Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Techniques applied directly to the skull or scalp.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#NeuromodulationConcept",
+      "labels" : {
+        "IRI-based" : "NeuromodulationConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Neuromodulation",
+          "type" : "iri"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Techniques to alter brain activity through various forms of stimulation.",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Neuromodulation Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#ChromosoundConcept",
+      "labels" : {
+        "IRI-based" : "ChromosoundConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "A specific type of audiovisual stimulation involving coordinated sound and color.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Chromosound",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Chromosound Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#SessionConcept",
+      "labels" : {
+        "IRI-based" : "SessionConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "A session instance involving stimulation, either guided or unguided.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Session",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Session Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#SpecialistPersonConcept",
+      "labels" : {
+        "IRI-based" : "SpecialistPersonConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "A human specialist in neuromodulation techniques.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#SpecialistPerson",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "SpecialistPerson Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#IndividualSessionConcept",
+      "labels" : {
+        "IRI-based" : "IndividualSessionConcept"
+      },
+      "annotations" : {
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#IndividualSession",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "IndividualSession Concept",
+          "type" : "label"
+        } ],
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "A single-user session of neuromodulation or stimulation.",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#FlickeringConcept",
+      "labels" : {
+        "IRI-based" : "FlickeringConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Visual technique using flickering lights to stimulate the brain.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Flickering",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Flickering Concept",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#LanguageConcept",
+      "labels" : {
+        "IRI-based" : "LanguageConcept"
+      },
+      "annotations" : {
+        "definition" : [ {
+          "identifier" : "definition",
+          "language" : "undefined",
+          "value" : "Stimulation involving human language.",
+          "type" : "label"
+        } ],
+        "related" : [ {
+          "identifier" : "related",
+          "language" : "undefined",
+          "value" : "https://biosyncare.github.io/ont/sso#Language",
+          "type" : "iri"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Language Concept",
+          "type" : "label"
+        } ]
+      }
+    } ]
+  }, {
+    "id" : "class28",
+    "label" : {
+      "IRI-based" : "BrainwaveEntrainment",
+      "undefined" : "BrainwaveEntrainment"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#BrainwaveEntrainment",
+    "comment" : {
+      "undefined" : "Techniques aligning brainwave frequencies with external rhythms."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class20" ],
+    "instances" : 0
+  }, {
+    "id" : "class4",
+    "label" : {
+      "IRI-based" : "ChemicalStimulation",
+      "undefined" : "ChemicalStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#ChemicalStimulation",
+    "comment" : {
+      "undefined" : "Stimulation using chemical agents or drugs."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class6" ],
+    "instances" : 0
+  }, {
+    "id" : "class14",
+    "label" : {
+      "IRI-based" : "GuidingStimulation",
+      "undefined" : "GuidingStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#GuidingStimulation",
+    "comment" : {
+      "undefined" : "Stimulation guided by rhythms or cycles, such as breathing cycles."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class8" ],
+    "instances" : 0
+  }, {
+    "id" : "class35",
+    "label" : {
+      "IRI-based" : "Language",
+      "undefined" : "Language"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Language",
+    "comment" : {
+      "undefined" : "Stimulation involving human language."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class27" ],
+    "instances" : 0
+  }, {
+    "id" : "class19",
+    "label" : {
+      "IRI-based" : "IndividualSession",
+      "undefined" : "IndividualSession"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#IndividualSession",
+    "comment" : {
+      "undefined" : "A single-user session of neuromodulation or stimulation."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class15" ],
+    "instances" : 0
+  }, {
+    "id" : "class6",
+    "label" : {
+      "IRI-based" : "Neuromodulation",
+      "undefined" : "Neuromodulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Neuromodulation",
+    "comment" : {
+      "undefined" : "Techniques to alter brain activity through various forms of stimulation."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class2", "class4", "class27", "class8", "class10" ],
+    "instances" : 0
+  }, {
+    "id" : "class3",
+    "label" : {
+      "IRI-based" : "Company",
+      "undefined" : "Company"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Company",
+    "comment" : {
+      "undefined" : "An organization providing neuromodulation devices or services."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class9" ],
+    "instances" : 0
+  }, {
+    "id" : "class1",
+    "label" : {
+      "IRI-based" : "TactileStimulation",
+      "undefined" : "TactileStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#TactileStimulation",
+    "comment" : {
+      "undefined" : "Stimulation through tactile feedback, using vibrations or touch."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class8" ],
+    "instances" : 0
+  }, {
+    "id" : "class23",
+    "label" : {
+      "IRI-based" : "IsochronousSounds",
+      "undefined" : "IsochronousSounds"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#IsochronousSounds",
+    "comment" : {
+      "undefined" : "Sounds with equal intervals, often used for entrainment."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class34" ],
+    "instances" : 0
+  }, {
+    "id" : "class33",
+    "label" : {
+      "IRI-based" : "AudioStimulation",
+      "undefined" : "AudioStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#AudioStimulation",
+    "comment" : {
+      "undefined" : "Stimulation using audio signals like isochronic or binaural beats."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class13" ],
+    "instances" : 0
+  }, {
+    "id" : "class26",
+    "label" : {
+      "IRI-based" : "GeneralPurposeDevice",
+      "undefined" : "GeneralPurposeDevice"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#GeneralPurposeDevice",
+    "comment" : {
+      "undefined" : "Devices like smartphones and laptops that can run software for stimulation."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class18" ],
+    "instances" : 0
+  }, {
+    "id" : "class34",
+    "label" : {
+      "IRI-based" : "AudioTechniques",
+      "undefined" : "AudioTechniques"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#AudioTechniques",
+    "comment" : {
+      "undefined" : "Audio-based modulation techniques for brain and sensory stimulation."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class30", "class23", "class31" ],
+    "superClasses" : [ "class20" ],
+    "instances" : 0
+  }, {
+    "id" : "class7",
+    "label" : {
+      "IRI-based" : "VisualStimulation",
+      "undefined" : "VisualStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#VisualStimulation",
+    "comment" : {
+      "undefined" : "Stimulation using visual signals, including flickering lights and color."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class13" ],
+    "instances" : 0
+  }, {
+    "id" : "class25",
+    "label" : {
+      "IRI-based" : "TranscranialMagneticStimulation",
+      "undefined" : "TranscranialMagneticStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#TranscranialMagneticStimulation",
+    "comment" : {
+      "undefined" : "Magnetic stimulation applied to the brain non-invasively."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class10" ],
+    "instances" : 0
+  }, {
+    "id" : "class10",
+    "label" : {
+      "IRI-based" : "TranscranialStimulation",
+      "undefined" : "TranscranialStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#TranscranialStimulation",
+    "comment" : {
+      "undefined" : "Techniques applied directly to the skull or scalp."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class25" ],
+    "superClasses" : [ "class6" ],
+    "instances" : 0
+  }, {
+    "id" : "class5",
+    "label" : {
+      "IRI-based" : "SpecialistPerson",
+      "undefined" : "SpecialistPerson"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#SpecialistPerson",
+    "comment" : {
+      "undefined" : "A human specialist in neuromodulation techniques."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class9" ],
+    "instances" : 0
+  }, {
+    "id" : "class13",
+    "label" : {
+      "IRI-based" : "AudiovisualStimulation",
+      "undefined" : "AudiovisualStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#AudiovisualStimulation",
+    "comment" : {
+      "undefined" : "Stimulation using both audio and visual cues together."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class33", "class21", "class7" ],
+    "superClasses" : [ "class8" ],
+    "instances" : 0
+  }, {
+    "id" : "class30",
+    "label" : {
+      "IRI-based" : "BinauralBeats",
+      "undefined" : "BinauralBeats"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#BinauralBeats",
+    "comment" : {
+      "undefined" : "Dual-tone auditory beats used to create a perceived third beat for entrainment."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class34" ],
+    "instances" : 0
+  }, {
+    "id" : "class11",
+    "label" : {
+      "IRI-based" : "Collaborator",
+      "undefined" : "Collaborator"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Collaborator",
+    "comment" : {
+      "undefined" : "Potential collaborators for the SSO project, including experts and organizations."
+    },
+    "attributes" : [ "external" ],
+    "instances" : 8,
+    "individuals" : [ {
+      "iri" : "https://biosyncare.github.io/ont/sso#Emerson_Marques_Pedro",
+      "labels" : {
+        "IRI-based" : "Emerson_Marques_Pedro"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Emerson_Marques_Pedro",
+          "type" : "label"
+        } ],
+        "PotentialCollaborator" : [ {
+          "identifier" : "PotentialCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Renato_Fabbri",
+      "labels" : {
+        "IRI-based" : "Renato_Fabbri"
+      },
+      "annotations" : {
+        "ConfirmedCollaborator" : [ {
+          "identifier" : "ConfirmedCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Renato_Fabbri",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Ivan_Maero",
+      "labels" : {
+        "IRI-based" : "Ivan_Maero"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Ivan_Maero",
+          "type" : "label"
+        } ],
+        "ActiveCollaborator" : [ {
+          "identifier" : "ActiveCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Jacopo_Donati",
+      "labels" : {
+        "IRI-based" : "Jacopo_Donati"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Jacopo_Donati",
+          "type" : "label"
+        } ],
+        "ActiveCollaborator" : [ {
+          "identifier" : "ActiveCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Jorge_Antunes",
+      "labels" : {
+        "IRI-based" : "Jorge_Antunes"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Jorge_Antunes",
+          "type" : "label"
+        } ],
+        "PotentialCollaborator" : [ {
+          "identifier" : "PotentialCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Sergio_Basbaum",
+      "labels" : {
+        "IRI-based" : "Sergio_Basbaum"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Sergio_Basbaum",
+          "type" : "label"
+        } ],
+        "PotentialCollaborator" : [ {
+          "identifier" : "PotentialCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Marco_Schonhaut",
+      "labels" : {
+        "IRI-based" : "Marco_Schonhaut"
+      },
+      "annotations" : {
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Marco_Schonhaut",
+          "type" : "label"
+        } ],
+        "PotentialCollaborator" : [ {
+          "identifier" : "PotentialCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ]
+      }
+    }, {
+      "iri" : "https://biosyncare.github.io/ont/sso#Giorgia_Crimi",
+      "labels" : {
+        "IRI-based" : "Giorgia_Crimi"
+      },
+      "annotations" : {
+        "PotentialCollaborator" : [ {
+          "identifier" : "PotentialCollaborator",
+          "language" : "undefined",
+          "value" : "true",
+          "type" : "label"
+        } ],
+        "prefLabel" : [ {
+          "identifier" : "prefLabel",
+          "language" : "undefined",
+          "value" : "Giorgia_Crimi",
+          "type" : "label"
+        } ]
+      }
+    } ]
+  }, {
+    "id" : "class21",
+    "label" : {
+      "IRI-based" : "Chromosound",
+      "undefined" : "Chromosound"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Chromosound",
+    "comment" : {
+      "undefined" : "A specific type of audiovisual stimulation involving coordinated sound and color."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class13" ],
+    "instances" : 0
+  }, {
+    "id" : "class8",
+    "label" : {
+      "IRI-based" : "SensoryStimulation",
+      "undefined" : "SensoryStimulation"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#SensoryStimulation",
+    "comment" : {
+      "undefined" : "Stimulation via sensory inputs such as audio, visual, and tactile cues."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class13", "class14", "class1" ],
+    "superClasses" : [ "class6" ],
+    "instances" : 0
+  }, {
+    "id" : "class18",
+    "label" : {
+      "IRI-based" : "Device",
+      "undefined" : "Device"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Device",
+    "comment" : {
+      "undefined" : "Device used for various stimulation techniques."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class26", "class37" ],
+    "instances" : 0
+  }, {
+    "id" : "class16",
+    "label" : {
+      "IRI-based" : "GroupSession",
+      "undefined" : "GroupSession"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#GroupSession",
+    "comment" : {
+      "undefined" : "A session involving multiple users undergoing the same stimulation protocol."
+    },
+    "attributes" : [ "external" ],
+    "superClasses" : [ "class15" ],
+    "instances" : 0
+  }, {
+    "id" : "class20",
+    "label" : {
+      "IRI-based" : "Technique",
+      "undefined" : "Technique"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#Technique",
+    "comment" : {
+      "undefined" : "Techniques used for neuromodulation."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class34", "class28", "class24" ],
+    "instances" : 0
+  }, {
+    "id" : "class24",
+    "label" : {
+      "IRI-based" : "VisualTechniques",
+      "undefined" : "VisualTechniques"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#VisualTechniques",
+    "comment" : {
+      "undefined" : "Visual-based modulation techniques for stimulation."
+    },
+    "attributes" : [ "external" ],
+    "subClasses" : [ "class17", "class12" ],
+    "superClasses" : [ "class20" ],
+    "instances" : 0
+  } ],
+  "property" : [ {
+    "id" : "property38",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property37",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property2",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property1",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property29",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property4",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property3",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property26",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property25",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property28",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property27",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property22",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property34",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property21",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property24",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property23",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property20",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property36",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property32",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property9",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property6",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property5",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property8",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property7",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property19",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property18",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property33",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property15",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property14",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property17",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property16",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property11",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property10",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property31",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property39",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property13",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property12",
+    "type" : "rdfs:SubClassOf"
+  }, {
+    "id" : "property35",
+    "type" : "owl:objectProperty"
+  }, {
+    "id" : "property30",
+    "type" : "rdfs:SubClassOf"
+  } ],
+  "propertyAttribute" : [ {
+    "id" : "property38",
+    "label" : {
+      "IRI-based" : "appliesTechnique"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#appliesTechnique",
+    "comment" : {
+      "undefined" : "Technique applied by an expert."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class9",
+    "range" : "class20"
+  }, {
+    "id" : "property37",
+    "label" : {
+      "IRI-based" : "usesDevice"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#usesDevice",
+    "comment" : {
+      "undefined" : "Session uses a specific device for stimulation."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class15",
+    "range" : "class18"
+  }, {
+    "id" : "property2",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class5",
+    "range" : "class9"
+  }, {
+    "id" : "property1",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class3",
+    "range" : "class9"
+  }, {
+    "id" : "property29",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class17",
+    "range" : "class24"
+  }, {
+    "id" : "property4",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class19",
+    "range" : "class15"
+  }, {
+    "id" : "property3",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class16",
+    "range" : "class15"
+  }, {
+    "id" : "property26",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class34",
+    "range" : "class20"
+  }, {
+    "id" : "property25",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class37",
+    "range" : "class18"
+  }, {
+    "id" : "property28",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class24",
+    "range" : "class20"
+  }, {
+    "id" : "property27",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class28",
+    "range" : "class20"
+  }, {
+    "id" : "property22",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class14",
+    "range" : "class8"
+  }, {
+    "id" : "property34",
+    "label" : {
+      "IRI-based" : "administeredBy"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#administeredBy",
+    "comment" : {
+      "undefined" : "Session is administered by a specialist or organization."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class15",
+    "range" : "class9"
+  }, {
+    "id" : "property21",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class13",
+    "range" : "class8"
+  }, {
+    "id" : "property24",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class26",
+    "range" : "class18"
+  }, {
+    "id" : "property23",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class1",
+    "range" : "class8"
+  }, {
+    "id" : "property20",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class7",
+    "range" : "class13"
+  }, {
+    "id" : "property36",
+    "label" : {
+      "IRI-based" : "providedBy"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#providedBy",
+    "comment" : {
+      "undefined" : "Device provided by a company for neuromodulation."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class37",
+    "range" : "class3"
+  }, {
+    "id" : "property32",
+    "label" : {
+      "IRI-based" : "isPotentialCollaborator"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#isPotentialCollaborator",
+    "comment" : {
+      "undefined" : "Potential collaboration between experts and SSO."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class9",
+    "range" : "class11"
+  }, {
+    "id" : "property9",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class2",
+    "range" : "class6"
+  }, {
+    "id" : "property6",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class22",
+    "range" : "class27"
+  }, {
+    "id" : "property5",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class36",
+    "range" : "class29"
+  }, {
+    "id" : "property8",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class29",
+    "range" : "class2"
+  }, {
+    "id" : "property7",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class35",
+    "range" : "class27"
+  }, {
+    "id" : "property19",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class21",
+    "range" : "class13"
+  }, {
+    "id" : "property18",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class33",
+    "range" : "class13"
+  }, {
+    "id" : "property33",
+    "label" : {
+      "IRI-based" : "recommendsTechnique"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#recommendsTechnique",
+    "comment" : {
+      "undefined" : "Technique recommended by a collaborator."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class11",
+    "range" : "class20"
+  }, {
+    "id" : "property15",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class23",
+    "range" : "class34"
+  }, {
+    "id" : "property14",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class30",
+    "range" : "class34"
+  }, {
+    "id" : "property17",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class25",
+    "range" : "class10"
+  }, {
+    "id" : "property16",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class31",
+    "range" : "class34"
+  }, {
+    "id" : "property11",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class27",
+    "range" : "class6"
+  }, {
+    "id" : "property10",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class4",
+    "range" : "class6"
+  }, {
+    "id" : "property31",
+    "label" : {
+      "IRI-based" : "employsTechnique"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#employsTechnique",
+    "comment" : {
+      "undefined" : "Neuromodulation employs specific techniques."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class6",
+    "range" : "class20"
+  }, {
+    "id" : "property39",
+    "label" : {
+      "IRI-based" : "enhances"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#enhances",
+    "comment" : {
+      "undefined" : "Technique that enhances cognitive functions."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class20",
+    "range" : "class27"
+  }, {
+    "id" : "property13",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class10",
+    "range" : "class6"
+  }, {
+    "id" : "property12",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class8",
+    "range" : "class6"
+  }, {
+    "id" : "property35",
+    "label" : {
+      "IRI-based" : "supportsDevice"
+    },
+    "iri" : "https://biosyncare.github.io/ont/sso#supportsDevice",
+    "comment" : {
+      "undefined" : "Device supported by the company."
+    },
+    "attributes" : [ "external" ],
+    "domain" : "class3",
+    "range" : "class37"
+  }, {
+    "id" : "property30",
+    "label" : {
+      "IRI-based" : "Subclass Of"
+    },
+    "domain" : "class12",
+    "range" : "class24"
+  } ]
+}
