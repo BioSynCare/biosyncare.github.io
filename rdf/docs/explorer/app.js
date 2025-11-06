@@ -1,4 +1,4 @@
-const VERSION = '20251106-1';
+const VERSION = '20251106-2';
 
 async function loadJSON(path) {
   const url = path + (path.includes('?') ? '&' : '?') + 'v=' + VERSION;
@@ -163,6 +163,65 @@ async function main() {
 
   const info = document.getElementById('info');
   const infoEl = document.getElementById('infoContent');
+  // Comments UI
+  const commentsListEl = document.getElementById('commentsList');
+  const commentInputEl = document.getElementById('commentInput');
+  const addCommentBtn = document.getElementById('addComment');
+  const COMMENTS_KEY = 'bsc-explorer-comments';
+  function loadCommentsStore() {
+    try { const s = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); return { nodes: s.nodes || {}, edges: s.edges || {} }; }
+    catch { return { nodes: {}, edges: {} }; }
+  }
+  function saveCommentsStore() {
+    localStorage.setItem(COMMENTS_KEY, JSON.stringify(commentsStore));
+  }
+  let commentsStore = loadCommentsStore();
+  let currentSelection = null; // { type: 'node'|'edge', id: string }
+
+  function getCommentsFor(sel) {
+    if (!sel) return [];
+    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
+    return bucket[sel.id] || [];
+  }
+  function addComment(sel, text) {
+    if (!sel) return;
+    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
+    const arr = bucket[sel.id] || (bucket[sel.id] = []);
+    arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now() });
+    saveCommentsStore();
+  }
+  function deleteComment(sel, cid) {
+    if (!sel) return;
+    const bucket = sel.type === 'edge' ? commentsStore.edges : commentsStore.nodes;
+    const arr = bucket[sel.id] || [];
+    const idx = arr.findIndex(c => c.id === cid);
+    if (idx >= 0) { arr.splice(idx, 1); saveCommentsStore(); }
+  }
+  function renderComments() {
+    const items = getCommentsFor(currentSelection);
+    commentsListEl.innerHTML = '';
+    for (const c of items) {
+      const div = document.createElement('div');
+      div.className = 'comment-item';
+      const meta = document.createElement('div');
+      meta.className = 'comment-meta';
+      const date = new Date(c.ts).toLocaleString();
+      const left = document.createElement('span'); left.textContent = date;
+      const del = document.createElement('button'); del.className = 'btn'; del.textContent = 'Delete';
+      del.addEventListener('click', () => { deleteComment(currentSelection, c.id); renderComments(); });
+      meta.appendChild(left); meta.appendChild(del);
+      const text = document.createElement('div'); text.textContent = c.text;
+      div.appendChild(meta); div.appendChild(text);
+      commentsListEl.appendChild(div);
+    }
+  }
+  addCommentBtn.addEventListener('click', () => {
+    const text = (commentInputEl.value || '').trim();
+    if (!text) return;
+    addComment(currentSelection, text);
+    commentInputEl.value = '';
+    renderComments();
+  });
   function showInfo(nodeId) {
     const ent = entities[nodeId];
     if (!ent) { infoEl.innerHTML = '<p class="muted">No info.</p>'; return; }
@@ -179,8 +238,25 @@ async function main() {
     `;
   }
 
-  cy.on('select', 'node', (ev) => showInfo(ev.target.id()));
-  cy.on('tap', 'node', (ev) => showInfo(ev.target.id()));
+  function showEdgeInfo(edgeId) {
+    const e = edges.find(x => x.id === edgeId);
+    if (!e) { infoEl.innerHTML = '<p class="muted">No info.</p>'; return; }
+    const s = idNode.get(e.source);
+    const t = idNode.get(e.target);
+    const sl = s?.label || e.source;
+    const tl = t?.label || e.target;
+    infoEl.innerHTML = `
+      <h2>${e.label || e.kind}</h2>
+      <div class="muted">${e.kind}</div>
+      <p>${sl} → ${tl}</p>
+      <p class="muted">IDs: ${e.source} → ${e.target}</p>
+    `;
+  }
+
+  cy.on('select', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); renderComments(); });
+  cy.on('tap', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); renderComments(); });
+  cy.on('select', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); renderComments(); });
+  cy.on('tap', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); renderComments(); });
 
   const search = document.getElementById('search');
   search.addEventListener('input', () => {

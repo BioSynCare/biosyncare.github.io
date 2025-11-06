@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Ontology Explorer — Graph</title>
-  <link rel="stylesheet" href="./style.css?v=20251106-1" />
+    <title>BSCLab Ontology Explorer — Graph</title>
+  <link rel="stylesheet" href="./style.css?v=20251106-2" />
   <script defer src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
-  <script defer src="./app.js?v=20251106-1"></script>
+  <script defer src="./app.js?v=20251106-2"></script>
   </head>
   <body>
     <header>
-      <h1>Ontology Explorer — Graph</h1>
+  <h1>BSCLab Ontology Explorer — Graph</h1>
       <div class="bar">
         <div class="group">
           <label><input type="checkbox" id="toggleSubclass" checked /> subclass</label>
@@ -67,6 +67,14 @@
       <div id="cy"></div>
       <aside id="info">
         <div id="infoContent"></div>
+        <div id="comments">
+          <h3>Comments</h3>
+          <div id="commentsList" class="comments-list"></div>
+          <div class="comments-new">
+            <textarea id="commentInput" placeholder="Add a comment…"></textarea>
+            <button class="btn" id="addComment">Add</button>
+          </div>
+        </div>
         <hr />
         <div>
           <h3>Isolated in view</h3>

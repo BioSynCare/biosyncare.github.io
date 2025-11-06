@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Entity — Ontology Explorer</title>
-    <link rel="stylesheet" href="./style.css" />
-    <script defer src="./entity.js"></script>
+  <title>Entity — BSCLab Ontology Explorer</title>
+  <link rel="stylesheet" href="./style.css?v=20251106-2" />
+  <script defer src="./entity.js?v=20251106-2"></script>
   </head>
   <body>
     <header>
-      <h1>Entity</h1>
+  <h1>Entity — BSCLab Ontology Explorer</h1>
       <div class="bar">
         <a class="btn" href="./index.html">Back to graph</a>
         <a class="btn" id="webvowlLink" target="_blank">Open in WebVOWL</a>
@@ -23,6 +23,14 @@
         <p id="desc"></p>
       </div>
       <aside id="neighbors" style="grid-column: 1 / -1; padding: .75rem; border-top: 1px solid var(--border)"></aside>
+      <section style="grid-column: 1 / -1; padding: .75rem; border-top: 1px solid var(--border)">
+        <h3>Comments</h3>
+        <div id="commentsList" class="comments-list"></div>
+        <div class="comments-new">
+          <textarea id="commentInput" placeholder="Add a comment…"></textarea>
+          <button class="btn" id="addComment">Add</button>
+        </div>
+      </section>
     </main>
   </body>
   </html>
