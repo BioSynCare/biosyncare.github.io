@@ -21,6 +21,16 @@ Last updated: 2025-11-06
   - Owns: `scripts/music/**` (including `scripts/music/output/**` and `scripts/music/peals/**`), `docs/` notes for methods.
   - Avoid: `src/**` edits (if a change is needed, propose via PR). Prefer writing data to `scripts/music/output/` and documenting the interface.
 
+- Agent master (governance and meta-instructions)
+  - Goal: Improve and maintain the agent governance docs and per-agent instruction files; add light repo helpers to make workflows discoverable.
+  - Owns: `AGENTS.md`, `.vscode/ai-instructions/**`, `handoffs/**`, small Makefile helpers (non-functional, informational targets).
+  - Avoid: application logic changes; if needed, open a PR and hand off to the relevant agent.
+
+- Git master (repo health, committing, and reviews)
+  - Goal: Keep the repo in a healthy state; run quick checks; craft informative commits; propose follow-ups or small fixes.
+  - Owns: High-level housekeeping changes (format/readme/help targets), running linters/validators, batching safe commits. May open PRs that span multiple areas.
+  - Avoid: deep feature implementation (delegate to Web/RDF/Music via Handoff or PR assignments), destructive refactors without prior notes.
+
 Notes:
 - Shared files (e.g., `README.md`, `Makefile`) should be changed via small, focused PRs to avoid surprises.
 - If an agent must touch outside its area, open a PR instead of committing directly and explain the rationale in the Handoff.
@@ -31,7 +41,11 @@ Notes:
   - Web: `web/<short-topic>`
   - RDF/ONT: `rdf/<short-topic>`
   - Music: `music/<short-topic>`
+  - Agent master: `meta/<short-topic>`
+  - Git master: `ops/<short-topic>`
 - Commit message prefix: `[web]`, `[rdf]`, or `[music]`.
+  - Meta/governance: `[meta]`
+  - Ops/repo health: `[ops]`
 - Commit small and often. Reference the Handoff when stopping.
 
 ## Handoff protocol (leave this when stopping)
@@ -92,10 +106,13 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
 - Web: feature works locally (`make serve`), no console errors, basic accessibility, and a Handoff note.
 - RDF/ONT: `make rdf-validate` passes, docs generated (`make rdf-docs`), JSONs for WebVOWL updated (`make rdf-webvowl`), and a Handoff note.
 - Music: scripts run with a clean venv, outputs written under `scripts/music/output/`, readme updated if data shape changes, and a Handoff note.
+- Agent master: governance docs and instruction files improved; helpers added to Makefile if needed; Handoff note explains changes and intended usage.
+- Git master: repository status is clean; quick checks pass (lint/validate); commits are informative; Handoff note lists follow-ups per agent.
 
 ## Quick commands (helpers)
 
 - Show where the coordination docs live: `make agents-info`
 - Open this file (macOS): `make open-agents`
+ - Quick repo health scan (lint/status): `make repo-health`
 
 These are convenience wrappers so you don’t have to remember paths.

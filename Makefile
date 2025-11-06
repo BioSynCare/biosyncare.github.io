@@ -14,6 +14,7 @@ help:
 	@printf "  agents-info     Show locations of AGENTS.md and per-agent instructions\n"
 	@printf "  open-agents     Open AGENTS.md (macOS)\n"
 	@printf "  web-sync-music-data  Build src/data/musicStructures.js from scripts/music/output/musicStructures.json\n"
+	@printf "  repo-health      Quick repository health scan (status, lint, RDF validate)\n"
 	@printf "  agents-info     Show locations of AGENTS.md and per-agent instructions\n"
 	@printf "  open-agents     Open AGENTS.md (macOS)\n"
 	@printf "  rdf-setup       Create Python venv and install RDF tooling\n"
@@ -62,6 +63,14 @@ agents-info:
 
 open-agents:
 	open AGENTS.md
+
+# ---------- Repo health ----------
+.PHONY: repo-health
+
+repo-health:
+	@echo "== Git status ==" && git status -sb && echo
+	@echo "== Node lint (if available) ==" && npm run -s lint || echo "(lint script not defined or failed)" && echo
+	@echo "== RDF validate (if venv set up) ==" && $(MAKE) -s rdf-validate || echo "(rdf-validate skipped)" && echo
 
 # ---------- Web/Music data sync ----------
 .PHONY: web-sync-music-data
