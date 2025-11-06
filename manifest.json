@@ -1,0 +1,128 @@
+{
+  "name": "BioSynCare Lab - Neurosensory Modulation",
+  "short_name": "BioSynCare",
+  "description": "Advanced neurosensory audio stimulation platform for therapeutic binaural beats, isochronic tones, and breathing-guided modulation",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#6366f1",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "health",
+    "lifestyle",
+    "medical",
+    "productivity",
+    "wellness"
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/desktop-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/mobile-1.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "features": [
+    "Binaural beats generation",
+    "Isochronic tones",
+    "Martigli breathing modulation",
+    "Real-time safety monitoring",
+    "Offline support",
+    "Session tracking"
+  ],
+  "shortcuts": [
+    {
+      "name": "Quick Session",
+      "short_name": "Session",
+      "description": "Start a quick audio session",
+      "url": "/?action=quick-session",
+      "icons": [
+        {
+          "src": "/icons/shortcut-session.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Martigli Breathing",
+      "short_name": "Breathing",
+      "description": "Configure breathing controller",
+      "url": "/?action=martigli",
+      "icons": [
+        {
+          "src": "/icons/shortcut-breathing.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

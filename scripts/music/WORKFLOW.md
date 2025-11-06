@@ -96,6 +96,8 @@ This writes `src/data/musicStructures.js` with:
 - Detailed change-ringing libraries (rows, transitions, metrics)
 - Aggregated permutation families shared across peals
 - Symmetric group summaries (cycle types, canonical generators, samples)
+- Additional PlainChanges variants (extra hunt configurations / stages)
+- Symmetry structures (rotations, mirrors, dihedral sets, swap families)
 
 Then sync the JSON into a JS module for the frontend:
 
@@ -105,6 +107,10 @@ make web-sync-music-data
 
 This writes `src/data/musicStructures.js` from `scripts/music/output/musicStructures.json`.
 Import the generated module from the frontend to drive realtime synthesis.
+
+> Raw exports are kept in `scripts/music/output/` as both pretty and minified JSON:
+> `musicStructures.json`, `musicStructures.min.json`,
+> `musicStructures.compact.json`, and `musicStructures.compact.min.json`.
 
 ### 4. Convert Peals to Audio
 

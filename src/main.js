@@ -5455,3 +5455,72 @@ function initDiagnosticsWidget() {
 
 // Initialize diagnostics widget
 initDiagnosticsWidget();
+
+// ============================================================================
+// PWA & Safety Initialization
+// ============================================================================
+(async () => {
+  // Dynamic imports for PWA and safety features
+  const { compatChecker } = await import('./core/compat-check.js');
+  const { pwaInstaller } = await import('./core/pwa-installer.js');
+
+  // Run compatibility check
+  const compatResult = compatChecker.check();
+  console.log('[CompatCheck]', compatResult.supported ? 'Fully compatible' : 'Compatibility issues detected');
+
+  if (compatResult.warnings.length > 0) {
+    console.warn('[CompatCheck] Warnings:', compatResult.warnings);
+  }
+
+  if (compatResult.errors.length > 0) {
+    console.error('[CompatCheck] Errors:', compatResult.errors);
+  }
+
+  // Register service worker for PWA
+  const registration = await pwaInstaller.registerServiceWorker();
+  if (registration) {
+    console.log('[PWA] Service worker registered successfully');
+  } else {
+    console.warn('[PWA] Service worker registration failed or not supported');
+  }
+
+  // Listen for install prompt
+  pwaInstaller.onInstallable = () => {
+    console.log('[PWA] App can be installed - prompt available');
+    // TODO: Show install button in UI
+  };
+
+  pwaInstaller.onInstalled = () => {
+    console.log('[PWA] App installed successfully!');
+    // TODO: Show success notification
+  };
+
+  pwaInstaller.onUpdateAvailable = () => {
+    console.log('[PWA] App update available');
+    // TODO: Show update notification with refresh button
+  };
+
+  pwaInstaller.onOffline = () => {
+    console.warn('[PWA] Connection lost - app running in offline mode');
+    // TODO: Show offline indicator in UI
+  };
+
+  pwaInstaller.onOnline = () => {
+    console.log('[PWA] Connection restored');
+    // TODO: Hide offline indicator
+  };
+
+  // Log PWA status
+  const pwaStatus = pwaInstaller.getStatus();
+  console.log('[PWA] Status:', pwaStatus);
+
+  // Safety monitor is automatically initialized with AudioEngine
+  // Listen for safety warnings via custom events
+  window.addEventListener('audioSafetyWarning', (event) => {
+    const { severity, type, message } = event.detail;
+    console.warn(`[Safety] ${severity.toUpperCase()}: ${message}`);
+    // TODO: Show safety warning in UI (toast notification)
+  });
+
+  console.log('[BioSynCare] PWA & Safety systems initialized');
+})();

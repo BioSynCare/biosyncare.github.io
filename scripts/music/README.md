@@ -86,6 +86,26 @@ python generate_sample_peals.py
 
 Output files are saved to `peals/raw/` with metadata comments.
 
+### `export_structures.py`
+
+Exports the change-ringing library, additional PlainChanges variants, and
+permutation symmetry datasets.
+
+```bash
+python export_structures.py
+```
+
+Outputs (all under `scripts/music/output/`):
+- `musicStructures.json` (pretty) and `musicStructures.min.json`
+  - Full metadata including transition analytics, symmetry summaries, and
+    auto-generated PlainChanges sequences beyond the raw txt files.
+- `musicStructures.compact.json` and `musicStructures.compact.min.json`
+  - Lightweight permutations-only view for realtime consumers (bell indices,
+    rotations, mirrors, dihedral sets).
+
+Use `make web-sync-music-data` if you need to sync the pretty JSON into the
+web bundle.
+
 ## Dependencies
 
 The toolkit uses the **ttm/music** package, a comprehensive Python library for
