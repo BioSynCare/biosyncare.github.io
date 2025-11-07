@@ -1,4 +1,5 @@
 import { getAllAudioTracks, getAllVisualTracks } from '../state/track-state.js';
+import { detectStorageMode } from '../services/storage-mode.js';
 
 /**
  * BioSynCare Lab - System Diagnostics Widget
@@ -425,6 +426,19 @@ export function getSystemInfo() {
   return info;
 }
 
+async function renderStorageModeRow(container) {
+  try {
+    const mode = await detectStorageMode();
+    const row = document.createElement('div');
+    row.className = 'text-[11px] text-neutral-600';
+    const label = mode.mode === 'firebase' ? 'Comments/telemetry storage: Firebase (shared)' : 'Comments/telemetry storage: LocalStorage (this device)';
+    row.textContent = label;
+    container.appendChild(row);
+  } catch {
+    // noop
+  }
+}
+
 export function detectEngines() {
   const engines = {
     audio: { name: 'Nenhum', status: 'Não carregado', version: null },
@@ -834,4 +848,9 @@ export function initDiagnostics() {
   console.log('[BioSynCare] Diagnostics module loaded');
   // Widget UI is still in index.html for now
   // Future: could be extracted to a separate module
+  // Attempt to inject storage mode row if diagnostics panel exists
+  const diagPanel = document.querySelector('#diagnostics-panel, .diagnostics-panel, [data-diagnostics-root]');
+  if (diagPanel) {
+    renderStorageModeRow(diagPanel);
+  }
 }

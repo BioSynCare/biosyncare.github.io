@@ -15,6 +15,7 @@ import {
   fetchPublicEvents,
   getDefaultPrivacySettings,
 } from './utils/firebase.js';
+import { detectStorageMode } from './services/storage-mode.js';
 import {
   createAudioEngine,
   getAudioEngineOptions,
@@ -87,11 +88,17 @@ import {
 } from './state/track-state.js';
 import {
   loadPresetCatalog,
+  reloadPresetCatalog,
   listAudioPresets,
+  listSessionPresets,
   clonePresetDefaults,
   cloneSessionPreset,
 } from './presets/catalog.js';
 import { parsePresetUrlConfig } from './presets/url.js';
+import {
+  saveAudioPresetSnapshot,
+  snapshotCurrentSessionPreset,
+} from './presets/firebase-adapter.js';
 
 // Maintain backward compatibility with legacy helpers
 const generateTrackId = (prefix) => generateId(prefix);
@@ -120,6 +127,29 @@ const urlPresetConfig = parsePresetUrlConfig(initialSearchParams);
 
 await loadPresetCatalog();
 
+// Detect storage mode (Firebase vs LocalStorage) early and expose indicator
+let storageMode = { mode: 'local', detail: 'LocalStorage (default)' };
+try {
+  storageMode = await detectStorageMode();
+} catch {}
+if (typeof window !== 'undefined') {
+  window.__BSCLAB_STORAGE_MODE__ = storageMode;
+  // Attempt DOM injection if element already present
+  const inject = () => {
+    const el = document.getElementById('storage-mode-indicator');
+    if (el) {
+      el.textContent = storageMode.mode === 'firebase'
+        ? 'Firebase (shared)'
+        : 'LocalStorage (device)';
+    }
+  };
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inject);
+  } else {
+    inject();
+  }
+}
+
 const sharedAudioDefaults = (() => {
   const map = new Map();
   try {
@@ -133,6 +163,21 @@ const sharedAudioDefaults = (() => {
 })();
 
 const sessionTimers = new Set();
+
+const presetDebug = (...args) => {
+  if (typeof window === 'undefined' || window.__PRESETS_DEBUG === false) {
+    return;
+  }
+  console.info('[Presets]', ...args);
+};
+
+const presetLibraryState = {
+  audio: [],
+  sessions: [],
+  filter: '',
+  activeTab: 'audio',
+};
+let presetFilterArmed = false;
 
 // Martigli/Breathing Controller - Global shared breathing oscillation
 const martigliController = {
@@ -2510,6 +2555,14 @@ const stopAllAudioBtn = document.getElementById('btn-stop-all-audio');
 const audioActiveList = document.getElementById('audio-active-list');
 const audioActiveEmpty = document.getElementById('audio-active-empty');
 const audioTrackCount = document.getElementById('audio-track-count');
+const presetAudioListEl = document.getElementById('preset-audio-list');
+const presetSessionListEl = document.getElementById('preset-session-list');
+const presetSearchInput = document.getElementById('preset-search');
+const presetTabButtons = document.querySelectorAll('[data-preset-tab]');
+const btnRefreshPresets = document.getElementById('btn-refresh-presets');
+const btnClearPresetFilter = document.getElementById('btn-clear-preset-filter');
+const btnSaveAudioPreset = document.getElementById('btn-save-audio-preset');
+const btnSaveSessionPreset = document.getElementById('btn-save-session-preset');
 
 const visualMenu = document.getElementById('visual-menu');
 const visualDescriptionEl = document.getElementById('visual-description');
@@ -4196,6 +4249,339 @@ const buildPresetParameters = (presetKey, overrides = {}) => {
   return normalized;
 };
 
+const refreshPresetLibraryData = () => {
+  presetLibraryState.audio = listAudioPresets();
+  presetLibraryState.sessions = listSessionPresets();
+  presetDebug('Library data refreshed', {
+    audioCount: presetLibraryState.audio.length,
+    sessionCount: presetLibraryState.sessions.length,
+  });
+};
+
+const setPresetTab = (tab) => {
+  presetLibraryState.activeTab = tab === 'sessions' ? 'sessions' : 'audio';
+  renderPresetLibrary();
+};
+
+const refreshPresetLibrary = async () => {
+  try {
+    presetDebug('Reloading preset catalog…');
+    await reloadPresetCatalog();
+  } catch (error) {
+    console.warn('[Presets] Unable to reload catalog', error);
+  }
+  refreshPresetLibraryData();
+  renderPresetLibrary();
+};
+
+const toSearchableString = (value) => {
+  if (typeof value === 'string') return value;
+  if (value === null || value === undefined) return '';
+  return String(value);
+};
+
+const getPresetOwnerMetadata = (item = {}) => {
+  const metadata = item.metadata || {};
+  return {
+    ownerLabel: toSearchableString(item.ownerLabel || metadata.ownerLabel || metadata.owner),
+    ownerEmail: toSearchableString(item.ownerEmail || metadata.ownerEmail),
+    createdBy: toSearchableString(item.createdBy || metadata.createdBy),
+  };
+};
+
+const describePresetOwner = (item = {}) => {
+  const { ownerLabel, ownerEmail, createdBy } = getPresetOwnerMetadata(item);
+  if (ownerLabel) return ownerLabel;
+  if (ownerEmail) return ownerEmail;
+  if (createdBy) {
+    const suffix = String(createdBy).slice(-6);
+    return `User #${suffix}`;
+  }
+  return '';
+};
+
+const presetBelongsToCurrentUser = (item) => {
+  const user = authState.currentUser;
+  if (!user?.uid) return false;
+  const { ownerEmail, createdBy } = getPresetOwnerMetadata(item);
+  if (createdBy && createdBy === user.uid) {
+    return true;
+  }
+  const userEmail = user.email ? user.email.toLowerCase() : '';
+  if (userEmail) {
+    if (ownerEmail && ownerEmail.toLowerCase() === userEmail) {
+      return true;
+    }
+  }
+  return false;
+};
+
+const getOwnerFilterState = (needle) => {
+  if (!needle) return null;
+  const lower = needle.toLowerCase();
+  const userEmail = authState.currentUser?.email?.toLowerCase() || '';
+  if (
+    lower === 'me' ||
+    lower === 'mine' ||
+    lower === 'owner:me' ||
+    lower === 'user:me' ||
+    (userEmail && lower === userEmail)
+  ) {
+    return { type: 'self' };
+  }
+  if (lower.startsWith('owner:')) {
+    const value = lower.slice(6).trim();
+    if (value) return { type: 'explicit', value };
+  }
+  if (lower.startsWith('user:')) {
+    const value = lower.slice(5).trim();
+    if (value) return { type: 'explicit', value };
+  }
+  return null;
+};
+
+const matchesOwnerQuery = (item, ownerFilterState) => {
+  if (!ownerFilterState) return false;
+  if (ownerFilterState.type === 'self') {
+    return presetBelongsToCurrentUser(item);
+  }
+  const target = (ownerFilterState.value || '').toLowerCase();
+  if (!target) return false;
+  const { ownerLabel, ownerEmail, createdBy } = getPresetOwnerMetadata(item);
+  if (ownerLabel && ownerLabel.toLowerCase().includes(target)) return true;
+  if (ownerEmail && ownerEmail.toLowerCase().includes(target)) return true;
+  if (createdBy && String(createdBy).toLowerCase().includes(target)) return true;
+  return false;
+};
+
+const filterPresets = (list) => {
+  const rawFilter = (presetLibraryState.filter || '').trim();
+  if (!rawFilter) return list;
+  const needle = rawFilter.toLowerCase();
+  const ownerFilterState = getOwnerFilterState(needle);
+
+  return list.filter((item) => {
+    if (matchesOwnerQuery(item, ownerFilterState)) {
+      return true;
+    }
+    const { ownerLabel, ownerEmail, createdBy } = getPresetOwnerMetadata(item);
+    const haystack = [
+      item.label,
+      item.description,
+      ...(item.tags || []),
+      item.folderId,
+      ownerLabel,
+      ownerEmail,
+      createdBy,
+    ]
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase();
+    return haystack.includes(needle);
+  });
+};
+
+const renderPresetList = (list, targetEl, type = 'audio') => {
+  if (!targetEl) return;
+  targetEl.innerHTML = '';
+  if (!list.length) {
+    const empty = document.createElement('p');
+    empty.className = 'text-xs text-gray-400';
+    if (presetLibraryState.filter) {
+      const hint =
+        type === 'audio'
+          ? `No track presets match "${presetLibraryState.filter}".`
+          : `No session presets match "${presetLibraryState.filter}".`;
+      empty.textContent =
+        `${hint} Clear the search box or click ✕ to reset the filter.`;
+    } else {
+      empty.textContent =
+        type === 'audio' ? 'No track presets found.' : 'No session presets found.';
+    }
+    presetDebug(`Preset list empty (${type}).`);
+    targetEl.appendChild(empty);
+    return;
+  }
+
+  list.forEach((item) => {
+    const container = document.createElement('div');
+    container.className = 'preset-item';
+
+    const info = document.createElement('div');
+    info.className = 'preset-item-info';
+    const labelEl = document.createElement('label');
+    labelEl.textContent = item.label;
+    const meta = document.createElement('span');
+    const metaParts = [];
+    const ownerDisplay = describePresetOwner(item);
+    if (ownerDisplay) {
+      metaParts.push(ownerDisplay);
+    }
+    if (item.folderId) {
+      metaParts.push(`#${item.folderId}`);
+    }
+    const createdDisplay = formatDateTime(item.createdAt);
+    if (createdDisplay && createdDisplay !== '—') {
+      metaParts.push(createdDisplay);
+    }
+    meta.textContent = metaParts.join(' • ') || '—';
+    info.appendChild(labelEl);
+    if (item.description) {
+      const desc = document.createElement('span');
+      desc.textContent = item.description;
+      info.appendChild(desc);
+    }
+    info.appendChild(meta);
+
+    const loadBtn = document.createElement('button');
+    loadBtn.type = 'button';
+    loadBtn.textContent = type === 'audio' ? 'Load track' : 'Load session';
+    loadBtn.addEventListener('click', () => {
+      if (type === 'audio') {
+        handleLoadAudioPresetFromLibrary(item.id);
+      } else {
+        handleLoadSessionPresetFromLibrary(item.id);
+      }
+    });
+
+    container.appendChild(info);
+    container.appendChild(loadBtn);
+    targetEl.appendChild(container);
+  });
+};
+
+const renderPresetLibrary = () => {
+  if (!presetAudioListEl || !presetSessionListEl) return;
+
+  const filteredAudio = filterPresets(presetLibraryState.audio);
+  const filteredSessions = filterPresets(presetLibraryState.sessions);
+  presetDebug('Rendering preset lists', {
+    tab: presetLibraryState.activeTab,
+    filter: presetLibraryState.filter,
+    audioFiltered: filteredAudio.length,
+    sessionsFiltered: filteredSessions.length,
+  });
+  if (presetSearchInput && presetSearchInput.value !== presetLibraryState.filter) {
+    presetSearchInput.value = presetLibraryState.filter;
+  }
+
+  renderPresetList(filteredAudio, presetAudioListEl, 'audio');
+  renderPresetList(filteredSessions, presetSessionListEl, 'sessions');
+
+  if (presetLibraryState.activeTab === 'audio') {
+    presetAudioListEl.classList.remove('hidden');
+    presetSessionListEl.classList.add('hidden');
+  } else {
+    presetAudioListEl.classList.add('hidden');
+    presetSessionListEl.classList.remove('hidden');
+  }
+
+  presetTabButtons.forEach((btn) => {
+    const tab = btn.dataset.presetTab;
+    const isActive = tab === presetLibraryState.activeTab;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  });
+};
+
+const handleLoadAudioPresetFromLibrary = async (presetId) => {
+  if (!presetId || !audioMenu) return;
+  presetDebug('Load track preset requested', { presetId });
+  const catalogPreset =
+    presetLibraryState.audio.find((item) => item.id === presetId) ||
+    presetLibraryState.audio.find((item) => item.basePresetId === presetId);
+
+  const targetPresetId =
+    audioPresets[presetId]
+      ? presetId
+      : catalogPreset?.basePresetId || catalogPreset?.metadata?.presetKey || catalogPreset?.category;
+
+  if (!targetPresetId || !audioPresets[targetPresetId]) {
+    console.warn('[Presets] Track preset not available locally:', presetId);
+    return;
+  }
+
+  audioMenu.value = targetPresetId;
+  const preset = audioPresets[targetPresetId];
+  const state = ensurePresetState(targetPresetId);
+  const params = getPresetParams(preset);
+  const presetDefaults = catalogPreset?.defaults || {};
+
+  params.forEach((field) => {
+    if (Object.prototype.hasOwnProperty.call(presetDefaults, field.id)) {
+      state[field.id] = normalizeParameterValue(field, presetDefaults[field.id]);
+    } else {
+      state[field.id] = normalizeParameterValue(field, field.default ?? field.min ?? 0);
+    }
+  });
+  renderAudioParameterForm();
+  updateAudioDescription();
+  const displayLabel = catalogPreset?.label || preset.label;
+  if (statusEl) {
+    statusEl.textContent = `Preset "${displayLabel}" loaded. Starting track…`;
+  }
+  try {
+    const startParams = getPresetParameterValues(targetPresetId);
+    presetDebug('Starting track preset', {
+      presetId: targetPresetId,
+      label: displayLabel,
+      params: startParams,
+    });
+    await startAudioPresetTrack(targetPresetId, startParams, {
+      source: 'library',
+      label: displayLabel,
+      category: 'library',
+    });
+    renderAudioTracks({
+      message: `Preset "${displayLabel}" started via library.`,
+    });
+  } catch (error) {
+    console.error('[Presets] Failed to start track from library', error);
+    if (statusEl) statusEl.textContent = 'Unable to start preset track. Check console.';
+  }
+  renderPresetLibrary();
+};
+
+const handleLoadSessionPresetFromLibrary = (presetId) => {
+  if (!presetId) return;
+  presetDebug('Load session preset requested', { presetId });
+  const preset = cloneSessionPreset(presetId);
+  if (!preset) {
+    console.warn('[Presets] Session preset not found:', presetId);
+    return;
+  }
+  if (statusEl) statusEl.textContent = `Launching session "${preset.label}"…`;
+  scheduleSessionPlayback(preset, {});
+};
+
+const captureCurrentSessionSnapshot = (label = 'Session Snapshot') => {
+  const tracks = getAllAudioTracks();
+  if (!tracks.length) return null;
+  presetDebug('Capturing session snapshot', { trackCount: tracks.length });
+  const voices = tracks.map(([trackId, track], index) => ({
+    presetId: track.presetKey,
+    label: track.label || `Voice ${index + 1}`,
+    startOffsetSec: 0,
+    durationSec: null,
+    gain:
+      typeof track.parameters?.gain === 'number'
+        ? Number(track.parameters.gain)
+        : null,
+    params: track.parameters || {},
+    martigli: track.meta?.martigliConfig || {},
+  }));
+  return {
+    label,
+    description: '',
+    voices,
+    symmetryTrack: { enabled: false },
+    scheduling: { type: 'one-shot', startUtc: null },
+    metadata: {
+      trackCount: voices.length,
+    },
+  };
+};
+
 const startAudioPresetTrack = async (presetKey, overrideParams = {}, options = {}) => {
   const preset = audioPresets[presetKey];
   if (!preset) return null;
@@ -5036,6 +5422,76 @@ audioMenu.addEventListener('change', () => {
 });
 visualMenu.addEventListener('change', updateVisualDescription);
 
+presetSearchInput?.addEventListener('input', (event) => {
+  presetLibraryState.filter = event.target.value || '';
+  renderPresetLibrary();
+});
+
+btnClearPresetFilter?.addEventListener('click', () => {
+  presetLibraryState.filter = '';
+  if (presetSearchInput) {
+    presetSearchInput.value = '';
+  }
+  renderPresetLibrary();
+});
+
+presetTabButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    setPresetTab(button.dataset.presetTab);
+  });
+});
+
+btnRefreshPresets?.addEventListener('click', () => {
+  refreshPresetLibrary();
+});
+
+btnSaveAudioPreset?.addEventListener('click', async () => {
+  if (!audioMenu) return;
+  const presetKey = audioMenu.value;
+  if (!presetKey) return;
+  const params = buildPresetParameters(presetKey, ensurePresetState(presetKey));
+  const label = prompt('Name for this track preset:', `${audioPresets[presetKey]?.label || 'Track'} ${new Date().toLocaleTimeString()}`);
+  if (!label) return;
+  try {
+    presetDebug('Saving track preset', { label, presetKey, params });
+    await saveAudioPresetSnapshot({
+      label,
+      presetKey,
+      defaults: params,
+    });
+    await refreshPresetLibrary();
+    if (statusEl) statusEl.textContent = `Preset "${label}" saved.`;
+  } catch (error) {
+    console.error('Failed to save audio preset', error);
+    if (statusEl) statusEl.textContent = `Unable to save preset: ${error.message || 'Check authentication/permissions.'}`;
+  }
+});
+
+btnSaveSessionPreset?.addEventListener('click', async () => {
+  const snapshot = captureCurrentSessionSnapshot();
+  if (!snapshot) {
+    console.warn('[Presets] No audio tracks available for session snapshot.');
+    if (statusEl) statusEl.textContent = 'Add at least one audio layer before saving a session.';
+    return;
+  }
+  const label =
+    prompt('Name for this session preset:', `${snapshot.label} ${new Date().toLocaleTimeString()}`) ||
+    snapshot.label;
+  snapshot.label = label;
+  try {
+    presetDebug('Saving session preset', { label, voices: snapshot.voices?.length });
+    await snapshotCurrentSessionPreset(snapshot, { label, visibility: 'private' });
+    await refreshPresetLibrary();
+    if (statusEl) statusEl.textContent = `Session preset "${label}" saved.`;
+  } catch (error) {
+    console.error('Failed to save session preset', error);
+    if (statusEl) {
+      statusEl.textContent = `Unable to save session preset: ${error.message ||
+        'Check authentication/permissions'}.`;
+    }
+  }
+});
+
 addAudioBtn.addEventListener('click', async () => {
   const presetKey = audioMenu.value;
   const params = getPresetParameterValues(presetKey);
@@ -5173,6 +5629,12 @@ stopBtn.addEventListener('click', async () => {
 });
 
 applyUrlPresetConfig();
+if (presetSearchInput && presetSearchInput.value) {
+  presetLibraryState.filter = presetSearchInput.value;
+  presetDebug('Preset search pre-filled', { filter: presetLibraryState.filter });
+}
+refreshPresetLibraryData();
+renderPresetLibrary();
 updateAudioDescription();
 renderAudioParameterForm();
 updateVisualDescription();

@@ -258,6 +258,110 @@
         color: #6b7280;
         padding: 0.75rem 0.5rem;
       }
+      .preset-manager {
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        padding: 1rem;
+        background: #fdfcff;
+        margin-bottom: 1.5rem;
+      }
+      .preset-manager-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.75rem;
+      }
+      .preset-tabs {
+        display: inline-flex;
+        border-radius: 9999px;
+        border: 1px solid rgba(99, 102, 241, 0.3);
+        overflow: hidden;
+      }
+      .preset-tab-btn {
+        font-size: 0.7rem;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 0.4rem 0.9rem;
+        border: none;
+        background: transparent;
+        color: #4c1d95;
+        cursor: pointer;
+      }
+      .preset-tab-btn.active {
+        background: rgba(129, 140, 248, 0.15);
+        color: #312e81;
+        font-weight: 600;
+      }
+      .preset-library-toolbar {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+      .preset-search {
+        flex: 1;
+        border: 1px solid #dbeafe;
+        border-radius: 9999px;
+        padding: 0.35rem 0.9rem;
+        font-size: 0.8rem;
+      }
+      .preset-refresh-btn {
+        border-radius: 9999px;
+        border: 1px solid rgba(129, 140, 248, 0.4);
+        background: rgba(191, 219, 254, 0.6);
+        padding: 0.35rem 0.65rem;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+      .preset-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        max-height: 12rem;
+        overflow-y: auto;
+        margin-bottom: 0.85rem;
+      }
+      .preset-list.hidden {
+        display: none;
+      }
+      .preset-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.6rem;
+        border: 1px solid rgba(209, 213, 219, 0.8);
+        border-radius: 0.6rem;
+        padding: 0.4rem 0.65rem;
+        background: white;
+      }
+      .preset-item-info {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.8rem;
+      }
+      .preset-item label {
+        font-weight: 600;
+        color: #1f2937;
+      }
+      .preset-item span {
+        font-size: 0.7rem;
+        color: #94a3b8;
+      }
+      .preset-item button {
+        font-size: 0.7rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 9999px;
+        border: 1px solid rgba(59, 130, 246, 0.4);
+        background: rgba(191, 219, 254, 0.6);
+        color: #1d4ed8;
+        cursor: pointer;
+      }
+      .preset-save-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
       .visual-layer-container {
         position: absolute;
         inset: 0;
@@ -1077,6 +1181,58 @@
                 class="parameter-panel hidden"
                 aria-live="polite"
               ></div>
+              <div class="preset-manager">
+                <div class="preset-manager-header">
+                  <h3 class="text-sm font-semibold text-gray-700">Preset Library</h3>
+                  <div class="preset-tabs" role="tablist">
+                    <button
+                      class="preset-tab-btn active"
+                      type="button"
+                      data-preset-tab="audio"
+                      aria-selected="true"
+                    >
+                      Tracks
+                    </button>
+                    <button
+                      class="preset-tab-btn"
+                      type="button"
+                      data-preset-tab="sessions"
+                      aria-selected="false"
+                    >
+                      Sessions
+                    </button>
+                  </div>
+                </div>
+                <div class="preset-library-toolbar">
+                  <input
+                    id="preset-search"
+                    class="preset-search"
+                    type="search"
+                    placeholder="Search presets…"
+                    autocomplete="off"
+                  />
+                  <button id="btn-refresh-presets" class="preset-refresh-btn" type="button">
+                    ⟳
+                  </button>
+                  <button id="btn-clear-preset-filter" class="preset-refresh-btn" type="button">
+                    ✕
+                  </button>
+                </div>
+                <div id="preset-audio-list" class="preset-list" aria-live="polite"></div>
+                <div
+                  id="preset-session-list"
+                  class="preset-list hidden"
+                  aria-live="polite"
+                ></div>
+                <div class="preset-save-actions">
+                  <button id="btn-save-audio-preset" class="btn-secondary text-xs">
+                    💾 Save track preset
+                  </button>
+                  <button id="btn-save-session-preset" class="btn-secondary text-xs">
+                    💾 Save session preset
+                  </button>
+                </div>
+              </div>
               <div class="flex flex-wrap gap-3">
                 <button id="btn-stop-all-audio" class="btn-secondary text-sm">
                   ⏹ Stop all audio
@@ -1667,6 +1823,9 @@
               <div class="flex justify-between">
                 <span>Status Haptic:</span>
                 <span id="engine-haptic-status" class="font-mono">--</span>
+              </div>
+              <div class="mt-2 text-[11px] text-gray-500">
+                <strong>Storage mode:</strong> <span id="storage-mode-indicator">detecting…</span>
               </div>
             </div>
           </details>

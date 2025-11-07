@@ -12,7 +12,7 @@
  * - Background sync for analytics
  */
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.3';
 const CACHE_NAME = `biosyncare-${CACHE_VERSION}`;
 const RUNTIME_CACHE = `biosyncare-runtime-${CACHE_VERSION}`;
 

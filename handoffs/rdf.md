@@ -1,28 +1,32 @@
 <!-- Append new handoff entries below. Keep newest at the top. -->
 
-Handoff — RDF/ONT agent — 2025-11-06 12:30 local
+Handoff — RDF/ONT agent — 2025-11-07 11:05 local
 
 Context
-- Wired shared (Firebase) comments into the BSCLab Ontology Explorer (graph and entity pages), replacing the LocalStorage-only MVP. Added visual highlighting for nodes that have comments using a Firestore-backed meta collection.
-- Kept a LocalStorage fallback when Firebase is unavailable, per serverless constraints.
+- Extended entity detail page to parity with graph explorer: real-time Firestore streaming for comments, nested replies (parentId), reactions (like/dislike/heart/celebrate), and soft delete placeholders. Added safe base64url doc IDs for meta collection to prevent invalid path errors (slashes in URIs). Meta counts now increment/decrement on add/soft delete.
+- Previous work (graph explorer) already had these features; this completes consistency across views. LocalStorage fallback preserved when Firebase unavailable or auth fails.
 
 Current state
 - Branch: main
-- Files changed: rdf/docs/explorer/{index.html, app.js, entity.html, entity.js}
-- Build/validation: PASS (static assets). No bundler. Tested basic add/delete comment with anonymous auth; meta highlights update after change.
+- Files changed (this step): rdf/docs/explorer/entity.js (version bump, streaming, reactions, soft delete, safe meta ids); rdf/docs/explorer/entity.html (cache bust version already at 20251106-4). Added safeId + meta bump logic.
+- Build/validation: PASS (static). No syntax errors reported. Anonymous auth tested; reactions and replies update live.
 - Known issues:
-	- Comment deletion is allowed by rules only for the owner; UI still shows a Delete button for all items. Non-owners will see a console warning if deletion fails.
-	- Meta highlights are fetched once on load and after comment mutations; not live-subscribed. Good enough for now.
+	- Graph page meta highlighting still not subscribed live to meta collection; entity page increments/decrements meta but doesn’t display count.
+	- Delete button shows for all users (permission check not yet enforced in UI).
+	- Soft delete reduces meta count; threads with deleted parents keep child visibility (intended) but could show a marker referencing the original text (future enhancement).
 
 Next steps (queue for successor)
-- [ ] Add live subscription to ontology_comments_meta to update highlights in real time.
-- [ ] Show per-node comment count as a small badge in the sidebar and/or on hover.
-- [ ] Persist UI state (theme/layout/fonts) in localStorage.
-- [ ] Optional: add edge-level highlighting when edges have comments.
+- [ ] Live subscription to ontology_comments_meta on graph + entity pages to update highlight/count without manual refresh.
+- [ ] Display per-entity comment count badge next to title and in neighbor lists.
+- [ ] Permission-aware Delete button (hide/disable if not owner).
+- [ ] Persist additional UI state (theme/layout/font) for entity page similar to graph.
+- [ ] Edge-level comment indicators (if edges gain comments later).
+- [ ] Reaction summary tooltip (breakdown) instead of inline buttons for compact mode.
 
 Risks / assumptions
-- Assumes project allows anonymous auth (enabled). If disabled, UI silently falls back to LocalStorage.
-- Firestore composite indexes are not required for equality filters used; sorting done client-side by createdAt.
+- Assumes anonymous auth stays enabled; fallback remains silent otherwise.
+- Firestore write amplification minimal; each reaction toggle is a single doc write/delete.
+- Meta decrement on soft delete assumes no race conditions from simultaneous deletes; potential need for transaction if concurrency increases.
 
 Owner handoff
 - Suggested next agent: rdf

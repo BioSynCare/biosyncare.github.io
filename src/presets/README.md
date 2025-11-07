@@ -23,6 +23,7 @@ Available helpers (2025-11-06)
 - `catalog.js`: exposes `listAudioPresets()`, `getAudioPreset()`, `listSessionPresets()`, etc. All backed by JSON in `src/data/presets/`.
 - `url.js`: parses URL arguments (`?preset=sine&preset.frequency=432&session=alpha_relax_15m`), returning defaults and overrides.
 - Shared JSON is also consumed by Python tooling via `scripts/music/presets/load_presets.py`.
+- `firebase-adapter.js`: reads/writes presets to Firestore (`presets_audio`, `presets_sessions`). `catalog.js` automatically merges Firebase docs with the bundled JSON.
 
 ### URL overrides
 

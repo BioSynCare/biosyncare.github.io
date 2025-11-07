@@ -1,4 +1,4 @@
-const VERSION = '20251106-3';
+const VERSION = '20251106-4';
 
 // Minimal Firebase ESM client for shared comments (falls back to LocalStorage if unavailable)
 const FB_VER = '10.7.0';
@@ -17,6 +17,21 @@ const FB_CONFIG = {
 };
 
 let fb = { app: null, auth: null, db: null, authModule: null, fsModule: null, ready: false };
+// Helpers to store Firestore-safe doc ids for arbitrary URIs (no '/')
+function safeId(s) {
+  try {
+    const b64 = btoa(unescape(encodeURIComponent(s)));
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  } catch { return s.replaceAll('/', '_'); }
+}
+function unsafeId(id) {
+  try {
+    const b64 = id.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = b64.length % 4 === 0 ? '' : '='.repeat(4 - (b64.length % 4));
+    const str = atob(b64 + pad);
+    return decodeURIComponent(str.split('').map(c => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join(''));
+  } catch { return id; }
+}
 async function initFirebaseClient() {
   if (fb.ready) return fb;
   try {
@@ -27,8 +42,15 @@ async function initFirebaseClient() {
     const db = fsMod.getFirestore(app);
     const auth = authMod.getAuth(app);
     try { auth.useDeviceLanguage && auth.useDeviceLanguage(); } catch {}
+    // Try anonymous auth; if admin-restricted, disable cloud path
     if (!auth.currentUser) {
-      try { await authMod.signInAnonymously(auth); } catch (e) { console.warn('[Explorer] Anonymous auth failed', e); }
+      try {
+        await authMod.signInAnonymously(auth);
+      } catch (e) {
+        console.warn('[Explorer] Anonymous auth failed', e);
+        fb = { app, db, auth, authModule: authMod, fsModule: fsMod, ready: false };
+        return fb;
+      }
     }
     fb = { app, db, auth, authModule: authMod, fsModule: fsMod, ready: true };
   } catch (e) {
@@ -154,7 +176,6 @@ async function main() {
     }), toggles, colorForNs),
   style: styleSheet(showEdgeLabels, nodeFont, edgeFont, theme === 'dark' ? 'rgba(0,0,0,0.8)' : 'rgba(255,255,255,0.85)', theme === 'dark' ? 0 : 1, emphasizeSubclass),
     layout: { name: 'cose', animate: false, fit: true, padding: 20 },
-    wheelSensitivity: 0.2,
   });
 
   function currentVisibleGraph() {
@@ -207,81 +228,205 @@ async function main() {
   const commentsListEl = document.getElementById('commentsList');
   const commentInputEl = document.getElementById('commentInput');
   const addCommentBtn = document.getElementById('addComment');
+  // Notice line under the Comments header
+  const commentsContainer = document.getElementById('comments');
+  const commentsHeader = commentsContainer?.querySelector('h3');
+  let commentsNote = document.getElementById('commentsNote');
+  if (!commentsNote && commentsHeader) {
+    commentsNote = document.createElement('div');
+    commentsNote.id = 'commentsNote';
+    commentsNote.className = 'muted';
+    commentsHeader.insertAdjacentElement('afterend', commentsNote);
+  }
   const COMMENTS_KEY = 'bsc-explorer-comments';
   function loadLocalStore() { try { const s = JSON.parse(localStorage.getItem(COMMENTS_KEY) || '{}'); return { nodes: s.nodes || {}, edges: s.edges || {} }; } catch { return { nodes: {}, edges: {} }; } }
   function saveLocalStore(store) { localStorage.setItem(COMMENTS_KEY, JSON.stringify(store)); }
   let localStore = loadLocalStore();
   let currentSelection = null; // { type: 'node'|'edge', id: string }
 
-  // Meta-highlight of commented nodes
+  // Meta-highlight of commented nodes (real-time)
   let commentedTargets = new Set();
+  const commentCounts = new Map(); // targetId -> count
   function updateCommentHighlights() {
     cy.nodes().forEach((n) => {
-      if (commentedTargets.has(n.id())) n.addClass('commented'); else n.removeClass('commented');
+      const id = n.id();
+      if (commentedTargets.has(id)) {
+        n.addClass('commented');
+        // Optional: set a data attr for count (could be used for a future overlay)
+        const c = commentCounts.get(id) || 0;
+        n.data('commentCount', c);
+      } else {
+        n.removeClass('commented');
+        n.removeData('commentCount');
+      }
     });
   }
 
-  async function fetchMetaAndHighlight() {
+  let metaUnsub = null;
+  async function subscribeMetaHighlights() {
     const { ready, db, fsModule } = await initFirebaseClient();
     if (!ready) return;
     try {
-      const { collection, getDocs } = fsModule;
-      const snap = await getDocs(collection(db, 'ontology_comments_meta'));
-      const next = new Set();
-      snap.forEach((doc) => { const d = doc.data(); if ((d?.count || 0) > 0) next.add(doc.id); });
-      commentedTargets = next;
-      updateCommentHighlights();
-    } catch (e) { console.warn('[Explorer] Failed to fetch comment meta', e); }
+      const { collection, onSnapshot } = fsModule;
+      if (metaUnsub) { try { metaUnsub(); } catch {} metaUnsub = null; }
+      metaUnsub = onSnapshot(collection(db, 'ontology_comments_meta'), (snap) => {
+        const nextTargets = new Set();
+        commentCounts.clear();
+        snap.forEach((doc) => {
+          const d = doc.data();
+          const c = d?.count || 0;
+          const tid = d?.targetId || unsafeId(doc.id);
+          if (c > 0) nextTargets.add(tid);
+          commentCounts.set(tid, c);
+        });
+        commentedTargets = nextTargets;
+        updateCommentHighlights();
+        // If an info panel is open on a node, update its count badge
+        if (currentSelection && currentSelection.type === 'node') {
+          showInfo(currentSelection.id);
+        }
+      }, (e) => {
+        console.warn('[Explorer] Meta subscription error', e);
+      });
+    } catch (e) {
+      console.warn('[Explorer] Failed to subscribe comment meta', e);
+      fb.ready = false;
+      updateCommentsNotice();
+    }
   }
 
-  async function getCommentsFor(sel) {
-    if (!sel) return [];
+  function updateCommentsNotice() {
+    if (!commentsNote) return;
+    if (!fb.ready) {
+      commentsNote.textContent = 'Cloud comments disabled; storing locally on this device.';
+    } else {
+      commentsNote.textContent = 'Comments sync via Firebase (anonymous session).';
+    }
+  }
+
+  // Streaming comments + reactions
+  let commentsUnsub = null;
+  const reactionUnsubs = new Map(); // commentId -> unsub
+  const reactionCounts = new Map(); // commentId -> { like, dislike, heart, celebrate }
+
+  function clearReactionSubs() {
+    for (const u of reactionUnsubs.values()) { try { u(); } catch {} }
+    reactionUnsubs.clear();
+    reactionCounts.clear();
+  }
+
+  function startReactionsStream(commentId) {
+    const { db, fsModule } = fb;
+    try {
+      const { collection, onSnapshot } = fsModule;
+      const col = collection(db, 'ontology_comments', commentId, 'reactions');
+      const unsub = onSnapshot(col, (snap) => {
+        const counts = { like: 0, dislike: 0, heart: 0, celebrate: 0 };
+        snap.forEach((doc) => {
+          const t = (doc.data()?.type) || '';
+          if (counts[t] !== undefined) counts[t]++;
+        });
+        reactionCounts.set(commentId, counts);
+        // Re-render to update counts
+        if (currentSelection) renderCommentsTree(lastCommentsSnapshot);
+      });
+      reactionUnsubs.set(commentId, unsub);
+    } catch (e) { /* ignore */ }
+  }
+
+  let lastCommentsSnapshot = [];
+  async function subscribeComments(sel) {
+    // Fallback local
     const { ready, db, fsModule } = await initFirebaseClient();
+    if (!sel) return;
     if (!ready) {
       const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
-      return bucket[sel.id] || [];
+      lastCommentsSnapshot = (bucket[sel.id] || []).map(x => ({ ...x, parentId: null, deleted: false }));
+      renderCommentsTree(lastCommentsSnapshot);
+      return;
     }
-    const { collection, query, where, getDocs } = fsModule;
-    const q = query(
-      collection(db, 'ontology_comments'),
-      where('targetType', '==', sel.type),
-      where('targetId', '==', sel.id)
-    );
-    const snap = await getDocs(q);
-    const items = [];
-    snap.forEach((doc) => {
-      const d = doc.data();
-      items.push({ id: doc.id, text: d.text, ts: d.createdAt?.toMillis ? d.createdAt.toMillis() : d.createdAt || Date.now(), userId: d.userId || null });
-    });
-    items.sort((a,b) => b.ts - a.ts);
-    return items;
+    // Cloud stream
+    try {
+      const { collection, query, where, orderBy, onSnapshot } = fsModule;
+      if (commentsUnsub) { try { commentsUnsub(); } catch {} commentsUnsub = null; }
+      clearReactionSubs();
+      const q = query(
+        collection(db, 'ontology_comments'),
+        where('targetType', '==', sel.type),
+        where('targetId', '==', sel.id),
+        orderBy('createdAt', 'asc')
+      );
+      commentsUnsub = onSnapshot(q, (snap) => {
+        const items = [];
+        snap.forEach((doc) => {
+          const d = doc.data();
+          items.push({
+            id: doc.id,
+            text: d.text,
+            ts: d.createdAt?.toMillis ? d.createdAt.toMillis() : d.createdAt || Date.now(),
+            userId: d.userId || null,
+            parentId: d.parentId || null,
+            deleted: Boolean(d.deleted),
+          });
+        });
+        lastCommentsSnapshot = items;
+        // Start/maintain reactions streams
+        items.forEach(c => { if (!reactionUnsubs.has(c.id)) startReactionsStream(c.id); });
+        renderCommentsTree(items);
+      }, (e) => {
+        console.warn('[Explorer] Comments subscription error; falling back local', e);
+        fb.ready = false; updateCommentsNotice();
+        const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+        lastCommentsSnapshot = (bucket[sel.id] || []).map(x => ({ ...x, parentId: null, deleted: false }));
+        renderCommentsTree(lastCommentsSnapshot);
+      });
+    } catch (e) {
+      console.warn('[Explorer] Failed to subscribe comments; falling back local', e);
+      fb.ready = false; updateCommentsNotice();
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      lastCommentsSnapshot = (bucket[sel.id] || []).map(x => ({ ...x, parentId: null, deleted: false }));
+      renderCommentsTree(lastCommentsSnapshot);
+    }
   }
 
-  async function addComment(sel, text) {
+  async function addComment(sel, text, parentId = null) {
     if (!sel) return;
     const { ready, db, fsModule, auth } = await initFirebaseClient();
     if (!ready) {
       const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
       const arr = bucket[sel.id] || (bucket[sel.id] = []);
-      arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now() });
+      arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now(), parentId, deleted: false });
       saveLocalStore(localStore);
       return;
     }
-    const { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc } = fsModule;
-    const userId = (auth && auth.currentUser) ? auth.currentUser.uid : null;
-    await addDoc(collection(db, 'ontology_comments'), {
-      targetType: sel.type,
-      targetId: sel.id,
-      text: text.trim(),
-      userId,
-      createdAt: serverTimestamp(),
-    });
-    // increment meta count
-    const metaRef = doc(db, 'ontology_comments_meta', sel.id);
-    const ms = await getDoc(metaRef);
-    if (!ms.exists()) await setDoc(metaRef, { count: 1 });
-    else await updateDoc(metaRef, { count: (ms.data().count || 0) + 1 });
-    await fetchMetaAndHighlight();
+    try {
+      const { collection, addDoc, serverTimestamp, doc, setDoc, getDoc, updateDoc } = fsModule;
+      const userId = (auth && auth.currentUser) ? auth.currentUser.uid : null;
+      // If no user (anonymous disabled), disable cloud
+      if (!userId) throw new Error('no-auth');
+      await addDoc(collection(db, 'ontology_comments'), {
+        targetType: sel.type,
+        targetId: sel.id,
+        text: text.trim(),
+        userId,
+        createdAt: serverTimestamp(),
+        parentId: parentId || null,
+        deleted: false,
+      });
+      // increment meta count
+      const metaRef = doc(db, 'ontology_comments_meta', safeId(sel.id));
+      const ms = await getDoc(metaRef);
+      if (!ms.exists()) await setDoc(metaRef, { targetId: sel.id, count: 1 });
+      else await updateDoc(metaRef, { targetId: sel.id, count: (ms.data().count || 0) + 1 });
+    } catch (e) {
+      console.warn('[Explorer] Cloud add failed; storing locally', e);
+      fb.ready = false;
+      updateCommentsNotice();
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      const arr = bucket[sel.id] || (bucket[sel.id] = []);
+      arr.push({ id: Date.now().toString(36), text: text.trim(), ts: Date.now(), parentId, deleted: false });
+      saveLocalStore(localStore);
+    }
   }
 
   async function deleteComment(sel, cid) {
@@ -291,52 +436,95 @@ async function main() {
       const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
       const arr = bucket[sel.id] || [];
       const idx = arr.findIndex(c => c.id === cid);
-      if (idx >= 0) { arr.splice(idx, 1); saveLocalStore(localStore); }
+      if (idx >= 0) { arr[idx].deleted = true; saveLocalStore(localStore); }
       return;
     }
-    const { doc, deleteDoc, getDoc, updateDoc } = fsModule;
-    try { await deleteDoc(doc(db, 'ontology_comments', cid)); } catch (e) { console.warn('Delete failed', e); }
-    const metaRef = doc(db, 'ontology_comments_meta', sel.id);
-    const ms = await getDoc(metaRef);
-    if (ms.exists()) {
-      const next = Math.max(0, (ms.data().count || 0) - 1);
-      if (next === 0) { try { await deleteDoc(metaRef); } catch {} }
-      else { await updateDoc(metaRef, { count: next }); }
+    try {
+      const { doc, updateDoc } = fsModule;
+      await updateDoc(doc(db, 'ontology_comments', cid), { deleted: true });
+      // meta count unchanged (we keep placeholder)
+    } catch (e) {
+      console.warn('[Explorer] Cloud delete failed; local placeholder only', e);
+      fb.ready = false; updateCommentsNotice();
+      const bucket = sel.type === 'edge' ? localStore.edges : localStore.nodes;
+      const arr = bucket[sel.id] || [];
+      const idx = arr.findIndex(c => c.id === cid);
+      if (idx >= 0) { arr[idx].deleted = true; saveLocalStore(localStore); }
     }
-    await fetchMetaAndHighlight();
   }
 
-  async function renderComments() {
-    const items = await getCommentsFor(currentSelection);
+  function renderCommentsTree(items) {
+    // Build tree
+    const byId = new Map();
+    const roots = [];
+    items.forEach(c => { byId.set(c.id, { ...c, children: [] }); });
+    items.forEach(c => {
+      const node = byId.get(c.id);
+      if (c.parentId && byId.has(c.parentId)) byId.get(c.parentId).children.push(node);
+      else roots.push(node);
+    });
+    // Render recursive
     commentsListEl.innerHTML = '';
-    for (const c of items) {
+    const renderNode = (node, depth=0) => {
       const div = document.createElement('div');
       div.className = 'comment-item';
-      const meta = document.createElement('div');
-      meta.className = 'comment-meta';
-      const date = new Date(c.ts).toLocaleString();
-      const left = document.createElement('span'); left.textContent = date;
-      const del = document.createElement('button'); del.className = 'btn'; del.textContent = 'Delete';
-      del.addEventListener('click', async () => { await deleteComment(currentSelection, c.id); await renderComments(); });
-      meta.appendChild(left); meta.appendChild(del);
-      const text = document.createElement('div'); text.textContent = c.text;
+      div.style.marginLeft = Math.min(depth*12, 48) + 'px';
+      const meta = document.createElement('div'); meta.className = 'comment-meta';
+      const date = document.createElement('span'); date.textContent = new Date(node.ts).toLocaleString();
+      const actions = document.createElement('div');
+      const replyBtn = document.createElement('button'); replyBtn.className = 'btn'; replyBtn.textContent = 'Reply';
+  const delBtn = document.createElement('button'); delBtn.className = 'btn'; delBtn.textContent = 'Delete'; delBtn.style.marginLeft = '.25rem';
+      actions.appendChild(replyBtn); actions.appendChild(delBtn);
+      meta.appendChild(date); meta.appendChild(actions);
+      const text = document.createElement('div'); text.textContent = node.deleted ? '[deleted]' : (node.text || '');
       div.appendChild(meta); div.appendChild(text);
+
+      // Reactions row
+      const rx = reactionCounts.get(node.id) || { like:0, dislike:0, heart:0, celebrate:0 };
+      const rxRow = document.createElement('div'); rxRow.className = 'muted'; rxRow.style.fontSize = '.85rem'; rxRow.style.display = 'flex'; rxRow.style.gap = '.5rem';
+      const mk = (label, key) => {
+        const b = document.createElement('button'); b.className = 'btn'; b.textContent = `${label} ${rx[key]||0}`;
+        b.addEventListener('click', () => toggleReaction(node.id, key)); return b;
+      };
+      rxRow.appendChild(mk('👍','like'));
+      rxRow.appendChild(mk('👎','dislike'));
+      rxRow.appendChild(mk('❤️','heart'));
+      rxRow.appendChild(mk('🎉','celebrate'));
+      div.appendChild(rxRow);
+
+      // Reply form (hidden until click)
+      const replyWrap = document.createElement('div'); replyWrap.style.marginTop = '.25rem';
+      replyWrap.style.display = 'none';
+      const ta = document.createElement('textarea'); ta.placeholder = 'Reply…'; ta.style.width = '100%'; ta.rows = 2;
+      const add = document.createElement('button'); add.className='btn'; add.textContent='Add reply'; add.style.marginTop = '.25rem';
+      replyWrap.appendChild(ta); replyWrap.appendChild(add);
+      div.appendChild(replyWrap);
+      replyBtn.addEventListener('click', () => { replyWrap.style.display = replyWrap.style.display==='none' ? 'block' : 'none'; });
+      add.addEventListener('click', async () => { const val=(ta.value||'').trim(); if(!val) return; await addComment(currentSelection, val, node.id); ta.value=''; replyWrap.style.display='none'; });
+  // Permission-aware delete: only owner can delete when using cloud
+  const canDelete = !fb.ready || !fb.auth?.currentUser?.uid || (node.userId && fb.auth.currentUser.uid === node.userId);
+  if (!canDelete) { delBtn.disabled = true; delBtn.title = 'You can only delete your own comments.'; }
+  delBtn.addEventListener('click', async () => { if (!canDelete) return; await deleteComment(currentSelection, node.id); });
+
       commentsListEl.appendChild(div);
-    }
+      node.children.forEach(ch => renderNode(ch, depth+1));
+    };
+    roots.forEach(r => renderNode(r, 0));
   }
   addCommentBtn.addEventListener('click', async () => {
     const text = (commentInputEl.value || '').trim();
     if (!text) return;
-    await addComment(currentSelection, text);
+    await addComment(currentSelection, text, null);
     commentInputEl.value = '';
-    await renderComments();
   });
   function showInfo(nodeId) {
     const ent = entities[nodeId];
     if (!ent) { infoEl.innerHTML = '<p class="muted">No info.</p>'; return; }
     const link = `./entity.html?uri=${encodeURIComponent(nodeId)}`;
+    const count = commentCounts.get(nodeId) || 0;
+    const countBadge = count > 0 ? `<span class="pill" style="background:#ef4444;color:#fff;">comments: ${count}</span>` : '';
     infoEl.innerHTML = `
-      <h2>${ent.label || nodeId}</h2>
+      <h2>${ent.label || nodeId} ${countBadge}</h2>
       <div class="muted">${ent.type || ''}</div>
       <p>${ent.description || ent.comment || ''}</p>
       <p>
@@ -362,10 +550,10 @@ async function main() {
     `;
   }
 
-  cy.on('select', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); renderComments(); });
-  cy.on('tap', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); renderComments(); });
-  cy.on('select', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); renderComments(); });
-  cy.on('tap', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); renderComments(); });
+  cy.on('select', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); subscribeComments(currentSelection); });
+  cy.on('tap', 'node', (ev) => { currentSelection = { type: 'node', id: ev.target.id() }; showInfo(ev.target.id()); subscribeComments(currentSelection); });
+  cy.on('select', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); subscribeComments(currentSelection); });
+  cy.on('tap', 'edge', (ev) => { currentSelection = { type: 'edge', id: ev.target.id() }; showEdgeInfo(ev.target.id()); subscribeComments(currentSelection); });
 
   const search = document.getElementById('search');
   search.addEventListener('input', () => {
@@ -553,7 +741,25 @@ async function main() {
   // initial isolated render
   refresh(false);
   // Initialize Firebase (if available) and fetch comment meta for highlighting
-  initFirebaseClient().then(() => fetchMetaAndHighlight());
+  initFirebaseClient().then(() => subscribeMetaHighlights());
+
+  async function toggleReaction(commentId, type) {
+    const { ready, db, fsModule, auth } = await initFirebaseClient();
+    if (!ready || !auth?.currentUser?.uid) return;
+    try {
+      const { doc, getDoc, setDoc, deleteDoc } = fsModule;
+      const uid = auth.currentUser.uid;
+      const rxRef = doc(db, 'ontology_comments', commentId, 'reactions', uid);
+      const snap = await getDoc(rxRef);
+      if (snap.exists() && snap.data()?.type === type) {
+        await deleteDoc(rxRef);
+      } else {
+        await setDoc(rxRef, { type });
+      }
+    } catch (e) {
+      console.warn('[Explorer] Reaction toggle failed', e);
+    }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', main);

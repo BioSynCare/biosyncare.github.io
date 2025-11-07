@@ -32,10 +32,14 @@ export class PWAInstallButton {
   }
 
   _init() {
+    console.log('[PWAInstallButton] Initializing button...', this.options);
+
     // Create button element
     this.element = this._createElement();
+    console.log('[PWAInstallButton] Element created:', this.element);
 
     // Check initial state
+    console.log('[PWAInstallButton] Checking initial visibility...');
     this._updateVisibility();
 
     // Listen for install availability
@@ -213,9 +217,20 @@ export class PWAInstallButton {
         this.show(); // Show to indicate installed status
       }
     } else if (!canInstall && !isInstalled) {
-      // Cannot install and not installed - hide button
-      console.log('[PWAInstallButton] Hiding: cannot install and not installed');
-      this.hide();
+      // Cannot install and not installed
+      // TEMPORARY: Show button anyway for debugging
+      console.log('[PWAInstallButton] TEMP: Showing button for debugging (normally would hide)');
+      this.show();
+
+      // Update button to show "Waiting for install prompt..." state
+      const btn = this.element?.querySelector('button');
+      if (btn && !this.options.hideWhenInstalled) {
+        const span = btn.querySelector('span');
+        if (span) {
+          span.textContent = 'Install App (preparing...)';
+        }
+        btn.style.backgroundColor = '#9ca3af'; // Gray to indicate waiting
+      }
     }
   }
 
@@ -224,6 +239,13 @@ export class PWAInstallButton {
    * @returns {Promise<boolean>} true if user accepted
    */
   async install() {
+    // Check if install prompt is available
+    if (!pwaInstaller.canInstall()) {
+      console.log('[PWAInstallButton] Install prompt not available, showing instructions');
+      this._showInstallInstructions();
+      return false;
+    }
+
     const accepted = await pwaInstaller.promptInstall();
 
     if (accepted) {
@@ -234,6 +256,103 @@ export class PWAInstallButton {
     }
 
     return accepted;
+  }
+
+  /**
+   * Show platform-specific install instructions when prompt not available
+   */
+  _showInstallInstructions() {
+    const isFirefox = navigator.userAgent.includes('Firefox');
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const isSafari = /Safari/i.test(navigator.userAgent) && !/Chrome/i.test(navigator.userAgent);
+
+    let instructions = '';
+
+    if (isIOS && isSafari) {
+      instructions = `To install this app on iOS:\n\n1. Tap the Share button (□ with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add"`;
+    } else if (isFirefox) {
+      instructions = `To install this app in Firefox:\n\n1. Click the menu (☰) in the top-right\n2. Select "Install [app name]" or "Add to Home Screen"\n\nAlternatively, use Chrome or Edge for easier installation.`;
+    } else {
+      instructions = `To install this app:\n\n1. Look for the install icon (⊕) in the address bar\n2. Click it and confirm installation\n\nOr try:\n- Browser menu → "Install app"\n- Use Chrome or Edge for best experience`;
+    }
+
+    // Show instructions in a styled modal
+    this._showInstructionsModal(instructions);
+  }
+
+  /**
+   * Show instructions modal
+   */
+  _showInstructionsModal(instructions) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    Object.assign(overlay.style, {
+      position: 'fixed',
+      top: '0',
+      left: '0',
+      right: '0',
+      bottom: '0',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      zIndex: '10000',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '20px',
+    });
+
+    // Create modal
+    const modal = document.createElement('div');
+    Object.assign(modal.style, {
+      backgroundColor: 'white',
+      borderRadius: '12px',
+      padding: '24px',
+      maxWidth: '400px',
+      width: '100%',
+      boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+    });
+
+    modal.innerHTML = `
+      <h3 style="margin: 0 0 16px 0; font-size: 20px; font-weight: 600; color: #1f2937;">
+        📱 Install Instructions
+      </h3>
+      <p style="margin: 0 0 20px 0; white-space: pre-line; color: #4b5563; line-height: 1.6; font-size: 14px;">
+        ${instructions}
+      </p>
+      <button id="close-instructions" style="
+        width: 100%;
+        padding: 12px;
+        background-color: #6366f1;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      ">Got it</button>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+
+    // Close button handler
+    const closeBtn = modal.querySelector('#close-instructions');
+    closeBtn.onmouseenter = () => {
+      closeBtn.style.backgroundColor = '#4f46e5';
+    };
+    closeBtn.onmouseleave = () => {
+      closeBtn.style.backgroundColor = '#6366f1';
+    };
+    closeBtn.onclick = () => {
+      overlay.remove();
+    };
+
+    // Close on overlay click
+    overlay.onclick = (e) => {
+      if (e.target === overlay) {
+        overlay.remove();
+      }
+    };
   }
 
   /**
@@ -315,19 +434,30 @@ export class PWAInstallButton {
  * @returns {PWAInstallButton} Button instance
  */
 export function createInstallButton(options = {}) {
+  console.log('[createInstallButton] Creating button with options:', options);
   const button = new PWAInstallButton(options);
 
   // Auto-append to body unless position is 'inline'
   if (options.position !== 'inline') {
+    console.log('[createInstallButton] Position is not inline, will append to body');
+    console.log('[createInstallButton] document.readyState:', document.readyState);
+
     // Check if DOM is already loaded (module scripts load after DOM)
     if (document.readyState === 'loading') {
+      console.log('[createInstallButton] DOM still loading, waiting for DOMContentLoaded');
       document.addEventListener('DOMContentLoaded', () => {
+        console.log('[createInstallButton] DOMContentLoaded fired, appending button');
         document.body.appendChild(button.element);
+        console.log('[createInstallButton] Button appended to body');
       });
     } else {
       // DOM already loaded, append immediately
+      console.log('[createInstallButton] DOM already loaded, appending immediately');
       document.body.appendChild(button.element);
+      console.log('[createInstallButton] Button appended to body, children count:', document.body.children.length);
     }
+  } else {
+    console.log('[createInstallButton] Position is inline, not auto-appending');
   }
 
   return button;

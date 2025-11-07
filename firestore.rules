@@ -3,6 +3,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(field) {
+      return isSignedIn() && field == request.auth.uid;
+    }
+
     // Diagnostic Reports - Write-only para todos (anônimo ok)
     // Apenas admin pode ler via Firebase Console
     match /diagnostic_reports/{reportId} {
@@ -25,6 +33,20 @@ service cloud.firestore {
     match /protocols/{protocolId} {
       allow read: if true; // público
       allow write: if false; // apenas admin via console
+    }
+
+    // Track presets (audio voices)
+    match /presets_audio/{presetId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy);
+    }
+
+    // Session presets (multi-voice sessions)
+    match /presets_sessions/{presetId} {
+      allow read: if true;
+      allow create: if isSignedIn();
+      allow update, delete: if isOwner(resource.data.createdBy);
     }
 
     // Sessões de usuário (futuro) - requer autenticação
@@ -68,7 +90,21 @@ service cloud.firestore {
                     && request.resource.data.text.size() <= 2000
                     && request.resource.data.createdAt is timestamp;
       allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow update: if false; // immutable text (delete+add to edit)
+      // Allow soft-delete only (toggle deleted->true) by owner
+      allow update: if request.auth != null
+                     && request.auth.uid == resource.data.userId
+                     && request.resource.data.keys().hasOnly(['targetType','targetId','text','userId','createdAt','parentId','deleted'])
+                     && request.resource.data.deleted == true
+                     && resource.data.deleted != true;
+
+      // Reactions subcollection: one doc per user with { type: 'like'|'dislike'|'heart'|'celebrate' }
+      match /reactions/{userId} {
+        allow read: if true;
+        allow create, update, delete: if request.auth != null
+                                       && request.auth.uid == userId
+                                       && request.resource.data.keys().hasOnly(['type'])
+                                       && request.resource.data.type in ['like','dislike','heart','celebrate'];
+      }
     }
 
     // Meta collection to quickly detect commented targets and counts

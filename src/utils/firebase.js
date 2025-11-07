@@ -76,7 +76,12 @@ async function ensureFirestoreModule() {
   return firestoreModule;
 }
 
-async function getFirestoreHelpers() {
+export async function getFirestoreInstance() {
+  const db = await initFirebase();
+  return db;
+}
+
+export async function getFirestoreHelpers() {
   const module = await ensureFirestoreModule();
   return {
     collection: module.collection,
@@ -85,6 +90,7 @@ async function getFirestoreHelpers() {
     getDoc: module.getDoc,
     updateDoc: module.updateDoc,
     addDoc: module.addDoc,
+    deleteDoc: module.deleteDoc,
     getDocs: module.getDocs,
     query: module.query,
     where: module.where,

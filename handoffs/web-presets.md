@@ -1,5 +1,31 @@
 <!-- Append new handoff entries below. Keep newest at the top. -->
 
+## Handoff — Web Presets Agent — 2025-11-07 02:10 UTC
+
+Context
+- Firebase adapter (`src/presets/firebase-adapter.js`) now fetches/saves presets; catalog merges hosted docs with bundled JSON.
+- Audio panel includes a preset library UI (search, tab between tracks/sessions, load buttons, save buttons).
+- “Save track preset” and “Save session preset” snapshot the current controls/active tracks to Firestore (private by default).
+
+Current State
+- Folders/default metadata hard-coded to `community`; no delete/rename UI yet.
+- Saving uses prompt dialogs; a richer modal is still outstanding.
+- Library reflects Firebase data after refresh; offline mode still falls back to static JSON.
+
+Next Steps
+- [ ] Add folder picker + metadata form (name, description, tags, visibility).
+- [ ] Surface collection hierarchy / filtering UI.
+- [ ] Allow deleting/renaming presets (respect ownership rules).
+- [ ] Hook symmetryTrack playback once audio support lands.
+
+Risks
+- Remote audio presets whose `basePresetId` isn’t in `audioPresets` cannot load (warning logged). Need validation/migration tools.
+- Save actions assume Firestore permissions allow writes; handle auth errors gracefully in future iteration.
+
+Owner: Web Presets
+
+---
+
 ## Handoff — Web Presets Agent — 2025-11-06 21:30 UTC
 
 Context
