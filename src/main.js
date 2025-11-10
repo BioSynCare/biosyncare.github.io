@@ -2147,6 +2147,7 @@ const handleUserContextChanged = async (user) => {
   await loadUserSettingsFor(user);
   await refreshUserEvents({ force: true });
   await refreshPublicEvents({ force: true });
+  renderPresetLibrary();
 };
 
 const describeUserLabel = (user) => {
@@ -4282,11 +4283,19 @@ const toSearchableString = (value) => {
 
 const getPresetOwnerMetadata = (item = {}) => {
   const metadata = item.metadata || {};
-  return {
-    ownerLabel: toSearchableString(item.ownerLabel || metadata.ownerLabel || metadata.owner),
-    ownerEmail: toSearchableString(item.ownerEmail || metadata.ownerEmail),
-    createdBy: toSearchableString(item.createdBy || metadata.createdBy),
-  };
+  let ownerLabel = toSearchableString(item.ownerLabel || metadata.ownerLabel || metadata.owner);
+  let ownerEmail = toSearchableString(item.ownerEmail || metadata.ownerEmail);
+  const createdBy = toSearchableString(item.createdBy || metadata.createdBy);
+  const currentUser = authState.currentUser;
+  if (currentUser && createdBy && currentUser.uid === createdBy) {
+    if (!ownerLabel) {
+      ownerLabel = describeUserLabel(currentUser);
+    }
+    if (!ownerEmail && currentUser.email) {
+      ownerEmail = currentUser.email;
+    }
+  }
+  return { ownerLabel, ownerEmail, createdBy };
 };
 
 const describePresetOwner = (item = {}) => {
@@ -4354,13 +4363,15 @@ const matchesOwnerQuery = (item, ownerFilterState) => {
   return false;
 };
 
-const filterPresets = (list) => {
+const filterPresets = (list, { type } = {}) => {
   const rawFilter = (presetLibraryState.filter || '').trim();
-  if (!rawFilter) return list;
+  if (!rawFilter) {
+    return { items: list, ownerFilterState: null, fallback: false };
+  }
+
   const needle = rawFilter.toLowerCase();
   const ownerFilterState = getOwnerFilterState(needle);
-
-  return list.filter((item) => {
+  const items = list.filter((item) => {
     if (matchesOwnerQuery(item, ownerFilterState)) {
       return true;
     }
@@ -4373,12 +4384,36 @@ const filterPresets = (list) => {
       ownerLabel,
       ownerEmail,
       createdBy,
+      ...(item.searchTokens || []),
     ]
       .filter(Boolean)
       .join(' ')
       .toLowerCase();
     return haystack.includes(needle);
   });
+
+  if (
+    items.length === 0 &&
+    !ownerFilterState &&
+    needle.includes('@') &&
+    authState.currentUser?.uid
+  ) {
+    const fallbackItems = list.filter((item) => presetBelongsToCurrentUser(item));
+    if (fallbackItems.length) {
+      presetDebug('Owner email fallback applied', {
+        filter: rawFilter,
+        type: type || 'unknown',
+        matched: fallbackItems.length,
+      });
+      return {
+        items: fallbackItems,
+        ownerFilterState: { type: 'self', reason: 'email-fallback' },
+        fallback: true,
+      };
+    }
+  }
+
+  return { items, ownerFilterState, fallback: false };
 };
 
 const renderPresetList = (list, targetEl, type = 'audio') => {
@@ -4453,20 +4488,20 @@ const renderPresetList = (list, targetEl, type = 'audio') => {
 const renderPresetLibrary = () => {
   if (!presetAudioListEl || !presetSessionListEl) return;
 
-  const filteredAudio = filterPresets(presetLibraryState.audio);
-  const filteredSessions = filterPresets(presetLibraryState.sessions);
+  const filteredAudio = filterPresets(presetLibraryState.audio, { type: 'audio' });
+  const filteredSessions = filterPresets(presetLibraryState.sessions, { type: 'sessions' });
   presetDebug('Rendering preset lists', {
     tab: presetLibraryState.activeTab,
     filter: presetLibraryState.filter,
-    audioFiltered: filteredAudio.length,
-    sessionsFiltered: filteredSessions.length,
+    audioFiltered: filteredAudio.items.length,
+    sessionsFiltered: filteredSessions.items.length,
   });
   if (presetSearchInput && presetSearchInput.value !== presetLibraryState.filter) {
     presetSearchInput.value = presetLibraryState.filter;
   }
 
-  renderPresetList(filteredAudio, presetAudioListEl, 'audio');
-  renderPresetList(filteredSessions, presetSessionListEl, 'sessions');
+  renderPresetList(filteredAudio.items, presetAudioListEl, 'audio');
+  renderPresetList(filteredSessions.items, presetSessionListEl, 'sessions');
 
   if (presetLibraryState.activeTab === 'audio') {
     presetAudioListEl.classList.remove('hidden');

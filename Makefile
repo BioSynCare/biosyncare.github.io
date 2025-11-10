@@ -178,6 +178,12 @@ rdf-webvowl: rdf-webvowl-setup rdf-webvowl-jar
 	@echo "Generating VOWL JSON for bsc-owl.ttl and sso-ontology.ttl (Java required)..."
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/core/bsc-owl.ttl -echo > rdf/docs/webvowl/bsc.json || true
 	java -jar scripts/rdf/tools/owl2vowl.jar -file rdf/external/sso/sso-ontology.ttl -echo > rdf/docs/webvowl/sso.json || true
+	@echo "Static viewer available at rdf/docs/webvowl/static.html (uses pre-converted JSON)."
+
+.PHONY: rdf-webvowl-static
+rdf-webvowl-static: rdf-webvowl
+	@echo "Open ./rdf/docs/webvowl/static.html in browser (GitHub Pages path: /rdf/docs/webvowl/static.html)."
+	@echo "Upload/IRI features disabled for serverless mode; only pre-converted JSONs load."
 
 rdf-webvowl-jar:
 	@if [ ! -s scripts/rdf/tools/owl2vowl.jar ]; then \

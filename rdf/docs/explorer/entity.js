@@ -141,7 +141,8 @@ async function main() {
 
   // External links
   const webvowl = document.getElementById('webvowlLink');
-  webvowl.href = '../webvowl/app/index.html#iri=' + encodeURIComponent(uri);
+  // Serverless mode: load pre-converted VOWL JSON instead of trying remote conversion
+  webvowl.href = '../webvowl/app/index.html#url=../bsc.json';
   const pylode = document.getElementById('pylodeLink');
   pylode.href = '../pylode/';
 }

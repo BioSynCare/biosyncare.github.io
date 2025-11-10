@@ -11,6 +11,11 @@ const DEFAULT_PRESET_META = Object.freeze({
   tags: [],
 });
 
+function normalizeToken(value) {
+  if (!value) return null;
+  return String(value).trim().toLowerCase();
+}
+
 function toDateISOString(value) {
   if (!value) return null;
   if (typeof value.toDate === 'function') {
@@ -56,6 +61,22 @@ function describeOwnerLabel(user) {
   return 'Anonymous';
 }
 
+function buildOwnerSearchTokens({ ownerLabel, ownerEmail, createdBy }) {
+  const tokens = [];
+  const normalizedEmail = normalizeToken(ownerEmail);
+  const normalizedLabel = normalizeToken(ownerLabel);
+  if (normalizedEmail) {
+    tokens.push(normalizedEmail, `email:${normalizedEmail}`);
+  }
+  if (normalizedLabel) {
+    tokens.push(normalizedLabel, `owner:${normalizedLabel}`);
+  }
+  if (createdBy) {
+    tokens.push(`uid:${createdBy}`);
+  }
+  return tokens;
+}
+
 function getCollectionName(type) {
   return COLLECTIONS[type] || COLLECTIONS.sessions;
 }
@@ -92,6 +113,7 @@ function normalizeAudioPreset(docId, data = {}) {
     metadata: data.metadata || {},
     visibility: data.visibility || DEFAULT_PRESET_META.visibility,
     basePresetId,
+    searchTokens: Array.isArray(data.searchTokens) ? data.searchTokens : [],
   };
 }
 
@@ -121,6 +143,7 @@ function normalizeSessionPreset(docId, data = {}) {
     },
     metadata: data.metadata || {},
     visibility: data.visibility || DEFAULT_PRESET_META.visibility,
+    searchTokens: Array.isArray(data.searchTokens) ? data.searchTokens : [],
   };
 }
 
@@ -173,6 +196,15 @@ function buildPresetPayload(type, preset, folderId) {
     ownerEmail: ownerMeta.ownerEmail || null,
     metadata,
   };
+  const searchTokenSet = new Set([
+    ...(preset.searchTokens || []),
+    ...buildOwnerSearchTokens({
+      ownerLabel: baseMeta.ownerLabel,
+      ownerEmail: baseMeta.ownerEmail,
+      createdBy: baseMeta.createdBy,
+    }),
+  ]);
+  baseMeta.searchTokens = Array.from(searchTokenSet);
 
   if (type === 'audio') {
     return {
