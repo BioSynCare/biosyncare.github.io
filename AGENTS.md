@@ -98,7 +98,7 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
 ## Interfaces between agents
 
 - Web ⇄ RDF/ONT
-  - RDF produces artifacts in `rdf/**`, docs in `rdf/docs/**` (pyLODE, Ontospy, WebVOWL). Web only links/consumes.
+  - RDF produces artifacts in `rdf/**`, docs in `rdf/docs/**` (pyLODE, Ontospy). Web only links/consumes.
   - If web needs a new RDF export, open an issue/PR tagged `[rdf]` describing the shape/location.
 
 - Web Presets ⇄ Music
@@ -117,7 +117,7 @@ Did: <one-liner>. Next: <one-liner>. Issues: <optional>.
 
 - Web Presets: preset load/save (URL, Firebase, Music JSON) works locally (`make serve`); schema validated/sanitized; includes a Handoff note.
 - Web Core: feature works locally (`make serve`), no console errors, basic accessibility, and a Handoff note; does not modify `src/presets/**`.
-- RDF/ONT: `make rdf-validate` passes, docs generated (`make rdf-docs`), JSONs for WebVOWL updated (`make rdf-webvowl`), and a Handoff note.
+- RDF/ONT: `make rdf-validate` passes and docs generated (`make rdf-docs`), with a Handoff note.
 - Music: scripts run with a clean venv, outputs written under `scripts/music/output/`, readme updated if data shape changes, and a Handoff note.
 - Agent master: governance docs and instruction files improved; helpers added to Makefile if needed; Handoff note explains changes and intended usage.
 - Git master: repository status is clean; quick checks pass (lint/validate); commits are informative; Handoff note lists follow-ups per agent.

@@ -140,9 +140,7 @@ async function main() {
   addCommentBtn.addEventListener('click', async () => { const txt=(commentInputEl.value||'').trim(); if(!txt) return; await addComment(uri, txt, null); commentInputEl.value=''; });
 
   // External links
-  const webvowl = document.getElementById('webvowlLink');
-  // Serverless mode: load pre-converted VOWL JSON instead of trying remote conversion
-  webvowl.href = '../webvowl/app/index.html#url=../bsc.json';
+  // WebVOWL removed; legacy link element ignored if present
   const pylode = document.getElementById('pylodeLink');
   pylode.href = '../pylode/';
 }

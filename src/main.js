@@ -179,6 +179,17 @@ const presetLibraryState = {
 };
 let presetFilterArmed = false;
 
+const applyDefaultOwnerPresetFilter = () => {
+  if (presetFilterArmed) return false;
+  if ((presetLibraryState.filter || '').trim()) return false;
+  const user = authState.currentUser;
+  if (!user) return false;
+  presetLibraryState.filter = 'owner:me';
+  presetFilterArmed = true;
+  presetDebug('Preset filter auto-applied', { reason: 'owner_default' });
+  return true;
+};
+
 // Martigli/Breathing Controller - Global shared breathing oscillation
 const martigliController = {
   DEBUG: false,
@@ -4487,6 +4498,7 @@ const renderPresetList = (list, targetEl, type = 'audio') => {
 
 const renderPresetLibrary = () => {
   if (!presetAudioListEl || !presetSessionListEl) return;
+  applyDefaultOwnerPresetFilter();
 
   const filteredAudio = filterPresets(presetLibraryState.audio, { type: 'audio' });
   const filteredSessions = filterPresets(presetLibraryState.sessions, { type: 'sessions' });
@@ -5458,11 +5470,13 @@ audioMenu.addEventListener('change', () => {
 visualMenu.addEventListener('change', updateVisualDescription);
 
 presetSearchInput?.addEventListener('input', (event) => {
+  presetFilterArmed = true;
   presetLibraryState.filter = event.target.value || '';
   renderPresetLibrary();
 });
 
 btnClearPresetFilter?.addEventListener('click', () => {
+  presetFilterArmed = true;
   presetLibraryState.filter = '';
   if (presetSearchInput) {
     presetSearchInput.value = '';

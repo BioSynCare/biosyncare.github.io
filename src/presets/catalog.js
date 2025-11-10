@@ -1,79 +1,5 @@
 import { fetchFirebasePresets } from './firebase-adapter.js';
 
-const FALLBACK_AUDIO_PRESETS = [
-  {
-    id: 'sine',
-    label: 'Pure sine • 440Hz',
-    folderId: 'core',
-    visibility: 'public',
-    defaults: {
-      frequency: 440,
-      gain: 0.2,
-      pan: 0,
-    },
-  },
-  {
-    id: 'binaural',
-    label: 'Binaural beat • Alpha 10Hz',
-    folderId: 'core',
-    visibility: 'public',
-    defaults: {
-      frequencyMode: 'carrier-beat',
-      base: 200,
-      beat: 10,
-      gain: 0.25,
-    },
-  },
-  {
-    id: 'monaural',
-    label: 'Monaural beat • Theta 6Hz',
-    folderId: 'core',
-    visibility: 'public',
-    defaults: {
-      base: 210,
-      beat: 6,
-      gain: 0.3,
-    },
-  },
-  {
-    id: 'isochronic',
-    label: 'Isochronic pulse • 12Hz breathing',
-    folderId: 'core',
-    visibility: 'public',
-    defaults: {
-      freq: 180,
-      pulseFreq: 12,
-      gain: 0.22,
-    },
-  },
-  {
-    id: 'martigli',
-    label: 'Martigli harmonics',
-    folderId: 'core',
-    visibility: 'public',
-    defaults: {
-      fundamental: 220,
-      gain: 0.14,
-    },
-  },
-  { id: 'noise-white', label: 'Noise • White spectrum', folderId: 'core', defaults: { gain: 0.18 } },
-  { id: 'noise-pink', label: 'Noise • Pink spectrum', folderId: 'core', defaults: { gain: 0.18 } },
-  { id: 'noise-brown', label: 'Noise • Brown spectrum', folderId: 'core', defaults: { gain: 0.22 } },
-];
-
-const FALLBACK_SESSION_PRESETS = [
-  {
-    id: 'alpha_relax_15m',
-    label: 'Alpha Relaxation • 15 min',
-    folderId: 'core',
-    visibility: 'public',
-    description: 'Binaural alpha driver with Martigli harmonics and pink noise bed.',
-    voices: [],
-    symmetryTrack: { enabled: false },
-    scheduling: { type: 'one-shot', startUtc: null },
-  },
-];
-
 let audioPresetsData = null;
 let sessionPresetsData = null;
 let loadPromise = null;
@@ -156,12 +82,12 @@ async function loadData() {
   ]);
 
   if (!audio.presets || !audio.presets.length) {
-    console.warn('[Presets] Local audio preset catalog missing; using fallback.');
-    audio.presets = FALLBACK_AUDIO_PRESETS;
+    console.warn('[Presets] Local audio preset catalog missing; no bundled presets available.');
+    audio.presets = [];
   }
   if (!sessions.sessions || !sessions.sessions.length) {
-    console.warn('[Presets] Local session preset catalog missing; using fallback.');
-    sessions.sessions = FALLBACK_SESSION_PRESETS;
+    console.warn('[Presets] Local session preset catalog missing; no bundled presets available.');
+    sessions.sessions = [];
   }
 
   audioPresetsData = audio;
